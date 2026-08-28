@@ -51,7 +51,7 @@ const AU_TASKS: Task[] = [
     tag: "출국 전 · 필수",
     body:
       "비자 조건 8501에 따라 체류 기간 전체를 덮는 적정한 건강보험을 유지해야 합니다. 분실과 취소를 주로 보장하는 일반 여행자보험으로는 이 조건을 충족하지 못하며 OVHC 같은 건강보험이 필요합니다.",
-    items: ["체류 기간 전체 보장", "OVHC 등 건강보험", "증서 저장"],
+    items: ["체류 기간 전체 보장", "OVHC 등 건강보험", "가입 증서 보관"],
     done: false,
     sourceUrl:
       "https://immi.homeaffairs.gov.au/help-support/meeting-our-requirements/health/adequate-health-insurance",
@@ -214,7 +214,7 @@ export const GUIDE_BY_COUNTRY: Record<CountryCode, Record<GuideSituation, GuideI
         points: [
           "OVHC 같은 건강보험 상품을 고릅니다",
           "체류 기간 전체를 덮는지 확인합니다",
-          "증서는 문서 탭에 저장해 둡니다",
+          "가입 증서는 입국 심사에서 보여줄 수 있게 준비해 둡니다",
         ],
         sourceUrl:
           "https://immi.homeaffairs.gov.au/help-support/meeting-our-requirements/health/adequate-health-insurance",

@@ -200,10 +200,25 @@ export function useWabiApp() {
     setAvatarUrl(dataUrl);
   }
 
-  function clearAvatar() {
-    if (!window.confirm("프로필 사진을 지울까요?")) return;
+  /**
+   * discussion.md 30.2절: window.confirm(브라우저 기본 대화상자, 토큰·서체·화면 모드를 안 따름)
+   * 대신 27.2절과 같은 방식(pending 상태 + 셸 레벨 ConfirmSheet)을 쓴다. 실제 삭제(clearAvatar
+   * 자리)는 확정 시에만 한다.
+   */
+  const [pendingAvatarClear, setPendingAvatarClear] = useState(false);
+
+  function requestClearAvatar() {
+    setPendingAvatarClear(true);
+  }
+
+  function cancelClearAvatar() {
+    setPendingAvatarClear(false);
+  }
+
+  function confirmClearAvatar() {
     clearStoredAvatar();
     setAvatarUrl(null);
+    setPendingAvatarClear(false);
   }
 
   useEffect(() => {
@@ -518,12 +533,27 @@ export function useWabiApp() {
   }
 
   /**
-   * discussion.md 16.3절: 삭제는 목록 행에서, 확인을 한 번 받는다.
-   * discussion.md 24.1절: 삭제 저장이 실패하면 화면 목록을 바꾸지 않는다 — 실제로는 남아
-   * 있는데 지워진 것처럼 보이면 안 된다.
+   * discussion.md 30.2절: window.confirm 대신 27.2절과 같은 방식(pending 상태 + 셸 레벨
+   * ConfirmSheet)을 쓴다. 홈 우측 패널(NotesPanel)과 메모 탭(NotesScreen) 두 곳에서 모두
+   * 이 하나의 pending 상태·시트를 공유한다.
    */
-  function deleteNote(id: string) {
-    if (!window.confirm("메모를 삭제할까요?")) return;
+  const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState<string | null>(null);
+
+  function requestDeleteNote(id: string) {
+    setPendingDeleteNoteId(id);
+  }
+
+  function cancelDeleteNote() {
+    setPendingDeleteNoteId(null);
+  }
+
+  /**
+   * discussion.md 24.1절: 삭제 저장이 실패하면 화면 목록을 바꾸지 않고 시트도 닫지 않는다 —
+   * 실제로는 남아 있는데 지워진 것처럼 보이면 안 된다.
+   */
+  function confirmDeleteNote() {
+    if (!pendingDeleteNoteId) return;
+    const id = pendingDeleteNoteId;
     const next = notes.filter((n) => n.id !== id);
 
     if (!writeStoredNotes(next)) {
@@ -533,6 +563,7 @@ export function useWabiApp() {
 
     setNotes(next);
     if (editingNoteId === id) closeNoteEditor();
+    setPendingDeleteNoteId(null);
   }
 
   /**
@@ -571,7 +602,10 @@ export function useWabiApp() {
     setDepartureDate,
     avatarUrl,
     updateAvatar,
-    clearAvatar,
+    pendingAvatarClear,
+    requestClearAvatar,
+    cancelClearAvatar,
+    confirmClearAvatar,
 
     allTasks,
     total,
@@ -640,6 +674,9 @@ export function useWabiApp() {
     closeNoteEditor,
     saveNote,
     quickAddNote,
-    deleteNote,
+    pendingDeleteNoteId,
+    requestDeleteNote,
+    cancelDeleteNote,
+    confirmDeleteNote,
   };
 }

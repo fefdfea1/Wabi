@@ -77,7 +77,7 @@ export function WabiApp() {
             notes={wabi.notes}
             onOpenAdd={wabi.openAddNote}
             onOpenEdit={wabi.openEditNote}
-            onDelete={wabi.deleteNote}
+            onDelete={wabi.requestDeleteNote}
           />
         ) : null}
 
@@ -95,7 +95,7 @@ export function WabiApp() {
             onDepartureDateChange={wabi.setDepartureDate}
             avatarUrl={wabi.avatarUrl}
             onAvatarChange={wabi.updateAvatar}
-            onAvatarClear={wabi.clearAvatar}
+            onAvatarClear={wabi.requestClearAvatar}
           />
         ) : null}
       </main>
@@ -105,7 +105,7 @@ export function WabiApp() {
         notes={wabi.notes}
         onQuickAdd={wabi.quickAddNote}
         onOpenEdit={wabi.openEditNote}
-        onDelete={wabi.deleteNote}
+        onDelete={wabi.requestDeleteNote}
         footer={
           <button type="button" className={styles.panelPainCard} onClick={wabi.openPain}>
             <span className={styles.panelPainTitle}>먼저 간 사람들이 힘들어한 것</span>
@@ -209,6 +209,31 @@ export function WabiApp() {
           confirmLabel="삭제하기"
           onConfirm={wabi.confirmDeleteTask}
           onClose={wabi.cancelDeleteTask}
+        />
+      ) : null}
+
+      {/* discussion.md 30.2절: window.confirm 대신 ConfirmSheet로 통일한다 — 홈 우측 패널·
+          메모 탭 두 곳에서 모두 이 하나의 pending 상태·시트를 공유한다. */}
+      {wabi.pendingDeleteNoteId ? (
+        <ConfirmSheet
+          titleId="note-delete-confirm-title"
+          title="이 메모를 삭제할까요?"
+          description="삭제하면 되돌릴 수 없습니다."
+          confirmLabel="삭제하기"
+          onConfirm={wabi.confirmDeleteNote}
+          onClose={wabi.cancelDeleteNote}
+        />
+      ) : null}
+
+      {/* discussion.md 30.2절: 프로필 사진 삭제도 같은 방식으로 옮긴다. */}
+      {wabi.pendingAvatarClear ? (
+        <ConfirmSheet
+          titleId="avatar-clear-confirm-title"
+          title="프로필 사진을 삭제할까요?"
+          description="삭제하면 되돌릴 수 없습니다."
+          confirmLabel="삭제하기"
+          onConfirm={wabi.confirmClearAvatar}
+          onClose={wabi.cancelClearAvatar}
         />
       ) : null}
     </div>

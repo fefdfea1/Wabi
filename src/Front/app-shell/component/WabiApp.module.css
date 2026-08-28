@@ -68,3 +68,41 @@
     margin: 0 auto;
   }
 }
+
+/* discussion.md 43절: 본문 맨 아래 제보처. 읽는 흐름을 끊지 않도록 위쪽 여백을 크게 두고,
+   본문보다 옅은 색(--muted)으로 물러나 있게 한다. 42.2절에서 --muted가 세 배경 위 모두
+   4.5:1을 넘도록 맞췄으므로 옅어도 읽을 수 있다. */
+.feedback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 40px;
+  padding: 24px 0 8px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.feedbackText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* 최소 44px 높이를 확보해 손가락으로도 누를 수 있게 한다(42.3절과 같은 이유). */
+.feedbackMail {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+  font-size: 13.5px;
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .feedbackMail:hover {
+    color: var(--strong);
+  }
+}

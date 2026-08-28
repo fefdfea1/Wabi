@@ -96,6 +96,15 @@ export function WabiApp() {
             onAvatarClear={wabi.requestClearAvatar}
           />
         ) : null}
+
+        {/* discussion.md 43절: 베타 기간 동안 본문 맨 아래에 제보처를 둔다. 네 탭 모두에서
+            보여야 하므로 각 화면이 아니라 본문 컨테이너 끝에 놓는다. */}
+        <footer className={styles.feedback}>
+          <p className={styles.feedbackText}>버그 제보나 개선 사항 요청을 기다립니다.</p>
+          <a className={styles.feedbackMail} href="mailto:fefdfeas@gmail.com">
+            fefdfeas@gmail.com
+          </a>
+        </footer>
       </main>
 
       <NotesPanel

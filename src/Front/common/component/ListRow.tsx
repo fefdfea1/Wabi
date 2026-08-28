@@ -2,7 +2,8 @@ import styles from "./ListRow.module.css";
 
 export interface ListRowProps {
   title: string;
-  meta: string;
+  /** discussion.md 22.2절: 마감 표시 전용. 없으면(기본 제공 할 일 중 마감일이 없는 것) 이 자리를 비운다. */
+  meta?: string;
   done: boolean;
   urgent: boolean;
   onToggle: () => void;
@@ -43,7 +44,7 @@ export function ListRow({ title, meta, done, urgent, onToggle, onOpen }: ListRow
       <button type="button" className={styles.body} onClick={onOpen}>
         <span className={styles.texts}>
           <span className={titleClassName}>{title}</span>
-          <span className={metaClassName}>{meta}</span>
+          {meta ? <span className={metaClassName}>{meta}</span> : null}
         </span>
         {!done ? (
           <span className={styles.chevron} aria-hidden="true">

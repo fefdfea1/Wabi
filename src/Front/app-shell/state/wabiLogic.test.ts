@@ -14,7 +14,15 @@
 
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { computeDDay, computeVisaExpiry, deriveDueDisplay, firstSentence, formatDDay, pickNextTask } from "./wabiLogic.ts";
+import {
+  computeDDay,
+  computeVisaExpiry,
+  deriveDueDisplay,
+  firstSentence,
+  formatDDay,
+  pickNextTask,
+  sortTasksForDisplay,
+} from "./wabiLogic.ts";
 import type { Task } from "../../common/types/domain.ts";
 
 const REQUIRED_TIMEZONES = ["Asia/Seoul", "UTC", "America/Toronto"];
@@ -127,6 +135,37 @@ function runAssertions(): number {
   check("pickNextTask: 첫 미완료 항목", pickNextTask(tasks, { a: true })?.id, "b");
   check("pickNextTask: 모두 완료면 첫 항목 폴백", pickNextTask(tasks, { a: true, b: true })?.id, "a");
   check("pickNextTask: 빈 목록이면 null", pickNextTask([], {}), null);
+
+  // --- sortTasksForDisplay (discussion.md 21.3절, 시간대 무관) ---
+  function task(id: string, createdAt?: string): Task {
+    return { id, phase: "pre", title: id, meta: "", week: false, urgent: false, tag: "", body: "", items: [], done: false, createdAt };
+  }
+  const builtinA = task("builtin-a");
+  const builtinB = task("builtin-b");
+  const customOld = task("custom-old", "2026-08-01T00:00:00.000Z");
+  const customNew = task("custom-new", "2026-08-27T00:00:00.000Z");
+  const customNoCreatedAt = task("custom-broken");
+
+  check(
+    "sortTasksForDisplay: 직접 추가한 할 일이 기본 제공보다 위",
+    sortTasksForDisplay([builtinA, builtinB], [customOld]).map((t) => t.id),
+    ["custom-old", "builtin-a", "builtin-b"],
+  );
+  check(
+    "sortTasksForDisplay: 직접 추가한 것끼리는 createdAt 내림차순(최근이 위)",
+    sortTasksForDisplay([builtinA], [customOld, customNew]).map((t) => t.id),
+    ["custom-new", "custom-old", "builtin-a"],
+  );
+  check(
+    "sortTasksForDisplay: 기본 제공 할 일의 순서는 그대로 유지",
+    sortTasksForDisplay([builtinB, builtinA], []).map((t) => t.id),
+    ["builtin-b", "builtin-a"],
+  );
+  check(
+    "sortTasksForDisplay: createdAt 없는 직접 추가 항목은 가장 오래된 것으로 취급되지만 버려지지 않음",
+    sortTasksForDisplay([builtinA], [customNew, customNoCreatedAt, customOld]).map((t) => t.id),
+    ["custom-new", "custom-old", "custom-broken", "builtin-a"],
+  );
 
   // --- firstSentence (시간대 무관) ---
   check("firstSentence: 마침표 기준 첫 문장", firstSentence("첫 문장입니다. 둘째 문장."), "첫 문장입니다.");

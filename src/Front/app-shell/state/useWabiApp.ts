@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { COUNTRIES, GUIDE_BY_COUNTRY, PAIN_BY_COUNTRY, TASKS_BY_COUNTRY } from "@/Front/common/data/tasks";
 import { formatDateOnly, formatKoreanDate } from "@/Front/common/date/localDate";
 import { clearStoredAvatar, processAvatarFile, readStoredAvatar, writeStoredAvatar } from "@/Front/common/storage/avatar";
+import { readStoredCustomTasks, writeStoredCustomTasks } from "@/Front/common/storage/customTasks";
 import { readStoredDepartureDate, writeStoredDepartureDate } from "@/Front/common/storage/departureDate";
 import { readStoredNotes, writeStoredNotes } from "@/Front/common/storage/notes";
 import type {
@@ -15,7 +16,7 @@ import type {
   TabId,
   TaskPhase,
 } from "@/Front/common/types/domain";
-import { computeDDay, computeVisaExpiry, deriveDueDisplay, firstSentence, pickNextTask } from "./wabiLogic";
+import { computeDDay, computeVisaExpiry, deriveDueDisplay, firstSentence, pickNextTask, sortTasksForDisplay } from "./wabiLogic";
 
 export type SheetKind = "guide" | "pain" | "addTask" | "noteEditor" | "countryPicker" | null;
 
@@ -30,15 +31,15 @@ function emptyByCountry<T>(): Record<CountryCode, T[]> {
   return result;
 }
 
-/** 국가별 할 일 중 데이터에 done:true로 미리 표시된 것만 완료 상태로 시드한다(국가별로 분리 보관). */
-function seedDone(): Record<CountryCode, Record<string, boolean>> {
+/**
+ * discussion.md 23.1절: 조사한 할 일이 더 이상 목록의 초기값이 아니라 추천 원본일 뿐이라, 완료
+ * 상태도 더 이상 조사 데이터에서 미리 시드하지 않는다 — 이용자가 추천에서 고르거나 직접 적어야
+ * 비로소 그 할 일이 생기고, done은 그 뒤에 이용자가 직접 토글해야만 켜진다.
+ */
+function emptyDoneByCountry(): Record<CountryCode, Record<string, boolean>> {
   const result = {} as Record<CountryCode, Record<string, boolean>>;
   COUNTRIES.forEach((c) => {
-    const map: Record<string, boolean> = {};
-    (TASKS_BY_COUNTRY[c.code] ?? []).forEach((task) => {
-      if (task.done) map[task.id] = true;
-    });
-    result[c.code] = map;
+    result[c.code] = {};
   });
   return result;
 }
@@ -56,9 +57,15 @@ export function useWabiApp() {
   const [tab, setTab] = useState<TabId>("home");
   const [phase, setPhase] = useState<TaskPhase>("pre");
   const [countryCode, setCountryCode] = useState<CountryCode | null>(COUNTRIES[0]?.code ?? null);
-  const [done, setDone] = useState<Record<CountryCode, Record<string, boolean>>>(seedDone);
+  const [done, setDone] = useState<Record<CountryCode, Record<string, boolean>>>(emptyDoneByCountry);
+  // discussion.md 21.1절: 직접 추가한 할 일(localStorage, notes와 같은 자리). 초기값은 항상
+  // 빈 Record(서버·최초 클라이언트 렌더가 같아 안전)이고, 실제 값은 마운트 후 읽어온다.
   const [customTasks, setCustomTasks] = useState<Record<CountryCode, Task[]>>(emptyByCountry<Task>);
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCustomTasks((prev) => ({ ...prev, ...readStoredCustomTasks() }));
+  }, []);
 
   // 메모(localStorage) — discussion.md 16절. 초기값은 항상 빈 배열(서버·최초 클라이언트 렌더가
   // 같아 안전)이고, 실제 목록은 마운트 후 localStorage에서 읽어온다.
@@ -101,31 +108,45 @@ export function useWabiApp() {
 
   const country = COUNTRIES.find((c) => c.code === countryCode) ?? null;
 
+  // discussion.md 23.1절/23.5절: TASKS_BY_COUNTRY(조사 데이터)는 지우지 않지만 더 이상 목록의
+  // 초기값이 아니다 — 아래 recommendedTasks(할 일 추가 시트의 추천)의 원본으로만 쓰인다.
   const countryTasks = countryCode ? (TASKS_BY_COUNTRY[countryCode] ?? []) : [];
   const countryCustomTasks = countryCode ? (customTasks[countryCode] ?? []) : [];
   const countryDone = countryCode ? (done[countryCode] ?? {}) : {};
   const countryGuideAll = countryCode ? (GUIDE_BY_COUNTRY[countryCode] ?? { pre: [], post: [] }) : { pre: [], post: [] };
   const countryPain = countryCode ? (PAIN_BY_COUNTRY[countryCode] ?? []) : [];
 
-  // discussion.md 19.3절: dueDate가 있는 할 일(달력으로 직접 고른 마감)은 저장된 meta/urgent/week를
-  // 그대로 쓰지 않고 today 기준으로 매번 다시 계산한다 — 그렇지 않으면 "3일 남음" 같은 문구가
-  // 날짜가 지나도 그대로 굳어버린다(P-06과 같은 함정). dueDate가 없는 할 일은 그대로 둔다.
+  // discussion.md 23.1절: 할 일 목록은 이제 이용자가 추천에서 고르거나 직접 적은 것(customTasks)
+  // 뿐이다 — 조사 데이터(countryTasks)는 더 이상 여기 섞이지 않는다. discussion.md 19.3절:
+  // dueDate가 있는 할 일(달력으로 직접 고른 마감)은 저장된 meta/urgent/week를 그대로 쓰지 않고
+  // today 기준으로 매번 다시 계산한다 — 그렇지 않으면 "3일 남음" 같은 문구가 날짜가 지나도
+  // 그대로 굳어버린다(P-06과 같은 함정). dueDate가 없는 할 일은 그대로 둔다.
   const allTasks = useMemo(() => {
-    const merged = countryTasks.concat(countryCustomTasks);
-    if (!today) return merged;
-    return merged.map((task) => {
+    if (!today) return countryCustomTasks;
+    return countryCustomTasks.map((task) => {
       if (!task.dueDate) return task;
       const derived = deriveDueDisplay(task.dueDate, today);
       return derived ? { ...task, ...derived } : task;
     });
-  }, [countryTasks, countryCustomTasks, today]);
+  }, [countryCustomTasks, today]);
   const total = allTasks.length;
   const doneCount = allTasks.filter((task) => countryDone[task.id]).length;
-  const phaseTasks = allTasks.filter((task) => task.phase === phase);
-  const phaseDoneCount = phaseTasks.filter((task) => countryDone[task.id]).length;
+  const phaseTasksUnsorted = allTasks.filter((task) => task.phase === phase);
+  const phaseDoneCount = phaseTasksUnsorted.filter((task) => countryDone[task.id]).length;
+  // discussion.md 21.3절: 이제 목록 전체가 이용자가 넣은 것이라 기본 제공/직접 추가 구분이
+  // 필요 없어졌다 — createdAt 내림차순으로만 정렬한다(sortTasksForDisplay에 빈 builtin 배열을
+  // 넘겨 재사용한다).
+  const phaseTasks = sortTasksForDisplay([], phaseTasksUnsorted);
   const weekTasks = allTasks.filter((task) => task.week);
   const nextTask = pickNextTask(allTasks, countryDone);
   const nextDescription = nextTask ? firstSentence(nextTask.body) : "";
+
+  // discussion.md 23.2절: 할 일 추가 시트의 추천. 시트에 이미 있는 phase 선택(addTaskPhase)에
+  // 맞고, 현재 국가의 것이며, 이미 내 목록에 있는(같은 id) 항목은 감춘다 — id는 원본 그대로
+  // 쓰므로(23.3절) 이 id 비교가 "이미 골랐는지" 판별 기준이 된다.
+  const recommendedTasks = countryTasks.filter(
+    (task) => task.phase === addTaskPhase && !countryCustomTasks.some((custom) => custom.id === task.id),
+  );
 
   // discussion.md 10.3절: 오늘 날짜는 반드시 client effect 안에서만 계산한다. 이 라우트는
   // 정적 프리렌더 대상이라 렌더 중에 new Date()를 쓰면 빌드 시점 날짜로 고정되고
@@ -195,6 +216,10 @@ export function useWabiApp() {
 
   const detailTask = detailTaskId ? (allTasks.find((task) => task.id === detailTaskId) ?? null) : null;
   const detailDone = detailTask ? !!countryDone[detailTask.id] : false;
+  // discussion.md 21.4절: 삭제 버튼은 직접 추가한 할 일에만 보인다. countryCustomTasks(정렬 전
+  // 원본)에 id가 있는지로 판별한다 — createdAt 필드 유무로 추측하지 않는다(손상된 레코드는
+  // createdAt이 없어도 여전히 직접 추가한 항목이다, 21.2절).
+  const detailIsCustom = detailTask ? countryCustomTasks.some((task) => task.id === detailTask.id) : false;
 
   const guideQuestions = countryGuideAll[guideSituation];
   const guideAnswer = guideQuestionId
@@ -297,13 +322,68 @@ export function useWabiApp() {
       items: [],
       done: false,
       dueDate: dueDisplay ? addTaskDueDate : undefined,
+      // discussion.md 21.2절/21.3절: 정렬 전용(화면에는 표시하지 않는다) — 목록 화면에서 직접
+      // 추가한 할 일을 최근 만든 순으로 위에 올리는 데 쓴다.
+      createdAt: new Date().toISOString(),
     };
 
-    setCustomTasks((prev) => ({ ...prev, [code]: (prev[code] ?? []).concat(newTask) }));
+    setCustomTasks((prev) => {
+      const next = { ...prev, [code]: (prev[code] ?? []).concat(newTask) };
+      writeStoredCustomTasks(next);
+      return next;
+    });
     setPhase(addTaskPhase);
     setSheet(null);
     setAddTaskTitle("");
     setAddTaskDueDate("");
+  }
+
+  /**
+   * discussion.md 23.3절: 추천에서 하나를 고르면 조사된 title·body·items·sourceUrl·tag·phase를
+   * 그대로 복사해 이용자의 할 일이 된다 — 출처 링크가 따라와야 상세에서 근거를 볼 수 있다.
+   * meta·week·urgent는 넣지 않는다(22절, 마감을 함께 고를 때만 계산해 붙인다). id는 원본 id를
+   * 그대로 써서 이미 추가했는지 판별하는 기준(recommendedTasks에서 감추기)이 된다. 저장은
+   * 21절과 같은 wabi:custom-tasks다. 시트는 닫지 않는다 — 여러 개를 이어서 고를 수 있어야 한다
+   * (23.6절: 추천을 전부 추가하면 추천 영역이 사라진다).
+   */
+  function pickRecommendedTask(source: Task) {
+    if (!countryCode) return;
+    const code = countryCode;
+    const newTask: Task = {
+      id: source.id,
+      phase: source.phase,
+      title: source.title,
+      tag: source.tag,
+      body: source.body,
+      items: source.items,
+      done: false,
+      sourceUrl: source.sourceUrl,
+      createdAt: new Date().toISOString(),
+    };
+
+    setCustomTasks((prev) => {
+      const next = { ...prev, [code]: (prev[code] ?? []).concat(newTask) };
+      writeStoredCustomTasks(next);
+      return next;
+    });
+    setPhase(addTaskPhase);
+  }
+
+  /**
+   * discussion.md 21.4절: 직접 추가한 할 일만 삭제 대상이다(TaskDetailScreen이 isCustom일
+   * 때만 삭제 버튼·확인 시트를 보여주므로 여기서는 별도 방어 없이 detailTask를 그대로 쓴다).
+   * 삭제 후에는 상세 화면을 닫고 목록으로 돌아온다 — 사라진 항목의 상세에 남아 있으면 안 된다.
+   */
+  function deleteTask() {
+    if (!detailTask || !countryCode) return;
+    const code = countryCode;
+    const id = detailTask.id;
+    setCustomTasks((prev) => {
+      const next = { ...prev, [code]: (prev[code] ?? []).filter((task) => task.id !== id) };
+      writeStoredCustomTasks(next);
+      return next;
+    });
+    setDetailTaskId(null);
   }
 
   /** discussion.md 16.3절: 새 메모 추가 — 편집 대상 없이 빈 본문으로 시트를 연다. */
@@ -425,10 +505,12 @@ export function useWabiApp() {
 
     detailTask,
     detailDone,
+    detailIsCustom,
     openDetail,
     closeDetail,
     completeDetail,
     undoDetail,
+    deleteTask,
 
     sheet,
     openGuide,
@@ -460,6 +542,8 @@ export function useWabiApp() {
     addTaskDueDate,
     setAddTaskDueDate,
     todayIso,
+    recommendedTasks,
+    pickRecommendedTask,
     submitAddTask,
 
     notes: sortedNotes,

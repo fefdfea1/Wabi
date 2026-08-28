@@ -65,6 +65,25 @@ export function deriveDueDisplay(
 }
 
 /**
+ * discussion.md 21.3절: 할 일 목록 화면 전용 정렬. 직접 추가한 할 일이 기본 제공 할 일보다
+ * 위에 오고, 직접 추가한 것끼리는 createdAt 내림차순(가장 최근에 만든 것이 맨 위)이다. 기본
+ * 제공 할 일의 순서는 조사해서 넣은 준비 순서이므로 그대로 둔다(builtinTasks를 재정렬하지 않고
+ * 뒤에 그대로 이어붙인다).
+ *
+ * builtin/custom을 필드 값으로 추측하지 않고 호출부가 이미 알고 있는 두 배열로 나눠 받는다 —
+ * createdAt이 없는 직접 추가 항목(손상된 레코드)도 있을 수 있어(21.2절) 필드만으로는 구분이
+ * 모호하다. 그런 항목은 ''(가장 작은 문자열)로 취급돼 정렬에서 가장 오래된 것으로 밀리되,
+ * custom 목록에는 그대로 남아 builtin보다는 위에 온다.
+ *
+ * pickNextTask(다음 할 일 카드)·완료 개수 계산에는 이 함수의 결과를 넘기면 안 된다 — 그쪽은
+ * 마감일·긴급도로 고르는 별개 규칙이라 원래 순서를 그대로 써야 한다.
+ */
+export function sortTasksForDisplay(builtinTasks: Task[], customTasks: Task[]): Task[] {
+  const sortedCustom = [...customTasks].sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+  return sortedCustom.concat(builtinTasks);
+}
+
+/**
  * 비자 만료일 = 출국일 + 국가별 체류 허용 기간(일). 두 값 모두 고정된 입력이라
  * "오늘"을 참조하지 않으므로 서버/클라이언트 어디서 실행해도 같은 결과라 하이드레이션 문제가 없다.
  */

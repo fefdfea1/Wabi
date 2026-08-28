@@ -20,9 +20,20 @@ export interface Task {
   id: string;
   phase: TaskPhase;
   title: string;
-  meta: string;
-  week: boolean;
-  urgent: boolean;
+  /**
+   * discussion.md 22.2절: 마감 표시 전용이라 마감일(dueDate)이 있을 때만 값이 생긴다
+   * (deriveDueDisplay로 계산). 기본 제공 할 일은 대부분 마감일이 없어 이 필드도 없다 —
+   * 없으면 목록·상세 화면 모두 이 자리를 비운다(빈 문자열이나 대체 문구를 넣지 않는다).
+   */
+  meta?: string;
+  /**
+   * discussion.md 22.2절: 홈의 "이번 주 할 일"이 이 플래그를 더 이상 읽지 않는다(useWabiApp.ts가
+   * dueDate 기준으로 직접 계산한다) — 남아 있는 건 deriveDueDisplay가 채워주는 계산된 값을 그대로
+   * 실어 두는 자리일 뿐, 지어낸 고정값을 넣는 용도가 아니다.
+   */
+  week?: boolean;
+  /** discussion.md 22.2절: meta와 같은 이유로 마감일이 있을 때만 계산된다. 없으면 강조 색을 쓰지 않는다. */
+  urgent?: boolean;
   tag: string;
   body: string;
   items: string[];
@@ -37,6 +48,12 @@ export interface Task {
    * 고정 선택지(오늘까지/이번 주/이번 달/도착 후)로 만든 할 일에는 이 필드가 없다.
    */
   dueDate?: string;
+  /**
+   * discussion.md 21.2절: 직접 추가한 할 일에만 있는 등록 시각(ISO). 정렬(최근 만든 순)에만
+   * 쓰고 화면에는 표시하지 않는다 — dueDate(마감일)와 혼동될 수 있기 때문이다. 기본 제공
+   * 할 일에는 이 필드가 없다(조사해서 넣은 준비 순서를 그대로 유지하므로 정렬 기준이 필요 없다).
+   */
+  createdAt?: string;
 }
 
 export type GuideSituation = "pre" | "post";

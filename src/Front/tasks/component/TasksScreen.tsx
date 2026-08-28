@@ -55,7 +55,9 @@ export function TasksScreen({
 
       <div className={styles.list}>
         {phaseTasks.length === 0 ? (
-          <p className={styles.empty}>등록된 할 일이 없습니다.</p>
+          // discussion.md 23.4절: 새 화면이나 안내 카드를 만들지 않고, 기존 빈 상태 문구에
+          // 무엇을 하면 되는지 한 줄만 더한다.
+          <p className={styles.empty}>등록된 할 일이 없습니다. 오른쪽 위 + 버튼으로 추천에서 고르거나 직접 추가해 보세요.</p>
         ) : (
           phaseTasks.map((task) => (
             <ListRow

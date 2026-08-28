@@ -161,6 +161,8 @@ export function WabiApp() {
           dueDate={wabi.addTaskDueDate}
           onDueDateChange={wabi.setAddTaskDueDate}
           minDate={wabi.todayIso}
+          recommendedTasks={wabi.recommendedTasks}
+          onPickRecommended={wabi.pickRecommendedTask}
           onSubmit={wabi.submitAddTask}
           onClose={wabi.closeAddTask}
         />
@@ -189,9 +191,11 @@ export function WabiApp() {
         <TaskDetailScreen
           task={wabi.detailTask}
           done={wabi.detailDone}
+          isCustom={wabi.detailIsCustom}
           onClose={wabi.closeDetail}
           onComplete={wabi.completeDetail}
           onUndo={wabi.undoDetail}
+          onDelete={wabi.deleteTask}
         />
       ) : null}
     </div>

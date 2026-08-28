@@ -222,3 +222,24 @@
   border: 1.5px solid var(--line);
   cursor: pointer;
 }
+
+/* discussion.md 21.4절: 직접 추가한 할 일에만 보이는 삭제 버튼. 파괴적 동작이라 --alert 색을
+   쓰되, 화면에서 가장 눈에 띄는 요소(위의 .cta)가 되지 않도록 채움이 아닌 테두리로 둔다. */
+.deleteButton {
+  height: 48px;
+  border-radius: 14px;
+  font-size: 14.5px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--alert);
+  border: 1.5px solid var(--alert);
+  cursor: pointer;
+}
+
+/* discussion.md 21.4절: 확인 시트(BottomSheet, z-index:50)가 이 화면의 .overlay(z-index:60)보다
+   확실히 위에 뜨도록 새 스태킹 컨텍스트를 만든다 — position+z-index가 있는 조상 안에서는
+   자손의 z-index가 그 조상 자체의 z-index와 비교되지, 바깥 형제와 직접 비교되지 않는다. */
+.confirmLayer {
+  position: relative;
+  z-index: 70;
+}

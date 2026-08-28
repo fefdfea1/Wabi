@@ -133,7 +133,7 @@ export function useWabiApp() {
   // 비워 둔 채 등록할 수 있다.
   const [addTaskDueDate, setAddTaskDueDate] = useState("");
 
-  // discussion.md 19.3절: dueDate가 있는 할 일의 meta/urgent/week를 오늘 날짜 기준으로 다시
+  // discussion.md 19.3절: dueDate가 있는 할 일의 meta/urgent를 오늘 날짜 기준으로 다시
   // 계산하기 위한 값. computeDDay와 같은 이유로 client effect 안에서만 만든다.
   const [today, setToday] = useState<Date | null>(null);
   useEffect(() => {
@@ -157,7 +157,7 @@ export function useWabiApp() {
 
   // discussion.md 23.1절: 할 일 목록은 이제 이용자가 추천에서 고르거나 직접 적은 것(customTasks)
   // 뿐이다 — 조사 데이터(countryTasks)는 더 이상 여기 섞이지 않는다. discussion.md 19.3절:
-  // dueDate가 있는 할 일(달력으로 직접 고른 마감)은 저장된 meta/urgent/week를 그대로 쓰지 않고
+  // dueDate가 있는 할 일(달력으로 직접 고른 마감)은 저장된 meta/urgent를 그대로 쓰지 않고
   // today 기준으로 매번 다시 계산한다 — 그렇지 않으면 "3일 남음" 같은 문구가 날짜가 지나도
   // 그대로 굳어버린다(P-06과 같은 함정). dueDate가 없는 할 일은 그대로 둔다.
   const allTasks = useMemo(() => {
@@ -179,9 +179,8 @@ export function useWabiApp() {
   const sortedTasks = useMemo(() => sortTasksForDisplay(allTasks), [allTasks]);
   const phaseTasks = sortedTasks.filter((task) => task.phase === phase);
   const phaseDoneCount = phaseTasks.filter((task) => countryDone[task.id]).length;
-  // discussion.md 44절: 홈 목록은 마감이 이번 주 안인 것만 거르지 않는다 — 마감을 정하지 않은
-  // 할 일은 week가 아예 없어 홈에서 사라져 버렸다. 전체를 40절 순서로 보여주고, 마감 없는 것은
-  // 그 순서에 따라 자연히 맨 아래로 간다.
+  // discussion.md 44절: 홈 목록은 전체 할 일을 40절 순서로 보여준다. 예전에는 "이번 주 안에
+  // 마감"인 것만 걸렀는데, 마감을 정하지 않은 할 일은 그 값이 아예 없어 홈에서 사라져 버렸다.
   const homeTasks = sortedTasks;
   // discussion.md 41절: 다음 할 일도 같은 순서에서 고른다 — 목록 맨 위가 가장 급한 할 일인데
   // 카드가 다른 것을 가리키면 두 곳이 서로 다른 말을 한다.
@@ -365,7 +364,7 @@ export function useWabiApp() {
     const code = countryCode;
 
     // discussion.md 25.5절: 마감은 이제 날짜 직접 선택뿐이고 선택 사항이다 — 비어 있으면
-    // meta/week/urgent 셋 다 넣지 않는다(22절, 고정 선택지 폴백이 없어졌다).
+    // meta/urgent 둘 다 넣지 않는다(22절, 고정 선택지 폴백이 없어졌다).
     const dueDisplay = addTaskDueDate ? deriveDueDisplay(addTaskDueDate, new Date()) : null;
 
     const selectedSource = addTaskSelectedRecommendationId
@@ -383,7 +382,6 @@ export function useWabiApp() {
           done: false,
           sourceUrl: selectedSource.sourceUrl,
           meta: dueDisplay ? dueDisplay.meta : undefined,
-          week: dueDisplay ? dueDisplay.week : undefined,
           urgent: dueDisplay ? dueDisplay.urgent : undefined,
           dueDate: dueDisplay ? addTaskDueDate : undefined,
           createdAt: new Date().toISOString(),
@@ -404,7 +402,6 @@ export function useWabiApp() {
           items: [],
           done: false,
           meta: dueDisplay ? dueDisplay.meta : undefined,
-          week: dueDisplay ? dueDisplay.week : undefined,
           urgent: dueDisplay ? dueDisplay.urgent : undefined,
           dueDate: dueDisplay ? addTaskDueDate : undefined,
           // discussion.md 21.2절/21.3절: 정렬 전용(화면에는 표시하지 않는다) — 목록 화면에서 직접

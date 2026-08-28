@@ -100,37 +100,32 @@ function runAssertions(): number {
   // (구현이 그쪽으로 이동했다 — npm run test:local-date).
 
   // --- deriveDueDisplay (discussion.md 19.3절: 할 일 마감을 달력으로 직접 고른 경우) ---
-  check("deriveDueDisplay: 오늘이 마감이면 오늘까지/urgent/week", deriveDueDisplay("2026-08-28", today), {
+  check("deriveDueDisplay: 오늘이 마감이면 오늘까지/urgent", deriveDueDisplay("2026-08-28", today), {
     meta: "오늘까지",
     urgent: true,
-    week: true,
   });
   check("deriveDueDisplay: 내일이 마감이면 내일까지", deriveDueDisplay("2026-08-29", today), {
     meta: "내일까지",
     urgent: false,
-    week: true,
   });
   check("deriveDueDisplay: 3일 뒤면 3일 남음", deriveDueDisplay("2026-08-31", today), {
     meta: "3일 남음",
     urgent: false,
-    week: true,
   });
-  check("deriveDueDisplay: 8일 뒤면 이번 주 범위 밖(week: false)", deriveDueDisplay("2026-09-05", today), {
+  check("deriveDueDisplay: 8일 뒤면 일수로 표시하고 긴급이 아니다", deriveDueDisplay("2026-09-05", today), {
     meta: "8일 남음",
     urgent: false,
-    week: false,
   });
   check("deriveDueDisplay: 지난 날짜면 마감 지남/urgent", deriveDueDisplay("2026-08-20", today), {
     meta: "마감 지남",
     urgent: true,
-    week: true,
   });
   check("deriveDueDisplay: 파싱 불가 문자열이면 null", deriveDueDisplay("not-a-date", today), null);
 
   // --- pickNextTask (시간대 무관, 회귀 확인용으로 함께 포함) ---
   const tasks: Task[] = [
-    { id: "a", phase: "pre", title: "A", meta: "", week: false, urgent: false, tag: "", body: "", items: [], done: false },
-    { id: "b", phase: "pre", title: "B", meta: "", week: false, urgent: false, tag: "", body: "", items: [], done: false },
+    { id: "a", phase: "pre", title: "A", meta: "", urgent: false, tag: "", body: "", items: [], done: false },
+    { id: "b", phase: "pre", title: "B", meta: "", urgent: false, tag: "", body: "", items: [], done: false },
   ];
   check("pickNextTask: 첫 미완료 항목", pickNextTask(tasks, { a: true })?.id, "b");
   check("pickNextTask: 모두 완료면 null — 마지막 할 일이 계속 남지 않는다(45절)", pickNextTask(tasks, { a: true, b: true }), null);

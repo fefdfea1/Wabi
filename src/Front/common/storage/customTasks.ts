@@ -8,6 +8,11 @@ const STORAGE_KEY = "wabi:custom-tasks";
  * 구조화된 신원 식별자가 아니며, 서버로 전송되지 않는다). 국가별로 나눠 저장한다
  * (Record<CountryCode, Task[]>) — 국가를 바꾸면 다른 국가의 직접 추가 항목이 섞여 보이면 안 된다.
  */
+/**
+ * discussion.md 46절: 예전 레코드에는 week 필드가 들어 있을 수 있다({..., week: true}).
+ * 읽을 때 그냥 무시한다 — 남아 있어도 깨지지 않을 뿐, 되살려 쓰지 않는다(notes.ts의 title과
+ * 같은 방식, 19.7절). 다음에 그 할 일을 저장할 때 자연히 사라진다.
+ */
 function normalizeTask(raw: unknown): Task | null {
   if (typeof raw !== "object" || raw === null) return null;
   const record = raw as Record<string, unknown>;
@@ -18,11 +23,10 @@ function normalizeTask(raw: unknown): Task | null {
     id: record.id,
     phase: record.phase as TaskPhase,
     title: record.title,
-    // discussion.md 22.3절: meta/week/urgent는 이제 선택 항목이다 — 없으면 ""나 false로
+    // discussion.md 22.3절: meta/urgent는 이제 선택 항목이다 — 없으면 ""나 false로
     // 채워 넣지 않고 그대로 undefined로 둔다("값이 있는데 비어 있음"과 "값 자체가 없음"은
     // 다르고, 화면은 후자일 때만 그 자리를 완전히 비운다).
     meta: typeof record.meta === "string" ? record.meta : undefined,
-    week: typeof record.week === "boolean" ? record.week : undefined,
     urgent: typeof record.urgent === "boolean" ? record.urgent : undefined,
     tag: typeof record.tag === "string" ? record.tag : "",
     body: typeof record.body === "string" ? record.body : "",

@@ -22,14 +22,18 @@ export interface Task {
   title: string;
   /**
    * discussion.md 22.2절: 마감 표시 전용이라 마감일(dueDate)이 있을 때만 값이 생긴다
-   * (deriveDueDisplay로 계산). 기본 제공 할 일은 대부분 마감일이 없어 이 필드도 없다 —
-   * 없으면 목록·상세 화면 모두 이 자리를 비운다(빈 문자열이나 대체 문구를 넣지 않는다).
+   * (deriveDueDisplay로 계산). 추천에서 고른 할 일은 마감일이 없어 이 필드도 없다 —
+   * 없으면 목록 행과 홈의 다음 할 일 카드 모두 이 자리를 비운다(빈 문자열이나 대체 문구를
+   * 넣지 않는다). 37절에서 홈 카드의 "지금 하기" 버튼이 있던 자리가 이 값을 보여준다.
    */
   meta?: string;
   /**
-   * discussion.md 22.2절: 홈의 "이번 주 할 일"이 이 플래그를 더 이상 읽지 않는다(useWabiApp.ts가
-   * dueDate 기준으로 직접 계산한다) — 남아 있는 건 deriveDueDisplay가 채워주는 계산된 값을 그대로
-   * 실어 두는 자리일 뿐, 지어낸 고정값을 넣는 용도가 아니다.
+   * discussion.md 22.5절: 홈의 "이번 주 할 일"은 이 플래그를 그대로 읽는다
+   * (useWabiApp.ts의 `allTasks.filter((task) => task.week)`). 22.2절에서 dueDate 유무를 추가
+   * 조건으로 걸었다가 되돌린 자리다 — 조사해서 넣은 데이터에는 이 필드가 아예 없으므로,
+   * 플래그만 읽어도 지어낸 값이 섞여 들어오지 않는다.
+   *
+   * 값은 deriveDueDisplay가 마감일을 보고 계산해 채운다. 지어낸 고정값을 넣지 않는다.
    */
   week?: boolean;
   /** discussion.md 22.2절: meta와 같은 이유로 마감일이 있을 때만 계산된다. 없으면 강조 색을 쓰지 않는다. */
@@ -45,7 +49,9 @@ export interface Task {
    * 있는 할 일은 `meta`/`urgent`/`week`를 저장된 값 그대로 쓰지 않고, 오늘 날짜 기준으로
    * 매번 다시 계산한다(wabiLogic.ts의 deriveDueDisplay, useWabiApp.ts에서 client effect로 적용) —
    * 그렇지 않으면 "3일 남음"처럼 날짜가 지날수록 틀려지는 문구가 그대로 굳어버린다(P-06과 같은 함정).
-   * 고정 선택지(오늘까지/이번 주/이번 달/도착 후)로 만든 할 일에는 이 필드가 없다.
+   *
+   * discussion.md 25.5절: 마감을 정하는 길은 달력뿐이다(예전의 고정 선택지는 없앴다). 마감은
+   * 선택 사항이라 이 필드가 없는 할 일도 정상이며, 그런 할 일은 meta/urgent/week도 없다.
    */
   dueDate?: string;
   /**

@@ -170,15 +170,19 @@ export function useWabiApp() {
   }, [countryCustomTasks, today]);
   const total = allTasks.length;
   const doneCount = allTasks.filter((task) => countryDone[task.id]).length;
-  const phaseTasksUnsorted = allTasks.filter((task) => task.phase === phase);
-  const phaseDoneCount = phaseTasksUnsorted.filter((task) => countryDone[task.id]).length;
-  // discussion.md 40절: 마감이 이른 것이 위, 마감을 정하지 않은 것은 맨 아래. 홈과 할 일 탭이
-  // 같은 함수를 써야 두 화면의 순서가 어긋나지 않는다.
-  const phaseTasks = sortTasksForDisplay(phaseTasksUnsorted);
-  // discussion.md 39절: 홈의 "이번 주 할 일"도 할 일 탭과 같은 순서로 보여준다 — 거르기만 하면
-  // 저장된 순서(만든 순)가 그대로 나와, 같은 할 일이 두 화면에서 다른 자리에 놓인다.
-  const weekTasks = sortTasksForDisplay(allTasks.filter((task) => task.week));
-  const nextTask = pickNextTask(allTasks, countryDone);
+
+  /**
+   * discussion.md 40절: 마감이 이른 것이 위, 마감을 정하지 않은 것은 맨 아래.
+   * 41절: 목록 세 곳(할 일 탭·홈의 이번 주 할 일·다음 할 일 카드)이 모두 이 하나에서 갈라져
+   * 나오므로 순서가 어긋날 수 없다. 거르기는 순서를 바꾸지 않으니 정렬을 먼저 한 번만 한다.
+   */
+  const sortedTasks = useMemo(() => sortTasksForDisplay(allTasks), [allTasks]);
+  const phaseTasks = sortedTasks.filter((task) => task.phase === phase);
+  const phaseDoneCount = phaseTasks.filter((task) => countryDone[task.id]).length;
+  const weekTasks = sortedTasks.filter((task) => task.week);
+  // discussion.md 41절: 다음 할 일도 같은 순서에서 고른다 — 목록 맨 위가 가장 급한 할 일인데
+  // 카드가 다른 것을 가리키면 두 곳이 서로 다른 말을 한다.
+  const nextTask = pickNextTask(sortedTasks, countryDone);
   const nextDescription = nextTask ? firstSentence(nextTask.body) : "";
 
   // discussion.md 23.2절: 할 일 추가 시트의 추천. 시트에 이미 있는 phase 선택(addTaskPhase)에

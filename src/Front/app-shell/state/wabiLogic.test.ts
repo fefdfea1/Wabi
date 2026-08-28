@@ -181,6 +181,24 @@ function runAssertions(): number {
     ["due-10", "due-01"],
   );
 
+  check(
+    "pickNextTask: 정렬된 목록에서 고르면 마감이 가장 급한 미완료 할 일이 나온다(40·41절)",
+    pickNextTask(sortTasksForDisplay([noDueNew, due10, due01, due03]), {})?.id,
+    "due-01",
+  );
+  check(
+    "pickNextTask: 급한 것을 완료하면 그 다음으로 급한 것이 나온다",
+    pickNextTask(sortTasksForDisplay([noDueNew, due10, due01, due03]), { "due-01": true })?.id,
+    "due-03",
+  );
+  check(
+    "pickNextTask: 마감 있는 것을 모두 끝내면 마감 없는 할 일로 넘어간다",
+    pickNextTask(sortTasksForDisplay([noDueNew, due10, due01, due03]), {
+      "due-01": true, "due-03": true, "due-10": true,
+    })?.id,
+    "nodue-new",
+  );
+
   // --- firstSentence (시간대 무관) ---
   check("firstSentence: 마침표 기준 첫 문장", firstSentence("첫 문장입니다. 둘째 문장."), "첫 문장입니다.");
   check("firstSentence: 마침표 없으면 그대로", firstSentence("문장"), "문장.");

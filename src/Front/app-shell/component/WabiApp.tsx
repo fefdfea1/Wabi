@@ -102,10 +102,16 @@ export function WabiApp() {
         {/* discussion.md 43절: 베타 기간 동안 본문 맨 아래에 제보처를 둔다. 네 탭 모두에서
             보여야 하므로 각 화면이 아니라 본문 컨테이너 끝에 놓는다. */}
         <footer className={styles.feedback}>
-          <p className={styles.feedbackText}>버그 제보나 개선 사항 요청을 기다립니다.</p>
-          <a className={styles.feedbackMail} href="mailto:fefdfeas@gmail.com">
-            fefdfeas@gmail.com
-          </a>
+          <p className={styles.feedbackText}>
+            본 사이트는 워킹홀리데이에 대한 정보를 쉽게 접하고 앞서 갔던 사람들의 경험을 토대로
+            현지에서의 고충을 정리해둔 사이트입니다.
+          </p>
+          <div className={styles.feedbackContact}>
+            <span className={styles.feedbackLabel}>버그 제보 · 개선 요청</span>
+            <a className={styles.feedbackMail} href="mailto:fefdfeas@gmail.com">
+              fefdfeas@gmail.com
+            </a>
+          </div>
         </footer>
       </main>
 

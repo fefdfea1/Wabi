@@ -1,3 +1,75 @@
+/*
+ * discussion.md 20.9절(PM 실측 규명): 이 키프레임들은 app/globals.css의 전역 @keyframes를
+ * 참조하려 했으나, CSS Modules가 module.css 안의 animation-name 값을 자동으로 스코프
+ * 처리(해시)해 실제로 존재하지 않는 이름을 참조하게 되어 처음부터 한 번도 동작하지 않았다
+ * (브라우저는 존재하지 않는 애니메이션 이름을 오류 없이 조용히 무시한다). 참조하는 이 파일
+ * 안에 키프레임을 직접 정의해 이름 해시가 선언·참조 양쪽에서 항상 일치하게 한다.
+ */
+@keyframes wabiFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wabiSheetUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes wabiModalRiseIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* discussion.md 20.12절: 들어올 때와 대칭인 방향으로 나간다 — 나가는 애니메이션이 끝난 뒤에야
+   부모가 실제로 언마운트한다(useClosingTransition). forwards로 끝난 뒤 상태(투명·화면 밖)를
+   유지해, 그 사이 짧게라도 시작 프레임으로 되돌아가 보이지 않게 한다. */
+@keyframes wabiFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes wabiSheetDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes wabiModalRiseOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
 .overlay {
   position: fixed;
   inset: 0;
@@ -18,8 +90,16 @@
   animation: wabiFadeIn 0.2s ease-out;
 }
 
+.dimClosing {
+  animation: wabiFadeOut 0.2s ease-out forwards;
+}
+
 .sheet {
   position: relative;
+  /* discussion.md 20.13절 1번(PM 실측): 딤이 시트 위에 겹쳐 포인터 이벤트를 가로챌 가능성을
+     원천 차단하기 위해 명시적으로 딤보다 위 스택 순서를 준다(DOM 순서상 이미 위였지만
+     z-index 없이는 애매할 수 있어 확실히 한다). */
+  z-index: 1;
   width: 100%;
   max-width: 480px;
   max-height: 86vh;
@@ -28,6 +108,10 @@
   border-radius: 26px 26px 0 0;
   background: var(--surface);
   animation: wabiSheetUp 0.34s cubic-bezier(0.22, 0.72, 0.24, 1);
+}
+
+.sheetClosing {
+  animation: wabiSheetDown 0.34s cubic-bezier(0.22, 0.72, 0.24, 1) forwards;
 }
 
 .handleRow {
@@ -51,8 +135,9 @@
   }
 }
 
-/* 캔버스 06절: 데스크톱(>=1180px)에서는 바텀시트가 480px 중앙 모달로 바뀐다 — 네 모서리
-   모두 26px, wabiSheetUp 대신 위에서 8px 내려오며 페이드, 끌어내릴 대상이 아니므로 핸들은 숨긴다. */
+/* 캔버스 06절: 데스크톱(>=1180px)에서는 바텀시트가 480px 중앙 모달로 바뀐다 — 네 모서리 모두
+   26px, 끌어내릴 대상이 아니므로 핸들은 숨긴다. discussion.md 20.3절: 등장 애니메이션은
+   wabiModalRiseIn(작은 폭의 슬라이드+페이드)으로 통일한다(11.4절의 "위에서 8px 내려오며 페이드"를 대체). */
 @media (min-width: 1180px) {
   .overlay {
     justify-content: center;
@@ -62,7 +147,11 @@
   .sheet {
     max-width: 480px;
     border-radius: 26px;
-    animation: wabiModalIn 0.2s ease-out;
+    animation: wabiModalRiseIn 0.22s ease-out;
+  }
+
+  .sheetClosing {
+    animation: wabiModalRiseOut 0.22s ease-out forwards;
   }
 
   .handleRow {
@@ -70,9 +159,15 @@
   }
 }
 
+/* discussion.md 20.13절 1번(PM 실측): 넘치는 게 맞는데 휠·터치 모두 scrollTop이 안 움직이던
+   문제 — touch-action을 명시해 세로 스크롤이 브라우저 기본 동작으로 확실히 허용되게 하고,
+   overscroll-behavior로 끝까지 스크롤했을 때 뒤 배경으로 스크롤이 새는 것을 막는다. */
 .body {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   padding: 22px 20px 12px;
   display: flex;
   flex-direction: column;

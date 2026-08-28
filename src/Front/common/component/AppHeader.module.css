@@ -1,0 +1,131 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px 0;
+}
+
+/* discussion.md 20.13절 7번: 로고를 누르면 홈으로 돌아가므로 실제 button이다 — 예전 장식용
+   div의 스타일을 그대로 물려받되 버튼 기본 스타일(테두리 등)만 지운다. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.12s ease-out;
+}
+
+.logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.brandName {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--strong);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* discussion.md 20.13절 6번: 눌렀을 때(모든 구간) 살짝 축소됐다가 놓으면 돌아온다. transform은
+   레이아웃을 건드리지 않아 주변 요소를 밀지 않는다. hover는 데스크톱 전용(11.2절 확장 규칙). */
+.guideButton,
+.countryBadge {
+  transition: transform 0.12s ease-out;
+}
+
+@media (hover: hover) {
+  .brand:hover,
+  .guideButton:hover,
+  .countryBadge:hover {
+    transform: scale(0.97);
+  }
+}
+
+/* 마우스를 올린 채(hover) 누르면(active) 이 규칙이 뒤에 와야 더 강한 축소가 이긴다 — 같은
+   우선순위에서는 소스 순서가 늦은 쪽이 이기기 때문이다. */
+.brand:active,
+.guideButton:active,
+.countryBadge:active {
+  transform: scale(0.93);
+}
+
+.guideButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sunken);
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+.countryBadge {
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  background: var(--sunken);
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+/* 캔버스 06절: 태블릿(744~1179px) — 헤더가 Wabi 텍스트 + 국가 필로 단순해진다(로고·가이드 버튼은
+   레일에 이미 있어 숨긴다). */
+@media (min-width: 744px) {
+  .header {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 20px 0 0;
+  }
+
+  .logo,
+  .guideButton {
+    display: none;
+  }
+
+  .brandName {
+    font-size: 16px;
+  }
+
+  .countryBadge {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 10px;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 400;
+    /* 목업 실측은 36px지만 터치 대상 최소 48px 규칙(11.2절)이 우선이라 min-height는 유지한다. */
+  }
+}
+
+/* 캔버스 06절: 데스크톱(1180px+) — 헤더는 사이드바가 대신하므로 통째로 숨긴다. */
+@media (min-width: 1180px) {
+  .header {
+    display: none;
+  }
+}

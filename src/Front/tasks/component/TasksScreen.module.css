@@ -39,14 +39,15 @@
   border-radius: 2px;
 }
 
+/* discussion.md 20.13절 3번: 버튼(터치 영역 48×48)은 그대로 두고 아이콘만 절반 크기로 줄인다. */
 .plusVertical {
-  width: 1.8px;
-  height: 15px;
+  width: 1.4px;
+  height: 8px;
 }
 
 .plusHorizontal {
-  width: 15px;
-  height: 1.8px;
+  width: 8px;
+  height: 1.4px;
 }
 
 .progressRow {

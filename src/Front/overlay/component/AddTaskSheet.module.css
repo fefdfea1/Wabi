@@ -56,6 +56,12 @@
   border-color: var(--ink);
 }
 
+.dueDateLabel {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
 .submit {
   height: 52px;
   border-radius: 14px;

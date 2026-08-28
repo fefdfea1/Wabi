@@ -1,7 +1,9 @@
 "use client";
 
 import { COUNTRIES } from "@/Front/common/data/tasks";
+import { AppHeader } from "@/Front/common/component/AppHeader";
 import { TabBar } from "@/Front/common/component/TabBar";
+import { NotesPanel } from "@/Front/common/component/NotesPanel";
 import { HomeScreen } from "@/Front/home/component/HomeScreen";
 import { TasksScreen } from "@/Front/tasks/component/TasksScreen";
 import { NotesScreen } from "@/Front/notes/component/NotesScreen";
@@ -21,14 +23,22 @@ export function WabiApp() {
   return (
     <div className={styles.shell}>
       {/*
-        discussion.md 11.5절/11.6절: 데스크톱 우측 336px 패널은 화면 공용 컴포넌트가 아니다.
-        아래 네 화면은 각자 자기 컴포넌트 파일 안에 own aside를 넣거나(HomeScreen, NotesScreen)
-        아예 넣지 않는다(TasksScreen, MeScreen) — WabiApp이나 <main>에는 패널 마크업이 없다.
-        새 화면을 추가할 때 이 우측 패널이 "기본으로 딸려오는" 통로는 존재하지 않으므로,
-        패널이 필요하면 그 화면의 .tsx/.module.css 안에 명시적으로 새로 만들어야 한다.
-        (홈 = 내 메모 패널, 메모 = WRITING 패널, 할 일·나 = 패널 없음.)
+        discussion.md 20.1절/20.2절: 우측 336px 패널(NotesPanel)은 이제 화면 공용이 아니라
+        WabiApp 셸 레벨에 딱 하나만 마운트한다 — 탭이 바뀔 때마다 통째로 마운트/언마운트하면
+        폭이 뚝 끊겨 보이기 때문에, 항상 떠 있는 채로 collapsed prop만 바뀌어 부드럽게 열고
+        닫힌다(홈에서는 펼침, 그 외 탭에서는 접힘 — 메모 화면은 본문에 이미 같은 기능이 있어
+        패널 자체가 필요 없다). 할 일·나 화면은 여전히 이 패널을 전혀 쓰지 않는다(11.6절).
       */}
       <main className={styles.content}>
+        {/* discussion.md 20.13절 7번: 모바일·태블릿 헤더를 모든 탭에서 같은 자리에 공용으로
+            띄운다(데스크톱은 자기 CSS에서 숨고 사이드바가 대신한다). */}
+        <AppHeader
+          countryLabel={wabi.country?.label ?? null}
+          onOpenGuide={wabi.openGuide}
+          onOpenCountryPicker={wabi.openCountryPickerSheet}
+          onGoHome={() => wabi.goTab("home")}
+        />
+
         {wabi.tab === "home" ? (
           <HomeScreen
             countryLabel={wabi.country?.label ?? null}
@@ -42,14 +52,8 @@ export function WabiApp() {
             painCount={wabi.painItems.length}
             onToggleTask={wabi.toggleTask}
             onOpenDetail={wabi.openDetail}
-            onOpenGuide={wabi.openGuide}
             onOpenPain={wabi.openPain}
             onGoTasks={() => wabi.goTab("tasks")}
-            onOpenCountryPicker={wabi.openCountryPickerSheet}
-            notes={wabi.notes}
-            onOpenAddNote={wabi.openAddNote}
-            onOpenEditNote={wabi.openEditNote}
-            onQuickAddNote={wabi.quickAddNote}
           />
         ) : null}
 
@@ -72,13 +76,6 @@ export function WabiApp() {
             onOpenAdd={wabi.openAddNote}
             onOpenEdit={wabi.openEditNote}
             onDelete={wabi.deleteNote}
-            panelTitle={wabi.noteTitle}
-            panelBody={wabi.noteBody}
-            onPanelTitleChange={wabi.setNoteTitle}
-            onPanelBodyChange={wabi.setNoteBody}
-            onPanelSave={wabi.saveNote}
-            isPanelEditing={!!wabi.editingNoteId}
-            onPanelDelete={() => wabi.editingNoteId && wabi.deleteNote(wabi.editingNoteId)}
           />
         ) : null}
 
@@ -94,9 +91,30 @@ export function WabiApp() {
             visaExpiryLabel={wabi.visaExpiryLabel}
             showVisaLine={wabi.showVisaLine}
             onDepartureDateChange={wabi.setDepartureDate}
+            avatarUrl={wabi.avatarUrl}
+            onAvatarChange={wabi.updateAvatar}
+            onAvatarClear={wabi.clearAvatar}
           />
         ) : null}
       </main>
+
+      <NotesPanel
+        collapsed={wabi.tab !== "home"}
+        notes={wabi.notes}
+        onQuickAdd={wabi.quickAddNote}
+        onOpenEdit={wabi.openEditNote}
+        onDelete={wabi.deleteNote}
+        footer={
+          <button type="button" className={styles.panelPainCard} onClick={wabi.openPain}>
+            <span className={styles.panelPainTitle}>먼저 간 사람들이 힘들어한 것</span>
+            <span className={styles.panelPainMeta}>
+              {wabi.painItems.length > 0
+                ? `자주 나온 어려움 ${wabi.painItems.length}가지 ›`
+                : "정리하는 대로 보여드립니다 ›"}
+            </span>
+          </button>
+        }
+      />
 
       <TabBar
         active={wabi.tab}
@@ -140,6 +158,9 @@ export function WabiApp() {
           due={wabi.addTaskDue}
           onDueChange={wabi.setAddTaskDue}
           dueOptions={DUE_OPTIONS}
+          dueDate={wabi.addTaskDueDate}
+          onDueDateChange={wabi.setAddTaskDueDate}
+          minDate={wabi.todayIso}
           onSubmit={wabi.submitAddTask}
           onClose={wabi.closeAddTask}
         />
@@ -148,8 +169,6 @@ export function WabiApp() {
       {wabi.sheet === "noteEditor" ? (
         <NoteEditorSheet
           isEditing={!!wabi.editingNoteId}
-          title={wabi.noteTitle}
-          onTitleChange={wabi.setNoteTitle}
           body={wabi.noteBody}
           onBodyChange={wabi.setNoteBody}
           onSave={wabi.saveNote}

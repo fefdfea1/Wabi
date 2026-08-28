@@ -1,7 +1,11 @@
 import { BottomSheet } from "@/Front/common/component/BottomSheet";
 import { Chip } from "@/Front/common/component/Chip";
+import { useClosingTransition } from "@/Front/common/hooks/useClosingTransition";
 import type { Country, CountryCode } from "@/Front/common/types/domain";
 import styles from "./CountryPickerSheet.module.css";
+
+/* discussion.md 20.12절: BottomSheet 나가는 애니메이션(모바일·태블릿 0.34s)이 다 돌 시간을 준다. */
+const CLOSE_ANIMATION_MS = 340;
 
 export interface CountryPickerSheetProps {
   countries: Country[];
@@ -17,12 +21,15 @@ export interface CountryPickerSheetProps {
  * 시트도 닫힌다.
  */
 export function CountryPickerSheet({ countries, selectedCode, onSelect, onClose }: CountryPickerSheetProps) {
+  const { closing, requestClose } = useClosingTransition(onClose, CLOSE_ANIMATION_MS);
+
   return (
     <BottomSheet
       titleId="country-picker-title"
-      onClose={onClose}
+      closing={closing}
+      onRequestClose={requestClose}
       footer={
-        <button type="button" className={styles.closeButton} onClick={onClose}>
+        <button type="button" className={styles.closeButton} onClick={requestClose}>
           닫기
         </button>
       }

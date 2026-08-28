@@ -29,6 +29,14 @@ export interface Task {
   done: boolean;
   /** meta/body에 담긴 실무 정보의 근거 출처 URL (Research-team 조사 결과 주입용) */
   sourceUrl?: string;
+  /**
+   * discussion.md 19.3절: 할 일 추가 시트에서 달력으로 직접 고른 마감(ISO yyyy-mm-dd). 이 값이
+   * 있는 할 일은 `meta`/`urgent`/`week`를 저장된 값 그대로 쓰지 않고, 오늘 날짜 기준으로
+   * 매번 다시 계산한다(wabiLogic.ts의 deriveDueDisplay, useWabiApp.ts에서 client effect로 적용) —
+   * 그렇지 않으면 "3일 남음"처럼 날짜가 지날수록 틀려지는 문구가 그대로 굳어버린다(P-06과 같은 함정).
+   * 고정 선택지(오늘까지/이번 주/이번 달/도착 후)로 만든 할 일에는 이 필드가 없다.
+   */
+  dueDate?: string;
 }
 
 export type GuideSituation = "pre" | "post";
@@ -61,14 +69,13 @@ export type ThemeMode = "light" | "dark";
 export type DueOption = "오늘까지" | "이번 주" | "이번 달" | "도착 후";
 
 /**
- * 메모 탭에서 localStorage에 저장하는 메모 한 편. 캔버스 06절(태블릿·PC) 데스크톱 메모 목업이
- * 제목 입력과 내용 입력을 나눠 두고 목록도 제목·내용 요약·날짜로 그려 title 필드를 둔다.
- * title은 선택 입력이다 — 비어 있으면 목록에서 본문 첫 줄을 제목처럼 보여준다(예전 레코드
- * 호환: title이 아예 없던 이전 저장 데이터도 읽을 때 빈 문자열로 채워 넣는다, notes.ts 참고).
+ * 메모 탭에서 localStorage에 저장하는 메모 한 편. discussion.md 19.7절(사용자 지시): 우측 336
+ * 패널을 홈·메모가 공유하는 하나의 컴포넌트로 합치면서 제목 입력칸을 없앴다 — title을 채울
+ * 방법이 없어져 레코드에서도 뺐다. 목록의 "제목" 자리는 본문 첫 줄을 잘라 쓴다(NotesPanel/
+ * NotesScreen 참고). title이 들어간 예전 레코드가 있어도 읽을 때 그냥 무시한다(notes.ts 참고).
  */
 export interface NoteRecord {
   id: string;
-  title: string;
   body: string;
   /** 마지막으로 저장한 시각의 전체 ISO 타임스탬프(예: "2026-08-28T13:45:00.000Z").
    *  같은 날 여러 메모를 고치는 경우에도 "최근 수정 순" 정렬이 정확하도록 날짜뿐 아니라

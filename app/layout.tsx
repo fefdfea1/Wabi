@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="ko"
-      data-theme="light"
+      data-theme="dark"
       suppressHydrationWarning
       className={`${notoSansKr.variable} ${jetBrainsMono.variable}`}
     >

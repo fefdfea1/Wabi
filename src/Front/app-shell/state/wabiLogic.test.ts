@@ -14,7 +14,7 @@
 
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { computeDDay, computeVisaExpiry, firstSentence, formatDDay, pickNextTask } from "./wabiLogic.ts";
+import { computeDDay, computeVisaExpiry, deriveDueDisplay, firstSentence, formatDDay, pickNextTask } from "./wabiLogic.ts";
 import type { Task } from "../../common/types/domain.ts";
 
 const REQUIRED_TIMEZONES = ["Asia/Seoul", "UTC", "America/Toronto"];
@@ -90,6 +90,34 @@ function runAssertions(): number {
 
   // formatKoreanDate 테스트는 src/Front/common/date/localDate.test.ts로 옮겼다
   // (구현이 그쪽으로 이동했다 — npm run test:local-date).
+
+  // --- deriveDueDisplay (discussion.md 19.3절: 할 일 마감을 달력으로 직접 고른 경우) ---
+  check("deriveDueDisplay: 오늘이 마감이면 오늘까지/urgent/week", deriveDueDisplay("2026-08-28", today), {
+    meta: "오늘까지",
+    urgent: true,
+    week: true,
+  });
+  check("deriveDueDisplay: 내일이 마감이면 내일까지", deriveDueDisplay("2026-08-29", today), {
+    meta: "내일까지",
+    urgent: false,
+    week: true,
+  });
+  check("deriveDueDisplay: 3일 뒤면 3일 남음", deriveDueDisplay("2026-08-31", today), {
+    meta: "3일 남음",
+    urgent: false,
+    week: true,
+  });
+  check("deriveDueDisplay: 8일 뒤면 이번 주 범위 밖(week: false)", deriveDueDisplay("2026-09-05", today), {
+    meta: "8일 남음",
+    urgent: false,
+    week: false,
+  });
+  check("deriveDueDisplay: 지난 날짜면 마감 지남/urgent", deriveDueDisplay("2026-08-20", today), {
+    meta: "마감 지남",
+    urgent: true,
+    week: true,
+  });
+  check("deriveDueDisplay: 파싱 불가 문자열이면 null", deriveDueDisplay("not-a-date", today), null);
 
   // --- pickNextTask (시간대 무관, 회귀 확인용으로 함께 포함) ---
   const tasks: Task[] = [

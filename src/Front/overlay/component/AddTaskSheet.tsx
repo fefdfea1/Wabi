@@ -1,8 +1,13 @@
 import { BottomSheet } from "@/Front/common/component/BottomSheet";
 import { Segment } from "@/Front/common/component/Segment";
 import { TextField } from "@/Front/common/component/TextField";
+import { openDatePicker } from "@/Front/common/dom/openDatePicker";
+import { useClosingTransition } from "@/Front/common/hooks/useClosingTransition";
 import type { DueOption, TaskPhase } from "@/Front/common/types/domain";
 import styles from "./AddTaskSheet.module.css";
+
+/* discussion.md 20.12절: BottomSheet 나가는 애니메이션(모바일·태블릿 0.34s)이 다 돌 시간을 준다. */
+const CLOSE_ANIMATION_MS = 340;
 
 export interface AddTaskSheetProps {
   title: string;
@@ -12,6 +17,11 @@ export interface AddTaskSheetProps {
   due: DueOption;
   onDueChange: (due: DueOption) => void;
   dueOptions: DueOption[];
+  dueDate: string;
+  onDueDateChange: (dueDate: string) => void;
+  /** discussion.md 20.13절 8번: 과거 날짜를 고를 수 없게 하는 오늘 날짜(client effect에서만
+   *  계산됨, P-06과 같은 함정). 아직 계산 전(null)이면 min을 걸지 않는다. */
+  minDate: string | null;
   onSubmit: () => void;
   onClose: () => void;
 }
@@ -30,21 +40,26 @@ export function AddTaskSheet({
   due,
   onDueChange,
   dueOptions,
+  dueDate,
+  onDueDateChange,
+  minDate,
   onSubmit,
   onClose,
 }: AddTaskSheetProps) {
   const canSubmit = title.trim().length > 0;
+  const { closing, requestClose } = useClosingTransition(onClose, CLOSE_ANIMATION_MS);
 
   return (
     <BottomSheet
       titleId="add-task-sheet-title"
-      onClose={onClose}
+      closing={closing}
+      onRequestClose={requestClose}
       footer={
         <>
           <button type="button" className={styles.submit} disabled={!canSubmit} onClick={onSubmit}>
             등록하기
           </button>
-          <button type="button" className={styles.cancel} onClick={onClose}>
+          <button type="button" className={styles.cancel} onClick={requestClose}>
             취소
           </button>
         </>
@@ -73,20 +88,38 @@ export function AddTaskSheet({
         <p className={styles.groupLabel}>마감</p>
         <div className={styles.dueOptions}>
           {dueOptions.map((option) => {
-            const selected = option === due;
+            // discussion.md 19.3절: 날짜를 직접 고르면 그 값이 우선이라, 고정 선택지 중 어느 것도
+            // 선택 표시하지 않는다(둘이 동시에 선택된 것처럼 보이면 어느 쪽이 실제 마감인지 헷갈린다).
+            const selected = option === due && !dueDate;
             return (
               <button
                 key={option}
                 type="button"
                 aria-pressed={selected}
                 className={[styles.dueOption, selected ? styles.dueOptionSelected : ""].filter(Boolean).join(" ")}
-                onClick={() => onDueChange(option)}
+                onClick={() => {
+                  onDueChange(option);
+                  onDueDateChange("");
+                }}
               >
                 {option}
               </button>
             );
           })}
         </div>
+        <p className={styles.dueDateLabel}>또는 날짜 직접 선택</p>
+        {/* discussion.md 20.11절: 오른쪽 달력 아이콘만이 아니라 칸 전체를 눌러도 달력이 열려야
+            한다 — 네이티브 날짜 입력은 포커스만으로는 달력을 열지 않아 showPicker()를 직접 호출한다. */}
+        {/* discussion.md 20.13절 8번: 과거 날짜는 고를 수 없다(min=오늘). 출국일 입력에는
+            적용하지 않는다 — 이미 출국한 사람은 과거 날짜를 넣어야 하기 때문이다. */}
+        <TextField
+          type="date"
+          value={dueDate}
+          min={minDate ?? undefined}
+          onChange={(event) => onDueDateChange(event.target.value)}
+          onClick={(event) => openDatePicker(event.currentTarget)}
+          aria-label="마감 날짜 직접 선택"
+        />
       </div>
     </BottomSheet>
   );

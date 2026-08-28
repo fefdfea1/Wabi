@@ -1,8 +1,14 @@
 import { BottomSheet } from "@/Front/common/component/BottomSheet";
 import { Segment } from "@/Front/common/component/Segment";
 import { SourceLink } from "@/Front/common/component/SourceLink";
+import { useClosingTransition } from "@/Front/common/hooks/useClosingTransition";
 import type { GuideItem, GuideSituation } from "@/Front/common/types/domain";
 import styles from "./GuideSheet.module.css";
+
+/* discussion.md 20.12절: BottomSheet의 나가는 애니메이션(모바일·태블릿 0.34s)이 다 돌 시간을
+   준다. 데스크톱(0.22s)에서는 이보다 일찍 끝나 있어 무해하다 — 더 짧은 값을 여기 쓰면 반대로
+   모바일에서 애니메이션이 잘려 보인다. */
+const CLOSE_ANIMATION_MS = 340;
 
 export interface GuideSheetProps {
   situation: GuideSituation;
@@ -32,13 +38,15 @@ export function GuideSheet({
   onClose,
 }: GuideSheetProps) {
   const isAnswerMode = !!questionId && !!answer;
+  const { closing, requestClose } = useClosingTransition(onClose, CLOSE_ANIMATION_MS);
 
   return (
     <BottomSheet
       titleId="guide-sheet-title"
-      onClose={onClose}
+      closing={closing}
+      onRequestClose={requestClose}
       footer={
-        <button type="button" className={styles.closeButton} onClick={onClose}>
+        <button type="button" className={styles.closeButton} onClick={requestClose}>
           닫기
         </button>
       }

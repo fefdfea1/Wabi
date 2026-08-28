@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { TabId } from "@/Front/common/types/domain";
 import styles from "./TabBar.module.css";
 
@@ -5,8 +6,10 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "home", label: "홈" },
   { id: "tasks", label: "할 일" },
   { id: "notes", label: "메모" },
-  { id: "me", label: "나" },
+  { id: "me", label: "프로필" }, // discussion.md 20.4절: 탭 id는 me 그대로(저장된 상태와 어긋나지 않게), 라벨만 바꾼다.
 ];
+
+const COLLAPSE_STORAGE_KEY = "wabi:sidebarCollapsed";
 
 export interface TabBarProps {
   active: TabId;
@@ -22,6 +25,11 @@ export interface TabBarProps {
  * 태블릿 아이콘 레일(88px, 가이드만), 데스크톱 사이드바(236px, 가이드+국가 선택까지).
  * 조건부 렌더로 형태별 마크업을 따로 만들지 않는다(하이드레이션 불일치·중복 마크업 방지) —
  * 레일 전용 로고·데스크톱 브랜드·하단 그룹·배지를 모두 항상 렌더하고 CSS로 숨긴다.
+ *
+ * discussion.md 19.10절: 데스크톱 사이드바 접기 버튼이 예전에는 span+aria-hidden뿐이라 보이는데
+ * 눌리지 않는 가짜 어포던스였다(국가 배지와 같은 문제). 이제 실제 button이고, 누르면 236 ↔
+ * 88(태블릿 레일과 같은 폭)로 접힌다. 상태는 localStorage에 남겨 재방문해도 유지한다 — 초기값은
+ * 항상 펼침(false)이라 서버·최초 클라이언트 렌더가 같고, 마운트 후 저장된 값이 있으면 반영한다.
  */
 export function TabBar({
   active,
@@ -31,24 +39,60 @@ export function TabBar({
   countryLabel,
   onOpenCountryPicker,
 }: TabBarProps) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(COLLAPSE_STORAGE_KEY) === "1") setCollapsed(true);
+    } catch {
+      // 프라이빗 모드 등 저장소 접근이 막힌 환경에서는 기본값(펼침)을 유지한다.
+    }
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(COLLAPSE_STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        // 위와 같은 이유로 조용히 무시한다.
+      }
+      return next;
+    });
+  }
+
   return (
-    <nav className={styles.bar}>
+    <nav className={[styles.bar, collapsed ? styles.collapsed : ""].filter(Boolean).join(" ")}>
       {/* 태블릿 레일 전용 — W 로고만, 라벨 없음 */}
       <span className={styles.railLogo} aria-hidden="true">
         W
       </span>
 
-      {/* 데스크톱 사이드바 전용 브랜드. 사이드바 접기는 동작이 정의돼 있지 않아(캔버스는 정적
-          목업일 뿐) 가짜 클릭 어포던스를 만들지 않도록 button이 아닌 장식용 표시로만 둔다. */}
+      {/* 데스크톱 사이드바 전용 브랜드 + 접기 버튼 */}
       <div className={styles.brand}>
         <span className={styles.brandLogo} aria-hidden="true">
           W
         </span>
         <span className={styles.brandName}>Wabi</span>
-        <span className={styles.collapseHint} aria-hidden="true">
-          <span className={styles.collapseBar} />
-          <span className={styles.collapseChevron}>‹</span>
-        </span>
+        {/* discussion.md 20.2절: 기존 세로 막대+‹ 문자 아이콘이 거의 안 보인다는 지적으로,
+            뚜렷한 이중 화살표 SVG로 바꾸고 상태에 따라 180도 회전시켜 방향을 보여준다. */}
+        <button
+          type="button"
+          className={[styles.collapseHint, collapsed ? styles.collapseHintCollapsed : ""].filter(Boolean).join(" ")}
+          onClick={toggleCollapsed}
+          aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
+          aria-expanded={!collapsed}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d="M10.5 3 5.5 8l5 5"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
 
       <div className={styles.tabList}>

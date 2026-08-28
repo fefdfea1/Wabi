@@ -41,6 +41,8 @@
   color: var(--on-ink);
 }
 
+/* discussion.md 20.13절 2번: 누르는 중(모든 구간)·마우스 오버(데스크톱 전용)·키보드 포커스
+   모두 sunken 배경으로 보여준다(새 색을 만들지 않는다). 홈의 이번 주 할 일·할 일 탭 목록 공용. */
 .body {
   flex: 1;
   min-height: 64px;
@@ -53,6 +55,17 @@
   padding: 0 4px 0 0;
   text-align: left;
   cursor: pointer;
+}
+
+.body:active,
+.body:focus-visible {
+  background: var(--sunken);
+}
+
+@media (hover: hover) {
+  .body:hover {
+    background: var(--sunken);
+  }
 }
 
 .texts {

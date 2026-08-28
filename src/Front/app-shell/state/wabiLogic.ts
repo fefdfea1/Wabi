@@ -42,6 +42,29 @@ export function formatDDay(days: number): string {
 }
 
 /**
+ * discussion.md 19.3절: 할 일 마감을 달력으로 직접 고른 경우, 목록에 보여줄 상대 표현("오늘까지",
+ * "3일 남음" 등)과 urgent/week 플래그를 오늘 날짜 기준으로 계산한다. computeDDay와 같은 함정이
+ * 있다 — `today`는 반드시 호출부가 client effect 안에서 만든 `new Date()`를 넘겨야 한다. 이 함수
+ * 안에서 직접 `new Date()`를 만들면 정적 프리렌더 시점의 날짜가 굳어버린다.
+ */
+export function deriveDueDisplay(
+  dueDateIso: string,
+  today: Date,
+): { meta: string; urgent: boolean; week: boolean } | null {
+  const due = parseLocalDateOnly(dueDateIso);
+  if (Number.isNaN(due.getTime())) return null;
+
+  const t = new Date(today);
+  t.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((due.getTime() - t.getTime()) / 86_400_000);
+
+  const meta =
+    diffDays < 0 ? "마감 지남" : diffDays === 0 ? "오늘까지" : diffDays === 1 ? "내일까지" : `${diffDays}일 남음`;
+
+  return { meta, urgent: diffDays <= 0, week: diffDays <= 7 };
+}
+
+/**
  * 비자 만료일 = 출국일 + 국가별 체류 허용 기간(일). 두 값 모두 고정된 입력이라
  * "오늘"을 참조하지 않으므로 서버/클라이언트 어디서 실행해도 같은 결과라 하이드레이션 문제가 없다.
  */

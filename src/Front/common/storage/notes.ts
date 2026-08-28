@@ -8,9 +8,8 @@ const STORAGE_KEY = "wabi:notes";
  * 적는 자유 텍스트이고 구조화된 개인식별정보 필드가 아니며 서버로 전송되지 않는다.
  */
 /**
- * 캔버스 06절로 title 필드가 추가되기 전에 저장된 레코드({id, body, updatedAt})는 title이
- * 아예 없을 수 있다. 읽을 때 빈 문자열로 채워 넣어 나머지 코드가 title이 항상 있다고
- * 가정해도 깨지지 않게 한다.
+ * discussion.md 19.7절: 한때 title 필드가 있던 레코드({id, title, body, updatedAt})가 저장되어
+ * 있을 수 있다. 읽을 때 title은 그냥 무시한다 — 남아 있어도 깨지지 않을 뿐, 되살려 쓰지 않는다.
  */
 function normalize(raw: unknown): NoteRecord | null {
   if (typeof raw !== "object" || raw === null) return null;
@@ -18,7 +17,6 @@ function normalize(raw: unknown): NoteRecord | null {
   if (typeof record.id !== "string" || !record.id) return null;
   return {
     id: record.id,
-    title: typeof record.title === "string" ? record.title : "",
     body: typeof record.body === "string" ? record.body : "",
     updatedAt: typeof record.updatedAt === "string" ? record.updatedAt : "",
   };

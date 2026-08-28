@@ -5,10 +5,16 @@ import type { ThemeMode } from "@/Front/common/types/domain";
 import styles from "./ThemeToggle.module.css";
 
 const STORAGE_KEY = "theme";
+// discussion.md 19.6절: 앱 기본값이 다크로 바뀌었다(app/layout.tsx의 data-theme="dark"). 이 기본값이
+// bare fallback과 어긋나면, 아래 useLayoutEffect가 저장된 값이 없는 이용자의 화면을 마운트 시점에
+// "light"로 강제로 되돌려버린다(19.5절 이후 QA가 실제로 재현: 나 화면처럼 ThemeToggle이 있는
+// 화면으로 이동하면 다크가 라이트로 바뀌었다). 저장된 값이 없을 때의 기본값은 항상 layout.tsx와
+// 같아야 한다.
+const DEFAULT_THEME: ThemeMode = "dark";
 
 function readStoredTheme(): ThemeMode {
-  if (typeof window === "undefined") return "light";
-  return (localStorage.getItem(STORAGE_KEY) as ThemeMode | null) ?? "light";
+  if (typeof window === "undefined") return DEFAULT_THEME;
+  return (localStorage.getItem(STORAGE_KEY) as ThemeMode | null) ?? DEFAULT_THEME;
 }
 
 export function ThemeToggle() {
@@ -31,36 +37,22 @@ export function ThemeToggle() {
   }
 
   /*
-   * 캔버스 06절(태블릿·PC): 모바일은 지금의 토글 버튼 그대로 두고, 744px 이상에서는 라이트/다크
-   * 두 옵션을 한꺼번에 보여주는 세그먼트로 바뀐다. 토글(단일 버튼)과 세그먼트(두 버튼)는 클릭
-   * 의미 자체가 달라(전환 vs 명시적 선택) 마크업을 하나로 겸용할 수 없어, 두 구조를 모두 렌더링해
-   * 두고 미디어 쿼리로 하나만 보이게 한다(TabBar의 브랜드 블록과 같은 방식 — 조건부 렌더 아님).
+   * discussion.md 20.15절: 값이 라이트·다크 둘뿐이라 나란히 둔 두 옵션 중 하나를 정확히 골라
+   * 누르는 세그먼트 대신, 행 어디를 눌러도 현재의 반대로 바뀌는 토글 하나로 모든 화면 폭을
+   * 통일한다(20.13절 4번이 모바일에만 적용했던 것을 전체로 넓힌 것 — 예전 세그먼트 구조는
+   * 제거). 버튼은 부모 행(MeScreen의 .settingRow, position:relative) 전체를 덮는 투명
+   * 오버레이라 행 어디를 눌러도 전환된다. 테두리·화살표는 없고 현재 상태 글자만 오른쪽에
+   * 보인다. role="switch"·aria-checked로 온/오프 두 상태임을 알린다.
    */
   return (
-    <div className={styles.wrapper}>
-      <button type="button" className={styles.toggle} onClick={toggle}>
-        {theme === "dark" ? "다크" : "라이트"} ›
-      </button>
-      <div className={styles.segment} role="tablist" aria-label="화면 모드 선택">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={theme === "light"}
-          className={[styles.segmentOption, theme === "light" ? styles.segmentSelected : ""].filter(Boolean).join(" ")}
-          onClick={() => applyTheme("light")}
-        >
-          라이트
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={theme === "dark"}
-          className={[styles.segmentOption, theme === "dark" ? styles.segmentSelected : ""].filter(Boolean).join(" ")}
-          onClick={() => applyTheme("dark")}
-        >
-          다크
-        </button>
-      </div>
-    </div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={theme === "dark"}
+      className={styles.toggle}
+      onClick={toggle}
+    >
+      {theme === "dark" ? "다크" : "라이트"}
+    </button>
   );
 }

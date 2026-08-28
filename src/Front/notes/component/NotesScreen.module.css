@@ -5,11 +5,6 @@
   padding: 8px 20px 32px;
 }
 
-/* 모바일·태블릿에서는 그냥 통과시키는 래퍼일 뿐이라 .screen의 flex-column을 그대로 물려받는다. */
-.main {
-  display: contents;
-}
-
 .header {
   display: flex;
   align-items: center;
@@ -63,14 +58,15 @@
   border-radius: 2px;
 }
 
+/* discussion.md 20.13절 3번: 버튼(터치 영역 48×48)은 그대로 두고 아이콘만 절반 크기로 줄인다. */
 .plusVertical {
-  width: 1.8px;
-  height: 15px;
+  width: 1.4px;
+  height: 8px;
 }
 
 .plusHorizontal {
-  width: 15px;
-  height: 1.8px;
+  width: 8px;
+  height: 1.4px;
 }
 
 .addLabel {
@@ -97,6 +93,8 @@
   border-bottom: 1px solid var(--line);
 }
 
+/* discussion.md 20.13절 2번: 누르는 중(모든 구간)·마우스 오버(데스크톱 전용)·키보드 포커스
+   모두 sunken 배경으로 보여준다(새 색을 만들지 않는다). */
 .rowMain {
   flex: 1;
   min-width: 0;
@@ -111,19 +109,23 @@
   cursor: pointer;
 }
 
+.rowMain:active,
+.rowMain:focus-visible {
+  background: var(--sunken);
+}
+
+@media (hover: hover) {
+  .rowMain:hover {
+    background: var(--sunken);
+  }
+}
+
 .texts {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
-}
-
-.rowHead {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
 }
 
 .name {
@@ -135,23 +137,8 @@
   white-space: nowrap;
 }
 
-/* 태블릿·데스크톱에서만 이름 옆에 짧은 mono 날짜를 보여준다(모바일은 .meta 줄만 쓴다). */
-.date {
-  display: none;
-  flex: none;
-  font-family: var(--font-mono), monospace;
-  color: var(--muted);
-}
-
 .meta {
   font-size: 12.5px;
-  color: var(--muted);
-}
-
-/* title이 있는 메모만 본문 미리보기를 보여준다(NotesScreen.tsx notePreview 참고). 모바일에는 없다. */
-.preview {
-  display: none;
-  font-size: 13px;
   color: var(--muted);
 }
 
@@ -180,89 +167,6 @@
   padding: 20px 0;
   font-size: 13.5px;
   color: var(--muted);
-}
-
-/* 데스크톱 전용 우측 336px WRITING 패널 — 기본은 숨김. */
-.writingPanel {
-  display: none;
-}
-
-.writingCaption {
-  font-family: var(--font-mono), monospace;
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-.writingTitleInput {
-  height: 50px;
-  border-radius: 13px;
-  padding: 0 15px;
-  font-family: inherit;
-  font-size: 14.5px;
-  outline: none;
-  background: var(--bg);
-  color: var(--strong);
-  border: 1px solid var(--line);
-}
-
-.writingBody {
-  height: 280px;
-  border-radius: 14px;
-  padding: 14px 16px;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.75;
-  outline: none;
-  resize: none;
-  background: var(--bg);
-  color: var(--strong);
-  border: 1px solid var(--line);
-}
-
-.writingHint {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-
-.writingFooter {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-
-.writingSave {
-  height: 48px;
-  border-radius: 13px;
-  border: none;
-  background: var(--ink);
-  color: var(--on-ink);
-  font-size: 14.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.writingSave:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.writingDelete {
-  height: 44px;
-  border-radius: 13px;
-  border: none;
-  background: none;
-  color: var(--alert);
-  font-size: 13.5px;
-  cursor: pointer;
-}
-
-.writingDelete:disabled {
-  opacity: 0.4;
-  cursor: default;
 }
 
 /* 캔버스 06절: 태블릿(834 목업) — 본문 620px 중앙 정렬, 소개 문구가 붙고, 목록이 카드 2열 그리드로 바뀐다. */
@@ -313,34 +217,13 @@
     min-height: 0;
     /* 우측 상단에 절대 위치로 겹치는 삭제 버튼(32px + 여백)과 부딪히지 않게 오른쪽 여백을 더 둔다. */
     padding: 20px 40px 20px 20px;
-    gap: 10px;
-  }
-
-  .rowHead {
-    align-items: baseline;
+    gap: 6px;
   }
 
   .name {
     font-size: 15.5px;
     font-weight: 700;
     white-space: normal;
-  }
-
-  .date {
-    display: inline;
-    font-size: 10.5px;
-  }
-
-  .meta {
-    display: none;
-  }
-
-  .preview {
-    display: -webkit-box;
-    line-height: 1.7;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 
   .chevron {
@@ -356,27 +239,12 @@
   }
 }
 
-/* 캔버스 06절: 데스크톱(1280 목업) — 목록이 단일 열로 돌아가고, 우측에 WRITING 패널이 붙는다. */
+/* discussion.md 20.1절(사용자 지시): 데스크톱에서도 우측 336px 패널을 쓰지 않는다 — 본문이
+   이미 목록+입력을 담고 있어 중복이었다. 패널 있는 목업을 전제로 했던 "단일 열로 되돌아간다"는
+   더 이상 근거가 없어져, 목업이 따로 없는 이 구간은 임의로 새로 만들지 않고 태블릿의 카드
+   2열 그리드를 그대로 이어간다(사이드바 + 본문 620 중앙 정렬, 11.6절과 같은 원칙). "+ 새 메모"
+   버튼만 데스크톱다운 넓은 필 형태로 키운다. */
 @media (min-width: 1180px) {
-  .screen {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    max-width: none;
-    margin: 0;
-    padding: 0;
-    gap: 0;
-  }
-
-  .main {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-width: 0;
-    padding: 46px 44px;
-    gap: 28px;
-  }
-
   .addButton {
     width: auto;
     height: 48px;
@@ -394,58 +262,5 @@
     font-size: 14.5px;
     font-weight: 700;
     color: var(--on-ink);
-  }
-
-  .list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .row {
-    position: static;
-    border-radius: 0;
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .rowMain {
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 20px 16px;
-    gap: 16px;
-  }
-
-  .name {
-    font-size: 15.5px;
-    font-weight: 500;
-  }
-
-  .date {
-    font-size: 11px;
-    padding-top: 3px;
-  }
-
-  .preview {
-    -webkit-line-clamp: 1;
-    line-height: 1.6;
-  }
-
-  .deleteButton {
-    position: static;
-    width: 44px;
-    height: 44px;
-  }
-
-  .writingPanel {
-    display: flex;
-    flex: none;
-    width: 336px;
-    flex-direction: column;
-    gap: 22px;
-    padding: 46px 28px;
-    border-left: 1px solid var(--line);
-    background: var(--surface);
   }
 }

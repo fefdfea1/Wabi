@@ -5,75 +5,33 @@
   padding: 8px 20px 32px;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logo {
-  width: 26px;
-  height: 26px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 900;
-  background: var(--ink);
-  color: var(--on-ink);
-}
-
-.brandName {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--strong);
-}
-
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.guideButton {
-  width: 48px;
-  height: 48px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--sunken);
-  color: var(--text);
-  border: none;
-  cursor: pointer;
-}
-
-.countryBadge {
-  min-height: 48px;
-  padding: 0 12px;
-  border-radius: 9px;
-  font-size: 12.5px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  background: var(--sunken);
-  color: var(--text);
-  border: none;
-  cursor: pointer;
+/* discussion.md 20.7절: 시각적으로는 숨기되(정보 예산 유지) 스크린리더에는 화면 제목으로 잡히는
+   h1. 모든 구간(모바일·태블릿·데스크톱)에서 항상 렌더된다 — .header 안에 두면 데스크톱에서
+   display:none에 같이 걸려 스크린리더에도 안 잡히므로 .header 밖 최상단에 별도로 둔다. */
+.srOnlyTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .statusBlock {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* discussion.md 19.5절: 캡션 위·숫자 아래의 세로 블록. statusBlock이 가로 행이 되는
+   태블릿·데스크톱에서도 이 블록 안쪽만은 항상 세로다. */
+.ddayBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .ddayCaption {
@@ -90,13 +48,6 @@
   letter-spacing: -0.05em;
   line-height: 0.95;
   color: var(--strong);
-}
-
-.ddayEmpty {
-  margin: 0;
-  padding: 20px 0 4px;
-  font-size: 14px;
-  color: var(--muted);
 }
 
 .progressRow {
@@ -202,165 +153,16 @@
   opacity: 0.6;
 }
 
-/* 모바일·태블릿에서는 그냥 통과시키는 래퍼일 뿐이라 .screen의 flex-column을 그대로 물려받는다
-   (ThemeToggle의 wrapper와 같은 display:contents 패턴). 데스크톱에서만 실제 컬럼이 된다. */
-.main {
-  display: contents;
-}
-
-/* 데스크톱 전용 우측 336px 패널 — 기본은 숨김. */
-.rightPanel {
-  display: none;
-}
-
-.panelHeader {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.panelTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--strong);
-}
-
-.panelAddButton {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 12.5px;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.quickNote {
-  height: 132px;
-  border-radius: 14px;
-  padding: 14px 16px;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.7;
-  outline: none;
-  resize: none;
-  background: var(--bg);
-  color: var(--strong);
-  border: 1px solid var(--line);
-}
-
-.panelNoteList {
-  display: flex;
-  flex-direction: column;
-}
-
-.panelEmpty {
-  margin: 0;
-  padding: 14px 0;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.panelNoteRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-  background: none;
-  border-left: none;
-  border-right: none;
-  border-top: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  min-height: 48px;
-}
-
-.panelNoteTexts {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.panelNoteName {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--strong);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.panelNoteSub {
-  font-size: 12px;
-  color: var(--muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.panelNoteDate {
-  flex: none;
-  padding-top: 3px;
-  font-family: var(--font-mono), monospace;
-  font-size: 10.5px;
-  color: var(--muted);
-}
-
-.panelPainCard {
-  margin-top: auto;
-  border-radius: 16px;
-  background: var(--sunken);
-  border: none;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  text-align: left;
-  cursor: pointer;
-  min-height: 48px;
-}
-
-.panelPainTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--strong);
-}
-
-.panelPainMeta {
-  font-size: 12.5px;
-  color: var(--muted);
-}
-
 /* 캔버스 06절: 태블릿(744~1179px) — 헤더가 Wabi 텍스트 + 국가 필로 단순해진다(로고·가이드 버튼은
-   레일에 이미 있어 숨긴다). 본문은 620px 중앙 정렬, D-day/진행률이 가로 배치로 바뀐다. */
+   레일에 이미 있어 숨긴다). 본문은 620px 중앙 정렬, D-day/진행률이 가로 배치로 바뀐다.
+   discussion.md 20.1절/20.2절: 데스크톱 우측 336px 패널(NotesPanel)은 이제 WabiApp 셸이
+   소유하므로, 이 화면은 태블릿부터 쭉 다른 화면들과 같은 "본문 620 중앙 정렬" 한 형태다. */
 @media (min-width: 744px) {
   .screen {
     max-width: 620px;
     margin: 0 auto;
     padding: 44px 0;
     gap: 32px;
-  }
-
-  .logo,
-  .guideButton {
-    display: none;
-  }
-
-  .brandName {
-    font-size: 16px;
-  }
-
-  .countryBadge {
-    height: 36px;
-    padding: 0 14px;
-    border-radius: 10px;
-    gap: 7px;
-    font-size: 13px;
-    font-weight: 400;
-    /* 목업 실측은 36px지만 터치 대상 최소 48px 규칙(11.2절)이 우선이라 min-height는 유지한다. */
   }
 
   .statusBlock {
@@ -393,31 +195,9 @@
 }
 
 /* 캔버스 06절: 데스크톱(1180px+) — 헤더는 사이드바가 대신하므로 통째로 숨기고, D-day가 88px로
-   더 커지며, 우측 336px 패널이 나타난다. */
+   더 커진다. 우측 336px 패널(NotesPanel)의 "먼저 간 사람들이 힘들어한 것" footer가 이 본문의
+   painBlock을 대신하므로 여기서는 숨긴다(11.5절 — 다른 화면 내용을 옮겨 놓은 것뿐, 정보 중복 X). */
 @media (min-width: 1180px) {
-  .screen {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    max-width: none;
-    margin: 0;
-    padding: 0;
-    gap: 0;
-  }
-
-  .header {
-    display: none;
-  }
-
-  .main {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-width: 0;
-    padding: 46px 44px;
-    gap: 36px;
-  }
-
   .statusBlock {
     gap: 40px;
   }
@@ -444,16 +224,5 @@
 
   .painBlock {
     display: none;
-  }
-
-  .rightPanel {
-    display: flex;
-    flex: none;
-    width: 336px;
-    flex-direction: column;
-    gap: 22px;
-    padding: 46px 28px;
-    border-left: 1px solid var(--line);
-    background: var(--surface);
   }
 }

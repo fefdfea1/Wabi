@@ -1,7 +1,11 @@
 import { BottomSheet } from "@/Front/common/component/BottomSheet";
 import { SourceLink } from "@/Front/common/component/SourceLink";
+import { useClosingTransition } from "@/Front/common/hooks/useClosingTransition";
 import type { PainItem } from "@/Front/common/types/domain";
 import styles from "./PainSheet.module.css";
+
+/* discussion.md 20.12절: BottomSheet 나가는 애니메이션(모바일·태블릿 0.34s)이 다 돌 시간을 준다. */
+const CLOSE_ANIMATION_MS = 340;
 
 export interface PainSheetProps {
   items: PainItem[];
@@ -15,13 +19,15 @@ export interface PainSheetProps {
 /** 어려움 시트. 번호가 매겨진 목록 ↔ 상세(시점·본문·대처법)를 오간다(discussion.md 5.1절). */
 export function PainSheet({ items, itemId, onOpenItem, answer, onBack, onClose }: PainSheetProps) {
   const isAnswerMode = !!itemId && !!answer;
+  const { closing, requestClose } = useClosingTransition(onClose, CLOSE_ANIMATION_MS);
 
   return (
     <BottomSheet
       titleId="pain-sheet-title"
-      onClose={onClose}
+      closing={closing}
+      onRequestClose={requestClose}
       footer={
-        <button type="button" className={styles.closeButton} onClick={onClose}>
+        <button type="button" className={styles.closeButton} onClick={requestClose}>
           닫기
         </button>
       }

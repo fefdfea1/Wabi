@@ -82,6 +82,20 @@
   color: var(--muted);
 }
 
+/* discussion.md 20.9절: 전역 @keyframes를 module.css에서 참조하면 CSS Modules가 animation-name을
+   스코프 처리(해시)해 실제로 존재하지 않는 이름이 되어 조용히 무시된다 — 참조하는 파일 안에
+   직접 정의해 이름 해시가 항상 일치하게 한다. */
+@keyframes wabiSlideIn {
+  from {
+    transform: translateX(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .answer {
   display: flex;
   flex-direction: column;

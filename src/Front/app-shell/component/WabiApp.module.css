@@ -1,9 +1,10 @@
 /*
  * discussion.md 11절(캔버스 06절 기준, 전면 재작성): 모바일(<744) 1열+하단 탭바 →
  * 태블릿(744~1179) 아이콘 레일(88px)+본문 620px 중앙 → 데스크톱(>=1180) 사이드바(236px)+본문+
- * 우측 요약(336px, 홈/메모만). 내비게이션은 TabBar 쪽에서 같은 <nav> 마크업을 미디어 쿼리로만
- * 위치·형태를 바꿔 재사용한다. 본문 중앙 정렬(620px)이나 우측 요약(336px)은 화면마다 다르므로
- * 화면 하나(예: TasksScreen)로 고정하지 않고, 각 화면(NotesScreen 등) 자신의 CSS가 맡는다.
+ * 우측 요약(336px, 홈만 — 20.1절 이후 메모는 쓰지 않는다). 내비게이션(TabBar)과 우측 패널
+ * (NotesPanel)은 모두 같은 마크업을 항상 하나만 렌더해 두고 CSS/props로만 형태를 바꾼다
+ * (20.2절: 탭이 바뀔 때 폭이 뚝 끊기지 않고 부드럽게 열리고 닫히게 하려면 마운트를 유지해야
+ * 한다). 본문 중앙 정렬(620px)은 화면마다 다르므로 각 화면 자신의 CSS가 맡는다.
  */
 .shell {
   position: relative;
@@ -20,10 +21,47 @@
   min-width: 0;
 }
 
+/* discussion.md 19.7절: 우측 336 패널(NotesPanel)의 홈 전용 footer(margin-top: auto로 바닥에 붙는다). */
+.panelPainCard {
+  margin-top: auto;
+  border-radius: 16px;
+  background: var(--sunken);
+  border: none;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.panelPainTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--strong);
+}
+
+.panelPainMeta {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
 @media (min-width: 744px) {
   .shell {
     max-width: none;
     flex-direction: row;
     margin: 0;
+  }
+}
+
+/* discussion.md 11.1절(사용자 지시 2026-08-28, 1280 → 1440으로 확장): 창이 1440을 넘으면 셸은
+   더 늘어나지 않고 가운데 정렬만 된다. 사이드바 236 + 우측 336은 폭이 얼마든 고정이고, 본문은
+   남는 컨테이너 폭을 다 가져가되 그 안의 실제 콘텐츠는 620에서 멈춘다(HomeScreen/NotesScreen의
+   .main이 담당 — 본문 컨테이너와 콘텐츠를 혼동하지 않는다, 11.1절 TPC-26). */
+@media (min-width: 1180px) {
+  .shell {
+    max-width: 1440px;
+    margin: 0 auto;
   }
 }

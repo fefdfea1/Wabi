@@ -1,53 +1,28 @@
-.wrapper {
-  display: contents;
-}
-
+/* discussion.md 20.15절: 부모(MeScreen .settingRow, position:relative)를 통째로 덮는 투명
+   오버레이 — 행 어디를 눌러도 전환된다. 값 텍스트는 다른 설정 행처럼 오른쪽에 붙인다. 모든
+   화면 폭에서 같은 토글 하나를 쓴다(예전 744px+ 세그먼트는 제거).
+   20.13절 2번: active·hover(데스크톱 전용)·focus-visible 모두 sunken 배경으로 누르는 중임을
+   보여준다(새 색을 만들지 않는다). */
 .toggle {
-  height: 48px;
-  padding: 0 16px;
-  border-radius: 999px;
-  border: 1.5px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.segment {
-  display: none;
-  background: var(--sunken);
-  border-radius: 10px;
-  padding: 3px;
-}
-
-.segmentOption {
-  /*
-   * 캔버스 목업 시각 높이는 34px(태블릿)/32px(데스크톱)이지만, discussion.md 11.2절이 "태블릿의
-   * 탭 대상은 모바일과 같은 최소 48px를 유지"라고 명시적으로 못박고 있어 접근성 규칙을 우선한다.
-   */
-  min-height: 48px;
-  padding: 0 14px;
-  border-radius: 8px;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   border: none;
-  background: transparent;
+  background: none;
   color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 13.5px;
   cursor: pointer;
 }
 
-.segmentSelected {
-  background: var(--surface);
-  color: var(--strong);
-  font-weight: 700;
+.toggle:active,
+.toggle:focus-visible {
+  background: var(--sunken);
 }
 
-@media (min-width: 744px) {
-  .toggle {
-    display: none;
-  }
-  .segment {
-    display: flex;
+@media (hover: hover) {
+  .toggle:hover {
+    background: var(--sunken);
   }
 }

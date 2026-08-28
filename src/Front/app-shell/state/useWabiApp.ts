@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { COUNTRIES, GUIDE_BY_COUNTRY, PAIN_BY_COUNTRY, TASKS_BY_COUNTRY } from "@/Front/common/data/tasks";
-import { formatKoreanDate } from "@/Front/common/date/localDate";
+import { formatDateOnly, formatKoreanDate } from "@/Front/common/date/localDate";
+import { clearStoredAvatar, processAvatarFile, readStoredAvatar, writeStoredAvatar } from "@/Front/common/storage/avatar";
 import { readStoredDepartureDate, writeStoredDepartureDate } from "@/Front/common/storage/departureDate";
 import { readStoredNotes, writeStoredNotes } from "@/Front/common/storage/notes";
 import type {
@@ -14,7 +15,7 @@ import type {
   TabId,
   TaskPhase,
 } from "@/Front/common/types/domain";
-import { computeDDay, computeVisaExpiry, firstSentence, pickNextTask } from "./wabiLogic";
+import { computeDDay, computeVisaExpiry, deriveDueDisplay, firstSentence, pickNextTask } from "./wabiLogic";
 
 export type SheetKind = "guide" | "pain" | "addTask" | "noteEditor" | "countryPicker" | null;
 
@@ -63,7 +64,6 @@ export function useWabiApp() {
   // 같아 안전)이고, 실제 목록은 마운트 후 localStorage에서 읽어온다.
   const [notes, setNotes] = useState<NoteRecord[]>([]);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
-  const [noteTitle, setNoteTitle] = useState("");
   const [noteBody, setNoteBody] = useState("");
 
   useEffect(() => {
@@ -83,6 +83,21 @@ export function useWabiApp() {
   const [addTaskTitle, setAddTaskTitle] = useState("");
   const [addTaskPhase, setAddTaskPhase] = useState<TaskPhase>("pre");
   const [addTaskDue, setAddTaskDue] = useState<DueOption>("이번 주");
+  // discussion.md 19.3절: 고정 선택지 대신 달력으로 직접 고른 마감(ISO yyyy-mm-dd). 비어 있으면
+  // 고정 선택지(addTaskDue)를 쓴다 — 둘은 상호 배타적이다(AddTaskSheet에서 강제).
+  const [addTaskDueDate, setAddTaskDueDate] = useState("");
+
+  // discussion.md 19.3절: dueDate가 있는 할 일의 meta/urgent/week를 오늘 날짜 기준으로 다시
+  // 계산하기 위한 값. computeDDay와 같은 이유로 client effect 안에서만 만든다.
+  const [today, setToday] = useState<Date | null>(null);
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
+
+  // discussion.md 20.13절 8번: 할 일 마감 입력의 min(오늘)에 쓴다. P-06과 같은 함정이라
+  // 렌더 중에 계산하지 않고 today와 함께 client effect에서만 만든다 — 정적 프리렌더 시점에
+  // 굳으면 하루만 지나도 어제 날짜가 min이 되어 버린다.
+  const todayIso = useMemo(() => (today ? formatDateOnly(today) : null), [today]);
 
   const country = COUNTRIES.find((c) => c.code === countryCode) ?? null;
 
@@ -92,7 +107,18 @@ export function useWabiApp() {
   const countryGuideAll = countryCode ? (GUIDE_BY_COUNTRY[countryCode] ?? { pre: [], post: [] }) : { pre: [], post: [] };
   const countryPain = countryCode ? (PAIN_BY_COUNTRY[countryCode] ?? []) : [];
 
-  const allTasks = useMemo(() => countryTasks.concat(countryCustomTasks), [countryTasks, countryCustomTasks]);
+  // discussion.md 19.3절: dueDate가 있는 할 일(달력으로 직접 고른 마감)은 저장된 meta/urgent/week를
+  // 그대로 쓰지 않고 today 기준으로 매번 다시 계산한다 — 그렇지 않으면 "3일 남음" 같은 문구가
+  // 날짜가 지나도 그대로 굳어버린다(P-06과 같은 함정). dueDate가 없는 할 일은 그대로 둔다.
+  const allTasks = useMemo(() => {
+    const merged = countryTasks.concat(countryCustomTasks);
+    if (!today) return merged;
+    return merged.map((task) => {
+      if (!task.dueDate) return task;
+      const derived = deriveDueDisplay(task.dueDate, today);
+      return derived ? { ...task, ...derived } : task;
+    });
+  }, [countryTasks, countryCustomTasks, today]);
   const total = allTasks.length;
   const doneCount = allTasks.filter((task) => countryDone[task.id]).length;
   const phaseTasks = allTasks.filter((task) => task.phase === phase);
@@ -111,6 +137,36 @@ export function useWabiApp() {
     const stored = readStoredDepartureDate();
     if (stored) setDepartureDateState(stored);
   }, []);
+
+  // discussion.md 20.5절/20.6절: 프로필 사진(localStorage). 초기값 null은 서버·최초 클라이언트
+  // 렌더가 같아 안전하고, 실제 값은 마운트 후 읽어온다(notes/departureDate와 같은 패턴).
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAvatarUrl(readStoredAvatar());
+  }, []);
+
+  /** 처리(정사각 크롭 + 256×256 축소 + webp) 후 저장한다. 실패하면 알리고 이전 아바타를 유지한다. */
+  async function updateAvatar(file: File) {
+    let dataUrl: string;
+    try {
+      dataUrl = await processAvatarFile(file);
+    } catch {
+      window.alert("사진을 처리하지 못했습니다. 다른 사진으로 다시 시도해 주세요.");
+      return;
+    }
+    if (!writeStoredAvatar(dataUrl)) {
+      window.alert("프로필 사진을 저장하지 못했습니다. 다시 시도해 주세요.");
+      return;
+    }
+    setAvatarUrl(dataUrl);
+  }
+
+  function clearAvatar() {
+    if (!window.confirm("프로필 사진을 지울까요?")) return;
+    clearStoredAvatar();
+    setAvatarUrl(null);
+  }
 
   useEffect(() => {
     if (!departureDate) {
@@ -213,6 +269,7 @@ export function useWabiApp() {
     setAddTaskTitle("");
     setAddTaskPhase(phase);
     setAddTaskDue("이번 주");
+    setAddTaskDueDate("");
     setSheet("addTask");
   }
   function closeAddTask() {
@@ -224,39 +281,43 @@ export function useWabiApp() {
     if (!title || !countryCode) return;
     const code = countryCode;
 
+    // discussion.md 19.3절: 날짜를 직접 골랐으면 그 값이 우선이다. 등록 시점에도 한 번 계산해
+    // 두지만(즉시 표시용), 실제로 화면에 보이는 값은 allTasks에서 today 기준으로 다시 계산한다.
+    const dueDisplay = addTaskDueDate ? deriveDueDisplay(addTaskDueDate, new Date()) : null;
+
     const newTask: Task = {
       id: `custom-${Date.now()}`,
       phase: addTaskPhase,
       title,
-      meta: addTaskDue,
-      week: addTaskDue === "오늘까지" || addTaskDue === "이번 주",
-      urgent: addTaskDue === "오늘까지",
+      meta: dueDisplay ? dueDisplay.meta : addTaskDue,
+      week: dueDisplay ? dueDisplay.week : addTaskDue === "오늘까지" || addTaskDue === "이번 주",
+      urgent: dueDisplay ? dueDisplay.urgent : addTaskDue === "오늘까지",
       tag: `${addTaskPhase === "pre" ? "출국 전" : "현지 정착"} · 직접 추가`,
       body: "직접 등록한 할 일입니다.",
       items: [],
       done: false,
+      dueDate: dueDisplay ? addTaskDueDate : undefined,
     };
 
     setCustomTasks((prev) => ({ ...prev, [code]: (prev[code] ?? []).concat(newTask) }));
     setPhase(addTaskPhase);
     setSheet(null);
     setAddTaskTitle("");
+    setAddTaskDueDate("");
   }
 
-  /** discussion.md 16.3절 / 캔버스 06절: 새 메모 추가 — 편집 대상 없이 빈 제목·본문으로 시트를 연다. */
+  /** discussion.md 16.3절: 새 메모 추가 — 편집 대상 없이 빈 본문으로 시트를 연다. */
   function openAddNote() {
     setEditingNoteId(null);
-    setNoteTitle("");
     setNoteBody("");
     setSheet("noteEditor");
   }
 
-  /** 기존 메모를 눌러 편집 — 제목·본문을 채워 시트를 연다. */
+  /** 기존 메모를 눌러 편집 — 본문을 채워 시트를 연다. */
   function openEditNote(id: string) {
     const target = notes.find((n) => n.id === id);
     if (!target) return;
     setEditingNoteId(id);
-    setNoteTitle(target.title);
     setNoteBody(target.body);
     setSheet("noteEditor");
   }
@@ -264,7 +325,6 @@ export function useWabiApp() {
   function closeNoteEditor() {
     setSheet(null);
     setEditingNoteId(null);
-    setNoteTitle("");
     setNoteBody("");
   }
 
@@ -272,15 +332,14 @@ export function useWabiApp() {
   function saveNote() {
     const body = noteBody.trim();
     if (!body) return;
-    const title = noteTitle.trim();
     const updatedAt = new Date().toISOString();
 
     setNotes((prev) => {
       let next: NoteRecord[];
       if (editingNoteId) {
-        next = prev.map((n) => (n.id === editingNoteId ? { ...n, title, body, updatedAt } : n));
+        next = prev.map((n) => (n.id === editingNoteId ? { ...n, body, updatedAt } : n));
       } else {
-        next = prev.concat({ id: `note-${Date.now()}`, title, body, updatedAt });
+        next = prev.concat({ id: `note-${Date.now()}`, body, updatedAt });
       }
       writeStoredNotes(next);
       return next;
@@ -290,15 +349,15 @@ export function useWabiApp() {
   }
 
   /**
-   * discussion.md 11.5절: 홈 데스크톱 우측 패널의 "바로 적는" textarea. 별도 저장 버튼이
-   * 없는 빠른 기록용이라, Enter로 곧바로 메모 한 편(제목 없이)을 만든다.
+   * discussion.md 19.7절: 홈·메모가 공유하는 우측 336 패널의 "바로 적는" textarea. 별도 모달을
+   * 띄우지 않고, 저장하기를 누르면 곧바로 메모 한 편을 만들고 입력창을 비운다.
    */
   function quickAddNote(body: string) {
     const trimmed = body.trim();
     if (!trimmed) return;
     const updatedAt = new Date().toISOString();
     setNotes((prev) => {
-      const next = prev.concat({ id: `note-${Date.now()}`, title: "", body: trimmed, updatedAt });
+      const next = prev.concat({ id: `note-${Date.now()}`, body: trimmed, updatedAt });
       writeStoredNotes(next);
       return next;
     });
@@ -349,6 +408,9 @@ export function useWabiApp() {
     visaExpiryLabel,
     showVisaLine,
     setDepartureDate,
+    avatarUrl,
+    updateAvatar,
+    clearAvatar,
 
     allTasks,
     total,
@@ -395,12 +457,13 @@ export function useWabiApp() {
     setAddTaskPhase,
     addTaskDue,
     setAddTaskDue,
+    addTaskDueDate,
+    setAddTaskDueDate,
+    todayIso,
     submitAddTask,
 
     notes: sortedNotes,
     editingNoteId,
-    noteTitle,
-    setNoteTitle,
     noteBody,
     setNoteBody,
     openAddNote,

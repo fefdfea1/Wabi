@@ -54,8 +54,14 @@
   display: none;
 }
 
-.avatar {
+/* discussion.md 20.5절: "정보 수정" 버튼을 없애고 아바타 자체를 누르게 한다 — 프로필 사진을
+   바꾸는 자리다. */
+.avatarWrap {
+  position: relative;
   flex: none;
+}
+
+.avatarButton {
   width: 60px;
   height: 60px;
   border-radius: 999px;
@@ -66,6 +72,46 @@
   font-size: 19px;
   font-weight: 700;
   color: var(--text);
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.avatarClear {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--on-ink);
+  border: 2px solid var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 시각적으로만 숨긴다(선택 버튼이 avatarButton 클릭으로 이 input을 연다). */
+.avatarFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .profileTexts {
@@ -82,21 +128,6 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--strong);
-}
-
-/* 태블릿에는 목업에 없고 데스크톱(1180px+)에서만 나타난다 */
-.editButton {
-  display: none;
-  flex: none;
-  height: 44px;
-  padding: 0 18px;
-  border-radius: 12px;
-  border: 1.5px solid var(--ink);
-  background: transparent;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--ink);
-  cursor: pointer;
 }
 
 /* 태블릿·데스크톱 전용 요약 두 칸 */
@@ -141,14 +172,19 @@
   color: var(--strong);
 }
 
+/* discussion.md 20.13절 4번: position:relative는 ThemeToggle의 모바일 토글(투명 오버레이
+   버튼)이 이 행 전체를 기준으로 덮을 수 있게 한다. */
 .settingRow,
 .settingRowStatic {
+  position: relative;
   display: flex;
   align-items: center;
   min-height: 60px;
   border-bottom: 1px solid var(--line);
 }
 
+/* discussion.md 20.13절 2번: 누르는 중(모든 구간)·마우스 오버(데스크톱 전용)·키보드 포커스
+   모두 sunken 배경으로 보여준다(새 색을 만들지 않는다). */
 .settingRowButton {
   display: flex;
   align-items: center;
@@ -162,13 +198,44 @@
   cursor: pointer;
 }
 
+.settingRowButton:active,
+.settingRowButton:focus-visible {
+  background: var(--sunken);
+}
+
+@media (hover: hover) {
+  .settingRowButton:hover {
+    background: var(--sunken);
+  }
+}
+
+/* discussion.md 19.8절: label이라 행 전체가 클릭 대상이다(표준 HTML label↔input 동작).
+   국가 변경(button)과 같은 시각 규격(min-height 60/62)을 유지해 두 행이 똑같이 눌린다는
+   느낌을 준다. position:relative는 .dateInput이 행 전체를 덮는 기준이 된다. */
 .settingRowDate {
   position: relative;
   display: flex;
   align-items: center;
   min-height: 60px;
+  cursor: pointer;
 }
 
+/* discussion.md 20.13절 2번: .dateInput은 opacity:0이라 자신에게 배경을 줘도 안 보인다 —
+   :has()로 입력의 상태를 보고 보이는 행(label) 쪽에 배경을 준다. */
+.settingRowDate:has(.dateInput:active),
+.settingRowDate:has(.dateInput:focus-visible) {
+  background: var(--sunken);
+}
+
+@media (hover: hover) {
+  .settingRowDate:has(.dateInput:hover) {
+    background: var(--sunken);
+  }
+}
+
+/* discussion.md 20.12절(PM 실측 규명): 1×1로 클립해 숨기면 브라우저가 네이티브 달력 팝업을
+   그 1×1 지점(행 왼쪽 끝)에 붙여 열어 라벨을 덮어버린다. 클립 대신 행 전체 크기를 유지한 채
+   opacity:0으로만 안 보이게 해야 팝업이 행 전체를 기준으로 아래쪽에 열린다. */
 .dateInput {
   position: absolute;
   inset: 0;
@@ -237,9 +304,9 @@
   }
 }
 
-/* 캔버스 06절: 데스크톱(1180px+) — 프로필 카드가 조금 더 커지고 "정보 수정" 버튼이 붙는다. */
+/* 캔버스 06절: 데스크톱(1180px+) — 프로필 카드가 조금 더 커진다. */
 @media (min-width: 1180px) {
-  .avatar {
+  .avatarButton {
     width: 64px;
     height: 64px;
     font-size: 20px;
@@ -252,10 +319,5 @@
 
   .profileDepart {
     font-size: 22px;
-  }
-
-  .editButton {
-    display: flex;
-    align-items: center;
   }
 }

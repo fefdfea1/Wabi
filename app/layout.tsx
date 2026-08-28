@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Noto_Sans_KR, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const notoSansKr = Noto_Sans_KR({
@@ -33,7 +34,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* discussion.md 29절: 방문 수만 집계한다. 앱이 라우트 하나(/)뿐이라 URL에
+            이용자가 적은 글이 실릴 자리가 없고, localStorage 값을 넘기지 않는다
+            (SecurityReview.md 2절 3번 규칙 확인 완료). */}
+        <Analytics />
+      </body>
     </html>
   );
 }

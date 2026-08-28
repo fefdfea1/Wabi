@@ -197,3 +197,18 @@ discussion.md 9절은 "실제 파일 업로드와 기기 저장"을 이번 구�
 ## 9. 다음 단계
 
 Frontend는 이 문서와 `Agent-Prompts/Front-end.md`를 함께 따라 구현합니다. 3절(다크모드) 구현 시 개발 모드 Strict Mode 재마운트 이슈(`useLayoutEffect` 재적용)를 놓치지 않도록 특히 주의가 필요합니다. discussion.md 6.2절(조사 전 데이터)은 Research-team 산출물이 도착하기 전까지 데이터 구조와 화면만 구현하고 값은 비워둡니다. 파일 추가 시트(다음 차수) 구현 착수 시에는 6절의 IndexedDB·서버 업로드 금지·SVG 인라인 미리보기 금지 제약을 그대로 따릅니다.
+
+
+---
+
+## 부록. 런타임 의존성 현황 (2026-08-28 갱신)
+
+| 패키지 | 버전 | 쓰임 |
+|---|---|---|
+| `next` | 16.3.3 | App Router, 정적 프리렌더 |
+| `react` / `react-dom` | 19 계열 | UI |
+| `@vercel/analytics` | `^2.0.1` | 방문 집계(`app/layout.tsx`의 `<Analytics />`) |
+
+`@vercel/analytics`는 외부로 데이터를 보내는 **첫 의존성**입니다. `SecurityReview.md` 부록에 도입 전 확인 결과를 남겼습니다. 그 확인은 앱의 라우트가 `/` 하나뿐이라는 사실에 기대고 있으므로, 라우트를 늘릴 때 다시 검토해야 합니다.
+
+API 키가 필요한 SDK는 여전히 없습니다.

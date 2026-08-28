@@ -1,8 +1,13 @@
 /* discussion.md 20.15절: 부모(MeScreen .settingRow, position:relative)를 통째로 덮는 투명
    오버레이 — 행 어디를 눌러도 전환된다. 값 텍스트는 다른 설정 행처럼 오른쪽에 붙인다. 모든
    화면 폭에서 같은 토글 하나를 쓴다(예전 744px+ 세그먼트는 제거).
-   20.13절 2번: active·hover(데스크톱 전용)·focus-visible 모두 sunken 배경으로 누르는 중임을
-   보여준다(새 색을 만들지 않는다). */
+
+   21.6절: 이 버튼에는 **배경을 주지 않는다.** inset:0 오버레이라 자기 배경을 칠하면
+   뒤에 있는 "화면 모드" 라벨을 덮어버린다(실측: 라벨 중앙의 elementFromPoint가 이 버튼을
+   반환한다). 눌린 표시가 필요한 배경은 MeScreen의 .settingRow:has(button:...)가 그린다 —
+   .settingRowDate가 opacity:0 입력을 다루는 방식(20.13절 2번)과 같다.
+
+   21.6절: hover에는 색을 바꾸지 않는다. 대신 헤더 버튼과 같은 어휘로 살짝 줄어든다. */
 .toggle {
   position: absolute;
   inset: 0;
@@ -14,15 +19,26 @@
   color: var(--muted);
   font-size: 13.5px;
   cursor: pointer;
-}
-
-.toggle:active,
-.toggle:focus-visible {
-  background: var(--sunken);
+  transform: scale(1);
+  transition: transform 0.12s ease-out;
 }
 
 @media (hover: hover) {
   .toggle:hover {
-    background: var(--sunken);
+    transform: scale(0.97);
+  }
+}
+
+.toggle:active {
+  transform: scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle {
+    transition: none;
+  }
+  .toggle:hover,
+  .toggle:active {
+    transform: scale(1);
   }
 }

@@ -166,7 +166,9 @@
 .settingsHeading {
   display: none;
   margin: 0;
+  padding-right: 14px;
   padding-bottom: 8px;
+  padding-left: 14px;
   font-size: 13px;
   font-weight: 700;
   color: var(--strong);
@@ -180,7 +182,17 @@
   display: flex;
   align-items: center;
   min-height: 60px;
+  padding: 0 14px;
   border-bottom: 1px solid var(--line);
+}
+
+/* discussion.md 21.6절: ThemeToggle은 inset:0 오버레이라 자기 배경을 칠하면 뒤의 라벨을
+   덮는다. 눌린 표시는 행이 그린다. .toggle은 다른 모듈이라 해시된 클래스명을 여기서 쓸 수
+   없으므로 요소 선택자(button)로 짚는다 — 이 행에 든 버튼은 토글 하나뿐이다.
+   hover는 색을 바꾸지 않는다(21.6절): ThemeToggle이 scale로만 반응한다. */
+.settingRow:has(button:active),
+.settingRow:has(button:focus-visible) {
+  background: var(--sunken);
 }
 
 /* discussion.md 20.13절 2번: 누르는 중(모든 구간)·마우스 오버(데스크톱 전용)·키보드 포커스
@@ -192,7 +204,7 @@
   background: none;
   border: none;
   border-bottom: 1px solid var(--line);
-  padding: 0;
+  padding: 0 14px;
   width: 100%;
   text-align: left;
   cursor: pointer;
@@ -217,6 +229,7 @@
   display: flex;
   align-items: center;
   min-height: 60px;
+  padding: 0 14px;
   cursor: pointer;
 }
 

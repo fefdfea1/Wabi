@@ -11,7 +11,10 @@ export interface TasksScreenProps {
   phaseDoneCount: number;
   done: Record<string, boolean>;
   onToggleTask: (id: string) => void;
-  onOpenDetail: (id: string) => void;
+  /** discussion.md 27.1절/27.3절: 목록 행은 더 이상 상세를 열지 않는다(토글만) — 상세는
+   *  홈의 다음 할 일 카드에서만 연다. discussion.md 27.2절: 상세로 가는 길이 없어지며 끊긴
+   *  삭제 경로를 행 자체의 삭제 버튼으로 되살린다(확인 시트는 호출부가 연다). */
+  onDeleteTask: (id: string) => void;
   onOpenAddTask: () => void;
 }
 
@@ -28,7 +31,7 @@ export function TasksScreen({
   phaseDoneCount,
   done,
   onToggleTask,
-  onOpenDetail,
+  onDeleteTask,
   onOpenAddTask,
 }: TasksScreenProps) {
   return (
@@ -67,7 +70,7 @@ export function TasksScreen({
               done={!!done[task.id]}
               urgent={!!task.urgent && !done[task.id]}
               onToggle={() => onToggleTask(task.id)}
-              onOpen={() => onOpenDetail(task.id)}
+              onDelete={() => onDeleteTask(task.id)}
             />
           ))
         )}

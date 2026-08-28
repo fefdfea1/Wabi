@@ -52,11 +52,27 @@
   color: var(--muted);
 }
 
+/* discussion.md 26.1절(26.1 대체 — 여백을 채우는 대신 비어 있던 32px 자체를 없앤다): 평소에는
+   좌우 여백이 둘 다 없다 — 이름은 왼쪽 끝, 날짜는 오른쪽 끝. 마우스를 올리면 삭제 버튼이
+   오른쪽에서 밀고 들어오며 날짜를 왼쪽으로 민다. gap을 0으로 둬서(간격도 버튼 폭에 포함되지
+   않는 한 생기지 않는다) 평소 상태에 빈 공간이 전혀 남지 않게 한다. */
 .rowWrap {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0;
   border-bottom: 1px solid var(--line);
+}
+
+@media (hover: hover) {
+  .rowWrap:hover {
+    background: var(--sunken);
+  }
+}
+
+/* :has(.row:active)를 hover 미디어쿼리 뒤에 둔다(20.13절 6번과 같은 이유). */
+.rowWrap:has(.row:active),
+.rowWrap:has(.row:focus-visible) {
+  background: var(--sunken);
 }
 
 .row {
@@ -92,24 +108,44 @@
   color: var(--muted);
 }
 
-/* discussion.md 19.4절: 평소엔 숨겨 두고, 행에 hover했을 때만 보인다(데스크톱 전용 패널이라
-   hover만으로 충분하다). 레이아웃이 흔들리지 않도록 자리는 항상 차지한다. */
+/* discussion.md 26.1절: visibility:hidden은 자리를 차지해 오른쪽에만 여백이 있는 것처럼
+   보이게 한 원인이었다 — width:0(+overflow:hidden)으로 바꿔 평소엔 폭 자체가 없게 한다.
+   width만 transition을 걸어 늘어나는 동안 형제인 .row가 flex:1이라 자연히 줄어들고, 그 안의
+   .date(flex:none)는 .row의 오른쪽 끝을 계속 따라가 부드럽게 밀리는 것처럼 보인다(따로
+   .date에 transition을 걸 필요가 없다) — 튀지 않고 폭 변화 하나로 전부 이어진다.
+   :focus-within도 함께 걸어 키보드로 탭해 들어왔을 때도 나타나고, 나타난 뒤 커서가 버튼
+   위로 이동해도(자식이라 여전히 hover 중) 계속 보인다 — 눌리기 전에 사라지지 않는다. */
 .delete {
   flex: none;
-  width: 28px;
+  width: 0;
+  /* discussion.md 26.1절(PM 실측): flex 아이템의 min-width 기본값(auto)은 안의 내용(svg 아이콘)의
+     최소 크기를 바닥으로 삼을 수 있어 명시적으로 0으로 누른다. */
+  min-width: 0;
   height: 28px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   background: none;
   border: none;
+  /* 브라우저의 button 기본 padding(1px 6px)이 남아 있으면 box-sizing:border-box라도 좌우
+     6px씩(12px)이 바닥이 돼 width:0이 실제로는 12px로 실측됐다 — 0으로 눌러 진짜 0이 되게 한다. */
+  padding: 0;
+  box-sizing: border-box;
   color: var(--muted);
   cursor: pointer;
-  visibility: hidden;
+  transition: width 0.18s ease-out;
 }
 
-.rowWrap:hover .delete {
-  visibility: visible;
+.rowWrap:hover .delete,
+.rowWrap:focus-within .delete {
+  width: 32px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delete {
+    transition: none;
+  }
 }
 
 /* discussion.md 19.1절/20.1절/20.2절: 좌측 사이드바는 100dvh로 화면을 채우는데 우측은 내용

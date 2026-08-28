@@ -68,7 +68,11 @@
 }
 
 /* discussion.md 25.7절: 제목 부분을 누르면 25.3절대로 제목칸을 채운다 — 20.13절 2번과 같은
-   원칙으로 누르는 중임을 sunken 배경으로 보여준다. */
+   원칙으로 누르는 중임을 sunken 배경으로 보여준다.
+   discussion.md 25.8절(PM 실측): button 요소는 UA 기본 글자색(buttontext)이 상속을 이겨서
+   (P-07과 같은 계열) color를 직접 지정하지 않으면 다크 rgb(255,255,255)/라이트 rgb(0,0,0)이
+   그대로 나온다 — 토큰 체계 밖의 값이다. 실제 텍스트는 안쪽 .recommendedTitle span 자신의
+   color가 이겨 이미 정상 렌더되지만, 이 버튼 자체에도 명시해 자손이 늘어도 안전하게 한다. */
 .recommendedTitleButton {
   flex: 1;
   min-width: 0;
@@ -77,6 +81,7 @@
   padding: 0 4px;
   border: none;
   background: none;
+  color: var(--text);
   cursor: pointer;
   text-align: left;
 }
@@ -100,15 +105,18 @@
   background: var(--sunken);
 }
 
+/* discussion.md 25.8절: 제목 입력칸(--strong)보다 한 단계 낮은 --text를 쓴다 — 사용자가 요청한
+   "약간 낮은 색"이 되는 동시에, 추천은 제목을 채우는 보조 수단이라는 25절의 위계와 맞는다. */
 .recommendedTitle {
   font-size: 14.5px;
   font-weight: 500;
-  color: var(--strong);
+  color: var(--text);
 }
 
+/* discussion.md 25.8절: 고른 상태는 --strong으로 올려 무엇을 골랐는지 드러낸다. */
 .recommendedRowSelected .recommendedTitle {
   font-weight: 700;
-  color: var(--ink);
+  color: var(--strong);
 }
 
 /* discussion.md 25.7절: "!"는 조사해 둔 자료를 펼치는 버튼이다 — 경고가 아니라 읽을 거리

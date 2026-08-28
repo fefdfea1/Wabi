@@ -1,22 +1,49 @@
+/* discussion.md 27.1절: 체크 버튼과 본문 버튼이 형제로 나뉘어 있던 것을 하나(.toggle)로
+   합쳤다 — 삭제 버튼(.deleteButton)만 별개 형제다. align-items:center로 두 버튼 모두 자기
+   높이(toggle은 min-height, deleteButton은 고정 48px)대로 가운데 정렬된다. */
 .row {
   display: flex;
   align-items: center;
-  gap: 4px;
   min-height: 64px;
   border-bottom: 1px solid var(--line);
 }
 
-.checkButton {
+/* discussion.md 27.1절: 행 전체가 하나의 토글 버튼이다 — 화살표(상세 열기)는 없앴다. 안쪽에
+   체크 영역(48px 터치 자리, 시각 원 22px 가운데 정렬)과 텍스트를 담는다. */
+.toggle {
+  flex: 1;
+  min-width: 0;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .toggle:hover {
+    background: var(--sunken);
+  }
+}
+
+/* :active/:focus-visible을 hover 미디어쿼리 뒤에 둔다(20.13절 6번과 같은 이유 — 마우스를
+   올린 채 누르면 소스 순서가 늦은 쪽이 이겨야 한다). */
+.toggle:active,
+.toggle:focus-visible {
+  background: var(--sunken);
+}
+
+.checkArea {
   flex: none;
   width: 48px;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
 }
 
 .circle {
@@ -39,33 +66,6 @@
   background: var(--ink);
   border-color: var(--ink);
   color: var(--on-ink);
-}
-
-/* discussion.md 20.13절 2번: 누르는 중(모든 구간)·마우스 오버(데스크톱 전용)·키보드 포커스
-   모두 sunken 배경으로 보여준다(새 색을 만들지 않는다). 홈의 이번 주 할 일·할 일 탭 목록 공용. */
-.body {
-  flex: 1;
-  min-height: 64px;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: none;
-  border: none;
-  padding: 0 4px 0 0;
-  text-align: left;
-  cursor: pointer;
-}
-
-.body:active,
-.body:focus-visible {
-  background: var(--sunken);
-}
-
-@media (hover: hover) {
-  .body:hover {
-    background: var(--sunken);
-  }
 }
 
 .texts {
@@ -104,17 +104,49 @@
   color: var(--muted);
 }
 
-.chevron {
+/* discussion.md 27.2절: 21.4절에서 삭제 버튼을 상세 화면에 뒀는데, 27.1절이 상세로 가는 길을
+   없애 지울 방법이 사라졌다 — 메모 행(NotesPanel)과 같은 어휘를 쓴다. 터치 기기(hover 없음)
+   에서는 NotesScreen처럼 항상 48px로 보인다(기본값) — hover가 가능한 기기에서만 평소 폭 0,
+   마우스를 올리면 밀고 들어오게 바꾼다. 토글과 별개 버튼이라 눌러도 완료가 토글되지 않는다. */
+.deleteButton {
   flex: none;
-  font-size: 15px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  box-sizing: border-box;
   color: var(--muted);
-  opacity: 0.6;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .deleteButton {
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    transition: width 0.18s ease-out;
+  }
+
+  .row:hover .deleteButton,
+  .row:focus-within .deleteButton {
+    width: 48px;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .deleteButton {
+    transition: none;
+  }
 }
 
 /* 캔버스 06절: 태블릿·데스크톱 모두 행 높이가 64 → 68로 커진다(홈·할 일 화면 공용). */
 @media (min-width: 744px) {
   .row,
-  .body {
+  .toggle {
     min-height: 68px;
   }
 }

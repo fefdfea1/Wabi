@@ -202,6 +202,9 @@
     gap: 12px;
   }
 
+  /* discussion.md 26.4절(PM 실측): .rowMain이 hover·active·focus-visible에서 받는 --sunken
+     배경은 자기 둥글기가 없어, 카드(border-radius:16px)의 둥근 모서리 밖으로 각진 사각형이
+     튀어나왔다 — overflow:hidden으로 자식을 카드 모양대로 잘라낸다. */
   .row {
     position: relative;
     min-height: 0;
@@ -209,6 +212,7 @@
     border-radius: 16px;
     background: var(--surface);
     border: 1px solid var(--line);
+    overflow: hidden;
   }
 
   .rowMain {
@@ -218,6 +222,13 @@
     /* 우측 상단에 절대 위치로 겹치는 삭제 버튼(32px + 여백)과 부딪히지 않게 오른쪽 여백을 더 둔다. */
     padding: 20px 40px 20px 20px;
     gap: 6px;
+  }
+
+  /* discussion.md 26.4절: overflow:hidden은 요소 바깥으로 그려지는 것을 전부 자른다 —
+     기본 포커스 외곽선은 테두리 바깥쪽에 그려져 함께 잘리면 Tab으로 옮겨 다닐 때 지금
+     어디에 있는지 알 수 없어진다. outline-offset을 음수로 둬 외곽선이 안쪽에 그려지게 한다. */
+  .rowMain:focus-visible {
+    outline-offset: -2px;
   }
 
   .name {

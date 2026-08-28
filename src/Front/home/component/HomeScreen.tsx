@@ -16,7 +16,11 @@ export interface HomeScreenProps {
   done: Record<string, boolean>;
   painCount: number;
   onToggleTask: (id: string) => void;
+  /** discussion.md 27.3절: 상세는 이제 다음 할 일 카드("지금 하기")에서만 연다 — 아래 "이번 주
+   *  할 일" 목록 행은 같은 ListRow를 쓰지만 27.1절대로 토글만 하고 상세를 열지 않는다. */
   onOpenDetail: (id: string) => void;
+  /** discussion.md 27.2절: 목록 행의 삭제 버튼이 누르는 확인 시트를 연다. */
+  onDeleteTask: (id: string) => void;
   onOpenPain: () => void;
   onGoTasks: () => void;
 }
@@ -42,6 +46,7 @@ export function HomeScreen({
   painCount,
   onToggleTask,
   onOpenDetail,
+  onDeleteTask,
   onOpenPain,
   onGoTasks,
 }: HomeScreenProps) {
@@ -108,7 +113,7 @@ export function HomeScreen({
                 done={!!done[task.id]}
                 urgent={!!task.urgent && !done[task.id]}
                 onToggle={() => onToggleTask(task.id)}
-                onOpen={() => onOpenDetail(task.id)}
+                onDelete={() => onDeleteTask(task.id)}
               />
             ))}
           </div>
@@ -119,7 +124,8 @@ export function HomeScreen({
         <span className={styles.painTexts}>
           <span className={styles.painTitle}>먼저 간 사람들이 힘들어한 것</span>
           <span className={styles.painMeta}>
-            {painCount > 0 ? `자주 나온 어려움 ${painCount}가지와 대처법` : "정리하는 대로 보여드립니다"}
+            {/* discussion.md 28절: 개수를 세어 보여주지 않고 항상 같은 문구를 쓴다. */}
+            {painCount > 0 ? "자주 나온 어려움" : "정리하는 대로 보여드립니다"}
           </span>
         </span>
         <span className={styles.chevron} aria-hidden="true">

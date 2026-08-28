@@ -2,6 +2,7 @@
 
 import { COUNTRIES } from "@/Front/common/data/tasks";
 import { AppHeader } from "@/Front/common/component/AppHeader";
+import { ConfirmSheet } from "@/Front/common/component/ConfirmSheet";
 import { TabBar } from "@/Front/common/component/TabBar";
 import { NotesPanel } from "@/Front/common/component/NotesPanel";
 import { HomeScreen } from "@/Front/home/component/HomeScreen";
@@ -52,6 +53,7 @@ export function WabiApp() {
             painCount={wabi.painItems.length}
             onToggleTask={wabi.toggleTask}
             onOpenDetail={wabi.openDetail}
+            onDeleteTask={wabi.requestDeleteTask}
             onOpenPain={wabi.openPain}
             onGoTasks={() => wabi.goTab("tasks")}
           />
@@ -65,7 +67,7 @@ export function WabiApp() {
             phaseDoneCount={wabi.phaseDoneCount}
             done={wabi.done}
             onToggleTask={wabi.toggleTask}
-            onOpenDetail={wabi.openDetail}
+            onDeleteTask={wabi.requestDeleteTask}
             onOpenAddTask={wabi.openAddTask}
           />
         ) : null}
@@ -108,9 +110,8 @@ export function WabiApp() {
           <button type="button" className={styles.panelPainCard} onClick={wabi.openPain}>
             <span className={styles.panelPainTitle}>먼저 간 사람들이 힘들어한 것</span>
             <span className={styles.panelPainMeta}>
-              {wabi.painItems.length > 0
-                ? `자주 나온 어려움 ${wabi.painItems.length}가지 ›`
-                : "정리하는 대로 보여드립니다 ›"}
+              {/* discussion.md 28절: 개수를 세어 보여주지 않고 항상 같은 문구를 쓴다. */}
+              {wabi.painItems.length > 0 ? "자주 나온 어려움 ›" : "정리하는 대로 보여드립니다 ›"}
             </span>
           </button>
         }
@@ -194,6 +195,20 @@ export function WabiApp() {
           onComplete={wabi.completeDetail}
           onUndo={wabi.undoDetail}
           onDelete={wabi.deleteTask}
+        />
+      ) : null}
+
+      {/* discussion.md 27.2절: 목록 행(ListRow)의 삭제 버튼이 여는 확인 시트 — 상세 화면을
+          거치지 않는 별도 경로라 셸 레벨에 공용으로 둔다(TasksScreen·HomeScreen 둘 다 같은
+          ListRow를 쓴다). */}
+      {wabi.pendingDeleteTask ? (
+        <ConfirmSheet
+          titleId="list-row-delete-confirm-title"
+          title="이 할 일을 삭제할까요?"
+          description="삭제하면 되돌릴 수 없습니다."
+          confirmLabel="삭제하기"
+          onConfirm={wabi.confirmDeleteTask}
+          onClose={wabi.cancelDeleteTask}
         />
       ) : null}
     </div>

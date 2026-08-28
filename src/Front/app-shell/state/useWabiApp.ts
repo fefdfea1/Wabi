@@ -403,26 +403,53 @@ export function useWabiApp() {
   }
 
   /**
-   * discussion.md 21.4절: 직접 추가한 할 일만 삭제 대상이다(TaskDetailScreen이 isCustom일
-   * 때만 삭제 버튼·확인 시트를 보여주므로 여기서는 별도 방어 없이 detailTask를 그대로 쓴다).
-   * 삭제 후에는 상세 화면을 닫고 목록으로 돌아온다 — 사라진 항목의 상세에 남아 있으면 안 된다.
+   * discussion.md 21.4절: 직접 추가한 할 일만 삭제 대상이다(TaskDetailScreen이 isCustom일 때만,
+   * ListRow는 27.2절부터 모든 행에 삭제 버튼을 보여준다 — 27절 이후 목록의 모든 할 일은 이용자가
+   * 직접 넣었거나 추천에서 고른 것이라 예외가 없다). 저장에 실패하면 알리고 false를 돌려줘
+   * 호출부가 UI를 닫지 않게 한다(24.1절) — 실제로는 남아 있는데 사라진 것처럼 보이면 안 된다.
    */
-  function deleteTask() {
-    if (!detailTask || !countryCode) return;
+  function performDeleteTask(id: string): boolean {
+    if (!countryCode) return false;
     const code = countryCode;
-    const id = detailTask.id;
     const next = { ...customTasks, [code]: (customTasks[code] ?? []).filter((task) => task.id !== id) };
 
-    // discussion.md 24.1절: 삭제 저장이 실패하면 상세 화면을 닫지 않는다 — 실제로는 남아 있는데
-    // 목록으로 돌아가 사라진 것처럼 보이면 안 된다.
     if (!writeStoredCustomTasks(next)) {
       window.alert("할 일을 삭제하지 못했습니다. 다시 시도해 주세요.");
-      return;
+      return false;
     }
 
     setCustomTasks(next);
-    setDetailTaskId(null);
+    return true;
   }
+
+  /** 상세 화면(TaskDetailScreen)에서 삭제 — 성공하면 상세를 닫고 목록으로 돌아온다. */
+  function deleteTask() {
+    if (!detailTask) return;
+    if (performDeleteTask(detailTask.id)) setDetailTaskId(null);
+  }
+
+  /**
+   * discussion.md 27.2절: 목록 행(ListRow)의 삭제 버튼이 누른 항목의 id를 담아 확인 시트를 연다
+   * — 상세 화면을 거치지 않는 새 경로다. 시트는 WabiApp 셸 레벨에서 pendingDeleteTaskId를 보고
+   * 렌더한다(TasksScreen·HomeScreen 둘 다 같은 ListRow를 쓰므로 공용으로 둔다).
+   */
+  const [pendingDeleteTaskId, setPendingDeleteTaskId] = useState<string | null>(null);
+
+  function requestDeleteTask(id: string) {
+    setPendingDeleteTaskId(id);
+  }
+
+  function cancelDeleteTask() {
+    setPendingDeleteTaskId(null);
+  }
+
+  /** 목록 행에서 시작된 삭제를 확정한다 — 성공하면 확인 시트를 닫는다. */
+  function confirmDeleteTask() {
+    if (!pendingDeleteTaskId) return;
+    if (performDeleteTask(pendingDeleteTaskId)) setPendingDeleteTaskId(null);
+  }
+
+  const pendingDeleteTask = pendingDeleteTaskId ? (allTasks.find((task) => task.id === pendingDeleteTaskId) ?? null) : null;
 
   /** discussion.md 16.3절: 새 메모 추가 — 편집 대상 없이 빈 본문으로 시트를 연다. */
   function openAddNote() {
@@ -565,6 +592,11 @@ export function useWabiApp() {
     completeDetail,
     undoDetail,
     deleteTask,
+
+    pendingDeleteTask,
+    requestDeleteTask,
+    cancelDeleteTask,
+    confirmDeleteTask,
 
     sheet,
     openGuide,

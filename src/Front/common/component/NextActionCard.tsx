@@ -15,8 +15,9 @@ export interface NextActionCardProps {
 /**
  * discussion.md 4절: 1.5px ink 테두리, radius 16~18, NEXT 캡션 + 제목 + 설명 + 기한.
  * discussion.md 37절: "지금 하기" 버튼과 지어낸 설명 문구를 없앴다 — 이 카드는 더 이상 누르는
- * 곳이 아니다(37.3절: 상세로 가는 길은 사용자 확인을 받는 중이라 TaskDetailScreen 자체는
- * 그대로 둔다). 기한 자리는 버튼처럼 보이면 안 되므로 테두리·배경·cursor:pointer를 주지 않는다.
+ * 곳이 아니다. 37.3절이 남겼던 물음(상세로 가는 유일한 길이 이 카드였다)은 38절에서
+ * "상세 화면을 아예 없앤다"로 정리됐다 — TaskDetailScreen 자체가 삭제됐다. 기한 자리는
+ * 버튼처럼 보이면 안 되므로 테두리·배경·cursor:pointer를 주지 않는다.
  */
 export function NextActionCard({ title, description, dueLabel, urgent }: NextActionCardProps) {
   return (

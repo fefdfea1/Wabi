@@ -14,7 +14,6 @@ import { PainSheet } from "@/Front/overlay/component/PainSheet";
 import { AddTaskSheet } from "@/Front/overlay/component/AddTaskSheet";
 import { NoteEditorSheet } from "@/Front/overlay/component/NoteEditorSheet";
 import { CountryPickerSheet } from "@/Front/overlay/component/CountryPickerSheet";
-import { TaskDetailScreen } from "@/Front/task-detail/component/TaskDetailScreen";
 import { useWabiApp } from "@/Front/app-shell/state/useWabiApp";
 import styles from "./WabiApp.module.css";
 
@@ -185,21 +184,9 @@ export function WabiApp() {
         />
       ) : null}
 
-      {wabi.detailTask ? (
-        <TaskDetailScreen
-          task={wabi.detailTask}
-          done={wabi.detailDone}
-          isCustom={wabi.detailIsCustom}
-          onClose={wabi.closeDetail}
-          onComplete={wabi.completeDetail}
-          onUndo={wabi.undoDetail}
-          onDelete={wabi.deleteTask}
-        />
-      ) : null}
-
-      {/* discussion.md 27.2절: 목록 행(ListRow)의 삭제 버튼이 여는 확인 시트 — 상세 화면을
-          거치지 않는 별도 경로라 셸 레벨에 공용으로 둔다(TasksScreen·HomeScreen 둘 다 같은
-          ListRow를 쓴다). */}
+      {/* discussion.md 27.2절/38절: 목록 행(ListRow)의 삭제 버튼이 여는 확인 시트 — 상세
+          화면은 38절에서 없앴고, 이 시트가 유일한 삭제 경로다. TasksScreen·HomeScreen 둘 다
+          같은 ListRow를 쓰므로 셸 레벨에 공용으로 둔다. */}
       {wabi.pendingDeleteTask ? (
         <ConfirmSheet
           titleId="list-row-delete-confirm-title"

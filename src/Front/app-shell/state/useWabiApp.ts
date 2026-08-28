@@ -82,7 +82,6 @@ export function useWabiApp() {
   // discussion.md 21.1절: 직접 추가한 할 일(localStorage, notes와 같은 자리). 초기값은 항상
   // 빈 Record(서버·최초 클라이언트 렌더가 같아 안전)이고, 실제 값은 마운트 후 읽어온다.
   const [customTasks, setCustomTasks] = useState<Record<CountryCode, Task[]>>(emptyByCountry<Task>);
-  const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     setCustomTasks((prev) => ({ ...prev, ...readStoredCustomTasks() }));
@@ -269,13 +268,6 @@ export function useWabiApp() {
   // 국가의 체류 허용 기간이 조사되지 않았으면 비자 만료일 줄 자체를 숨긴다.
   const showVisaLine = !departureDate || !!visaExpiryLabel;
 
-  const detailTask = detailTaskId ? (allTasks.find((task) => task.id === detailTaskId) ?? null) : null;
-  const detailDone = detailTask ? !!countryDone[detailTask.id] : false;
-  // discussion.md 21.4절: 삭제 버튼은 직접 추가한 할 일에만 보인다. countryCustomTasks(정렬 전
-  // 원본)에 id가 있는지로 판별한다 — createdAt 필드 유무로 추측하지 않는다(손상된 레코드는
-  // createdAt이 없어도 여전히 직접 추가한 항목이다, 21.2절).
-  const detailIsCustom = detailTask ? countryCustomTasks.some((task) => task.id === detailTask.id) : false;
-
   const guideQuestions = countryGuideAll[guideSituation];
   const guideAnswer = guideQuestionId
     ? (countryGuideAll.pre.concat(countryGuideAll.post).find((q) => q.id === guideQuestionId) ?? null)
@@ -304,31 +296,6 @@ export function useWabiApp() {
 
   function goTab(next: TabId) {
     setTab(next);
-    setDetailTaskId(null);
-  }
-
-  function openDetail(id: string) {
-    setDetailTaskId(id);
-  }
-
-  function closeDetail() {
-    setDetailTaskId(null);
-  }
-
-  /** 완료 처리 후 상세를 닫는다(discussion.md 18.2절). */
-  function completeDetail() {
-    if (detailTask && !detailDone) toggleTask(detailTask.id);
-    setDetailTaskId(null);
-  }
-
-  /**
-   * discussion.md 18.2절: 원본 캔버스는 완료 취소만 하고 상세를 열어 두지만(completeDetail과
-   * 다른 동작), 사용자 지시로 이 항목을 고쳤다 — 완료 처리든 완료 취소든 "이 항목에 대한
-   * 처리를 끝냈다"는 뜻은 같으므로 completeDetail과 똑같이 상세를 닫는다.
-   */
-  function undoDetail() {
-    if (detailTask && detailDone) toggleTask(detailTask.id);
-    setDetailTaskId(null);
   }
 
   function openGuide() {
@@ -454,10 +421,10 @@ export function useWabiApp() {
   }
 
   /**
-   * discussion.md 21.4절: 직접 추가한 할 일만 삭제 대상이다(TaskDetailScreen이 isCustom일 때만,
-   * ListRow는 27.2절부터 모든 행에 삭제 버튼을 보여준다 — 27절 이후 목록의 모든 할 일은 이용자가
-   * 직접 넣었거나 추천에서 고른 것이라 예외가 없다). 저장에 실패하면 알리고 false를 돌려줘
-   * 호출부가 UI를 닫지 않게 한다(24.1절) — 실제로는 남아 있는데 사라진 것처럼 보이면 안 된다.
+   * discussion.md 21.4절/38.1절: 목록의 모든 할 일이 이용자가 직접 넣었거나 추천에서 고른
+   * 것이라(27절 이후 상세 화면 없이 목록 행에서만 삭제한다) 예외가 없다. 저장에 실패하면
+   * 알리고 false를 돌려줘 호출부가 UI를 닫지 않게 한다(24.1절) — 실제로는 남아 있는데 사라진
+   * 것처럼 보이면 안 된다.
    */
   function performDeleteTask(id: string): boolean {
     if (!countryCode) return false;
@@ -473,16 +440,11 @@ export function useWabiApp() {
     return true;
   }
 
-  /** 상세 화면(TaskDetailScreen)에서 삭제 — 성공하면 상세를 닫고 목록으로 돌아온다. */
-  function deleteTask() {
-    if (!detailTask) return;
-    if (performDeleteTask(detailTask.id)) setDetailTaskId(null);
-  }
-
   /**
-   * discussion.md 27.2절: 목록 행(ListRow)의 삭제 버튼이 누른 항목의 id를 담아 확인 시트를 연다
-   * — 상세 화면을 거치지 않는 새 경로다. 시트는 WabiApp 셸 레벨에서 pendingDeleteTaskId를 보고
-   * 렌더한다(TasksScreen·HomeScreen 둘 다 같은 ListRow를 쓰므로 공용으로 둔다).
+   * discussion.md 27.2절/38절: 목록 행(ListRow)의 삭제 버튼이 누른 항목의 id를 담아 확인 시트를
+   * 연다(상세 화면은 38절에서 없앴다 — 목록 행이 유일한 삭제 경로다). 시트는 WabiApp 셸
+   * 레벨에서 pendingDeleteTaskId를 보고 렌더한다(TasksScreen·HomeScreen 둘 다 같은 ListRow를
+   * 쓰므로 공용으로 둔다).
    */
   const [pendingDeleteTaskId, setPendingDeleteTaskId] = useState<string | null>(null);
 
@@ -614,10 +576,9 @@ export function useWabiApp() {
   }
 
   /**
-   * 국가를 바꾸면 이전 국가의 할 일 상세는 더 이상 유효하지 않으므로 닫는다(7절 탭 이동 규칙과
-   * 같은 이유). discussion.md 35.2절/35.3절(PM 실측): 저장 계층이 없어 새로고침하면 항상
-   * 호주로 돌아갔다 — 메모·출국일과 같은 방식으로 저장한다. 저장에 실패하면 알리고 화면
-   * 상태(선택된 국가·시트)를 바꾸지 않는다(24.1절) — 저장 안 된 선택이 된 것처럼 보이면 안 된다.
+   * discussion.md 35.2절/35.3절(PM 실측): 저장 계층이 없어 새로고침하면 항상 호주로 돌아갔다 —
+   * 메모·출국일과 같은 방식으로 저장한다. 저장에 실패하면 알리고 화면 상태(선택된 국가·시트)를
+   * 바꾸지 않는다(24.1절) — 저장 안 된 선택이 된 것처럼 보이면 안 된다.
    */
   function selectCountry(code: CountryCode) {
     if (!writeStoredCountry(code)) {
@@ -627,7 +588,6 @@ export function useWabiApp() {
 
     setCountryCode(code);
     setSheet(null);
-    setDetailTaskId(null);
   }
 
   return {
@@ -663,15 +623,6 @@ export function useWabiApp() {
     nextDescription,
     done: countryDone,
     toggleTask,
-
-    detailTask,
-    detailDone,
-    detailIsCustom,
-    openDetail,
-    closeDetail,
-    completeDetail,
-    undoDetail,
-    deleteTask,
 
     pendingDeleteTask,
     requestDeleteTask,

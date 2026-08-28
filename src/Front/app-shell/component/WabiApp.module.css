@@ -1,7 +1,9 @@
 /*
- * discussion.md 11절: 모바일(<640) 그대로 → 태블릿(640~1023) 본문 520px 중앙 정렬,
- * 하단 탭바 유지 → 데스크톱(>=1024) 좌측 240px 사이드바 + 본문 720px. 내비게이션은
- * TabBar 쪽에서 같은 <nav> 마크업을 미디어 쿼리로만 위치·방향을 바꿔 재사용한다.
+ * discussion.md 11절(캔버스 06절 기준, 전면 재작성): 모바일(<744) 1열+하단 탭바 →
+ * 태블릿(744~1179) 아이콘 레일(88px)+본문 620px 중앙 → 데스크톱(>=1180) 사이드바(236px)+본문+
+ * 우측 요약(336px, 홈/메모만). 내비게이션은 TabBar 쪽에서 같은 <nav> 마크업을 미디어 쿼리로만
+ * 위치·형태를 바꿔 재사용한다. 본문 중앙 정렬(620px)이나 우측 요약(336px)은 화면마다 다르므로
+ * 화면 하나(예: TasksScreen)로 고정하지 않고, 각 화면(NotesScreen 등) 자신의 CSS가 맡는다.
  */
 .shell {
   position: relative;
@@ -15,25 +17,13 @@
 
 .content {
   flex: 1;
+  min-width: 0;
 }
 
-@media (min-width: 640px) {
-  .shell {
-    max-width: 520px;
-  }
-}
-
-@media (min-width: 1024px) {
+@media (min-width: 744px) {
   .shell {
     max-width: none;
     flex-direction: row;
     margin: 0;
-  }
-
-  .content {
-    max-width: 720px;
-    width: 100%;
-    min-width: 0;
-    margin: 0 auto;
   }
 }

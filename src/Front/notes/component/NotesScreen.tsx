@@ -1,4 +1,4 @@
-import { formatMonthDay } from "@/Front/common/date/localDate";
+import { formatMonthDay, formatShortDate } from "@/Front/common/date/localDate";
 import type { NoteRecord } from "@/Front/common/types/domain";
 import styles from "./NotesScreen.module.css";
 
@@ -7,12 +7,30 @@ export interface NotesScreenProps {
   onOpenAdd: () => void;
   onOpenEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  panelTitle: string;
+  panelBody: string;
+  onPanelTitleChange: (value: string) => void;
+  onPanelBodyChange: (value: string) => void;
+  onPanelSave: () => void;
+  isPanelEditing: boolean;
+  onPanelDelete: () => void;
 }
 
-/** discussion.md 16.3절: 목록에서 본문 첫 줄이 제목 역할을 한다. */
-function firstLine(body: string): string {
-  const [line] = body.split("\n");
+/** discussion.md 16.3절: 목록에서 title이 비어 있으면 본문 첫 줄이 제목 역할을 한다. */
+function firstLine(text: string): string {
+  const [line] = text.split("\n");
   return line;
+}
+
+function noteHeading(note: NoteRecord): string {
+  return note.title.trim() || firstLine(note.body);
+}
+
+/** title이 있을 때만 본문을 미리보기로 따로 보여준다 — title이 없으면 이미 제목 자리에 첫 줄을 썼으니 중복 표시하지 않는다. */
+function notePreview(note: NoteRecord): string {
+  if (note.title.trim()) return note.body;
+  const rest = note.body.split("\n").slice(1).join(" ").trim();
+  return rest;
 }
 
 function metaText(note: NoteRecord): string {
@@ -20,55 +38,120 @@ function metaText(note: NoteRecord): string {
   return label ? `수정 ${label}` : "";
 }
 
-/** 메모 화면. ListRow 규격(행 높이 64px)을 따르는 목록 + BottomSheet 추가·편집(discussion.md 16절). */
-export function NotesScreen({ notes, onOpenAdd, onOpenEdit, onDelete }: NotesScreenProps) {
+/**
+ * 메모 화면. 모바일은 ListRow 규격을 따르는 단순 목록(discussion.md 16절). 태블릿(744~1179px)은
+ * 카드 2열 그리드, 데스크톱(1180px+)은 단일 열 목록 + 우측 336px WRITING 패널로 바뀐다(캔버스 06절).
+ * 우측 패널은 시트 편집과 같은 상태를 그대로 보여주는 것뿐이라 시트를 따로 숨기지 않는다 —
+ * 목록 항목을 누르면 기존과 똑같이 시트(데스크톱에서는 480px 모달)가 열리고, 패널도 같은 값을
+ * 동시에 보여준다. 패널의 저장·삭제 버튼은 그 상태를 시트 없이도 바로 조작할 수 있게 한다.
+ */
+export function NotesScreen({
+  notes,
+  onOpenAdd,
+  onOpenEdit,
+  onDelete,
+  panelTitle,
+  panelBody,
+  onPanelTitleChange,
+  onPanelBodyChange,
+  onPanelSave,
+  isPanelEditing,
+  onPanelDelete,
+}: NotesScreenProps) {
+  const canPanelSave = panelBody.trim().length > 0;
+
   return (
     <div className={styles.screen}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>메모</h1>
-        <button type="button" className={styles.addButton} onClick={onOpenAdd} aria-label="메모 추가">
-          <span aria-hidden="true" className={styles.plusVertical} />
-          <span aria-hidden="true" className={styles.plusHorizontal} />
-        </button>
-      </header>
+      <div className={styles.main}>
+        <header className={styles.header}>
+          <div className={styles.headingBlock}>
+            <h1 className={styles.title}>메모</h1>
+            <p className={styles.intro}>
+              계좌 번호, 집주인 연락처, 병원 이름처럼 잊으면 곤란한 것을 적어 두는 곳입니다.
+            </p>
+          </div>
+          <button type="button" className={styles.addButton} onClick={onOpenAdd} aria-label="메모 추가">
+            <span aria-hidden="true" className={styles.plusVertical} />
+            <span aria-hidden="true" className={styles.plusHorizontal} />
+            <span className={styles.addLabel}>+ 새 메모</span>
+          </button>
+        </header>
 
-      <p className={styles.notice}>기억해 둘 것을 적어 두세요. 이 기기에만 저장됩니다.</p>
+        <p className={styles.notice}>기억해 둘 것을 적어 두세요. 이 기기에만 저장됩니다.</p>
 
-      <div className={styles.list}>
-        {notes.length === 0 ? (
-          <p className={styles.empty}>아직 적어 둔 메모가 없습니다.</p>
-        ) : (
-          notes.map((note) => (
-            <div key={note.id} className={styles.row}>
-              <button type="button" className={styles.rowMain} onClick={() => onOpenEdit(note.id)}>
-                <span className={styles.texts}>
-                  <span className={styles.name}>{firstLine(note.body)}</span>
-                  <span className={styles.meta}>{metaText(note)}</span>
-                </span>
-                <span className={styles.chevron} aria-hidden="true">
-                  ›
-                </span>
-              </button>
-              <button
-                type="button"
-                className={styles.deleteButton}
-                aria-label="메모 삭제하기"
-                onClick={() => onDelete(note.id)}
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path
-                    d="M3 4h10M6.5 4V2.5h3V4M4.5 4v9a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V4"
-                    stroke="currentColor"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-          ))
-        )}
+        <div className={styles.list}>
+          {notes.length === 0 ? (
+            <p className={styles.empty}>아직 적어 둔 메모가 없습니다.</p>
+          ) : (
+            notes.map((note) => (
+              <div key={note.id} className={styles.row}>
+                <button type="button" className={styles.rowMain} onClick={() => onOpenEdit(note.id)}>
+                  <span className={styles.texts}>
+                    <span className={styles.rowHead}>
+                      <span className={styles.name}>{noteHeading(note)}</span>
+                      <span className={styles.date}>{formatShortDate(note.updatedAt)}</span>
+                    </span>
+                    <span className={styles.meta}>{metaText(note)}</span>
+                    {notePreview(note) ? <span className={styles.preview}>{notePreview(note)}</span> : null}
+                  </span>
+                  <span className={styles.chevron} aria-hidden="true">
+                    ›
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.deleteButton}
+                  aria-label="메모 삭제하기"
+                  onClick={() => onDelete(note.id)}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M3 4h10M6.5 4V2.5h3V4M4.5 4v9a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V4"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))
+          )}
+        </div>
       </div>
+
+      {/* 데스크톱(1180px+) 전용 우측 336px WRITING 패널 — 캔버스 06절/11.5절. */}
+      <aside className={styles.writingPanel}>
+        <span className={styles.writingCaption}>WRITING</span>
+        <input
+          className={styles.writingTitleInput}
+          aria-label="메모 제목"
+          placeholder="제목 (예: 집주인 연락처)"
+          value={panelTitle}
+          onChange={(event) => onPanelTitleChange(event.target.value)}
+        />
+        <textarea
+          className={styles.writingBody}
+          aria-label="메모 내용"
+          placeholder="내용을 적어 두세요"
+          value={panelBody}
+          onChange={(event) => onPanelBodyChange(event.target.value)}
+        />
+        <p className={styles.writingHint}>기기에만 저장됩니다.</p>
+        <div className={styles.writingFooter}>
+          <button type="button" className={styles.writingSave} disabled={!canPanelSave} onClick={onPanelSave}>
+            저장하기
+          </button>
+          <button
+            type="button"
+            className={styles.writingDelete}
+            disabled={!isPanelEditing}
+            onClick={onPanelDelete}
+          >
+            삭제
+          </button>
+        </div>
+      </aside>
     </div>
   );
 }

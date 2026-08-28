@@ -16,7 +16,7 @@ import type {
 } from "@/Front/common/types/domain";
 import { computeDDay, computeVisaExpiry, firstSentence, pickNextTask } from "./wabiLogic";
 
-export type SheetKind = "guide" | "pain" | "addTask" | "noteEditor" | null;
+export type SheetKind = "guide" | "pain" | "addTask" | "noteEditor" | "countryPicker" | null;
 
 export const DUE_OPTIONS: DueOption[] = ["오늘까지", "이번 주", "이번 달", "도착 후"];
 
@@ -55,7 +55,6 @@ export function useWabiApp() {
   const [tab, setTab] = useState<TabId>("home");
   const [phase, setPhase] = useState<TaskPhase>("pre");
   const [countryCode, setCountryCode] = useState<CountryCode | null>(COUNTRIES[0]?.code ?? null);
-  const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [done, setDone] = useState<Record<CountryCode, Record<string, boolean>>>(seedDone);
   const [customTasks, setCustomTasks] = useState<Record<CountryCode, Task[]>>(emptyByCountry<Task>);
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
@@ -64,6 +63,7 @@ export function useWabiApp() {
   // 같아 안전)이고, 실제 목록은 마운트 후 localStorage에서 읽어온다.
   const [notes, setNotes] = useState<NoteRecord[]>([]);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [noteTitle, setNoteTitle] = useState("");
   const [noteBody, setNoteBody] = useState("");
 
   useEffect(() => {
@@ -169,15 +169,20 @@ export function useWabiApp() {
     setDetailTaskId(null);
   }
 
-  /** 캔버스 completeDetail: 미완료면 완료 처리하고 상세를 닫는다(DETAIL-04). */
+  /** 완료 처리 후 상세를 닫는다(discussion.md 18.2절). */
   function completeDetail() {
     if (detailTask && !detailDone) toggleTask(detailTask.id);
     setDetailTaskId(null);
   }
 
-  /** 캔버스 undoDetail: 완료 취소만 하고 상세는 열린 채로 둔다(DETAIL-06, DETAIL-04와 다른 동작). */
+  /**
+   * discussion.md 18.2절: 원본 캔버스는 완료 취소만 하고 상세를 열어 두지만(completeDetail과
+   * 다른 동작), 사용자 지시로 이 항목을 고쳤다 — 완료 처리든 완료 취소든 "이 항목에 대한
+   * 처리를 끝냈다"는 뜻은 같으므로 completeDetail과 똑같이 상세를 닫는다.
+   */
   function undoDetail() {
     if (detailTask && detailDone) toggleTask(detailTask.id);
+    setDetailTaskId(null);
   }
 
   function openGuide() {
@@ -238,18 +243,20 @@ export function useWabiApp() {
     setAddTaskTitle("");
   }
 
-  /** discussion.md 16.3절: 새 메모 추가 — 편집 대상 없이 빈 본문으로 시트를 연다. */
+  /** discussion.md 16.3절 / 캔버스 06절: 새 메모 추가 — 편집 대상 없이 빈 제목·본문으로 시트를 연다. */
   function openAddNote() {
     setEditingNoteId(null);
+    setNoteTitle("");
     setNoteBody("");
     setSheet("noteEditor");
   }
 
-  /** 기존 메모를 눌러 편집 — 본문을 채워 시트를 연다. */
+  /** 기존 메모를 눌러 편집 — 제목·본문을 채워 시트를 연다. */
   function openEditNote(id: string) {
     const target = notes.find((n) => n.id === id);
     if (!target) return;
     setEditingNoteId(id);
+    setNoteTitle(target.title);
     setNoteBody(target.body);
     setSheet("noteEditor");
   }
@@ -257,6 +264,7 @@ export function useWabiApp() {
   function closeNoteEditor() {
     setSheet(null);
     setEditingNoteId(null);
+    setNoteTitle("");
     setNoteBody("");
   }
 
@@ -264,20 +272,36 @@ export function useWabiApp() {
   function saveNote() {
     const body = noteBody.trim();
     if (!body) return;
+    const title = noteTitle.trim();
     const updatedAt = new Date().toISOString();
 
     setNotes((prev) => {
       let next: NoteRecord[];
       if (editingNoteId) {
-        next = prev.map((n) => (n.id === editingNoteId ? { ...n, body, updatedAt } : n));
+        next = prev.map((n) => (n.id === editingNoteId ? { ...n, title, body, updatedAt } : n));
       } else {
-        next = prev.concat({ id: `note-${Date.now()}`, body, updatedAt });
+        next = prev.concat({ id: `note-${Date.now()}`, title, body, updatedAt });
       }
       writeStoredNotes(next);
       return next;
     });
 
     closeNoteEditor();
+  }
+
+  /**
+   * discussion.md 11.5절: 홈 데스크톱 우측 패널의 "바로 적는" textarea. 별도 저장 버튼이
+   * 없는 빠른 기록용이라, Enter로 곧바로 메모 한 편(제목 없이)을 만든다.
+   */
+  function quickAddNote(body: string) {
+    const trimmed = body.trim();
+    if (!trimmed) return;
+    const updatedAt = new Date().toISOString();
+    setNotes((prev) => {
+      const next = prev.concat({ id: `note-${Date.now()}`, title: "", body: trimmed, updatedAt });
+      writeStoredNotes(next);
+      return next;
+    });
   }
 
   /** discussion.md 16.3절: 삭제는 목록 행에서, 확인을 한 번 받는다. */
@@ -288,16 +312,24 @@ export function useWabiApp() {
       writeStoredNotes(next);
       return next;
     });
+    if (editingNoteId === id) closeNoteEditor();
   }
 
-  function toggleCountryPicker() {
-    setCountryPickerOpen((prev) => !prev);
+  /**
+   * discussion.md 18.1절 / 캔버스 06절: 홈 배지·사이드바 국가 선택·'나' 화면 국가 변경 행,
+   * 세 진입점이 모두 이 하나의 시트를 연다(CountryPickerSheet).
+   */
+  function openCountryPickerSheet() {
+    setSheet("countryPicker");
+  }
+  function closeCountryPickerSheet() {
+    setSheet(null);
   }
 
-  /** 국가를 바꾸면 이전 국가의 할 일 상세는 더 이상 유효하지 않으므로 닫는다. */
+  /** 국가를 바꾸면 이전 국가의 할 일 상세는 더 이상 유효하지 않으므로 닫는다(7절 탭 이동 규칙과 같은 이유). */
   function selectCountry(code: CountryCode) {
     setCountryCode(code);
-    setCountryPickerOpen(false);
+    setSheet(null);
     setDetailTaskId(null);
   }
 
@@ -308,8 +340,8 @@ export function useWabiApp() {
     setPhase,
 
     country,
-    countryPickerOpen,
-    toggleCountryPicker,
+    openCountryPickerSheet,
+    closeCountryPickerSheet,
     selectCountry,
     dday,
     departureDate,
@@ -367,12 +399,15 @@ export function useWabiApp() {
 
     notes: sortedNotes,
     editingNoteId,
+    noteTitle,
+    setNoteTitle,
     noteBody,
     setNoteBody,
     openAddNote,
     openEditNote,
     closeNoteEditor,
     saveNote,
+    quickAddNote,
     deleteNote,
   };
 }

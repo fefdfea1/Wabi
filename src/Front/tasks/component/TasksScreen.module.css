@@ -79,3 +79,29 @@
   font-size: 13.5px;
   color: var(--muted);
 }
+
+/* 캔버스 06절: 태블릿(834 목업) — 본문 620px 중앙 정렬. discussion.md 11.6절: 데스크톱은
+   캔버스에 목업이 없어 같은 사이드바 236 + 본문 620 중앙 정렬을 그대로 쓴다(우측 패널 없음,
+   새로 만들지 않는다) — 그래서 이 구간을 min-width 상한 없이 744px부터 그대로 유지한다. */
+@media (min-width: 744px) {
+  .screen {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 44px 0;
+    gap: 28px;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .addButton {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+  }
+
+  .progressLabelRow {
+    font-size: 13px;
+  }
+}

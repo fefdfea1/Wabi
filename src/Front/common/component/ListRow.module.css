@@ -97,3 +97,11 @@
   color: var(--muted);
   opacity: 0.6;
 }
+
+/* 캔버스 06절: 태블릿·데스크톱 모두 행 높이가 64 → 68로 커진다(홈·할 일 화면 공용). */
+@media (min-width: 744px) {
+  .row,
+  .body {
+    min-height: 68px;
+  }
+}

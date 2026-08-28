@@ -1,0 +1,36 @@
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.headingTitle {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--strong);
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.empty {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.closeButton {
+  height: 50px;
+  border-radius: 13px;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--sunken);
+  color: var(--strong);
+  border: none;
+  cursor: pointer;
+}

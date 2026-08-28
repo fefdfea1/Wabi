@@ -5,10 +5,23 @@
   padding: 8px 20px 32px;
 }
 
+/* 모바일·태블릿에서는 그냥 통과시키는 래퍼일 뿐이라 .screen의 flex-column을 그대로 물려받는다. */
+.main {
+  display: contents;
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+}
+
+.headingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 .title {
@@ -19,7 +32,17 @@
   color: var(--strong);
 }
 
+/* 태블릿·데스크톱 전용 소개 문구. 모바일 문구(.notice)는 그대로 두고 이걸 대신 숨긴다. */
+.intro {
+  display: none;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
 .addButton {
+  flex: none;
   width: 48px;
   height: 48px;
   border-radius: 12px;
@@ -27,6 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 9px;
   background: var(--ink);
   border: none;
   cursor: pointer;
@@ -47,6 +71,10 @@
 .plusHorizontal {
   width: 15px;
   height: 1.8px;
+}
+
+.addLabel {
+  display: none;
 }
 
 .notice {
@@ -91,6 +119,13 @@
   gap: 3px;
 }
 
+.rowHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .name {
   font-size: 15px;
   font-weight: 500;
@@ -100,8 +135,23 @@
   white-space: nowrap;
 }
 
+/* 태블릿·데스크톱에서만 이름 옆에 짧은 mono 날짜를 보여준다(모바일은 .meta 줄만 쓴다). */
+.date {
+  display: none;
+  flex: none;
+  font-family: var(--font-mono), monospace;
+  color: var(--muted);
+}
+
 .meta {
   font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* title이 있는 메모만 본문 미리보기를 보여준다(NotesScreen.tsx notePreview 참고). 모바일에는 없다. */
+.preview {
+  display: none;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -130,4 +180,272 @@
   padding: 20px 0;
   font-size: 13.5px;
   color: var(--muted);
+}
+
+/* 데스크톱 전용 우측 336px WRITING 패널 — 기본은 숨김. */
+.writingPanel {
+  display: none;
+}
+
+.writingCaption {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.writingTitleInput {
+  height: 50px;
+  border-radius: 13px;
+  padding: 0 15px;
+  font-family: inherit;
+  font-size: 14.5px;
+  outline: none;
+  background: var(--bg);
+  color: var(--strong);
+  border: 1px solid var(--line);
+}
+
+.writingBody {
+  height: 280px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.75;
+  outline: none;
+  resize: none;
+  background: var(--bg);
+  color: var(--strong);
+  border: 1px solid var(--line);
+}
+
+.writingHint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.writingFooter {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.writingSave {
+  height: 48px;
+  border-radius: 13px;
+  border: none;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.writingSave:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.writingDelete {
+  height: 44px;
+  border-radius: 13px;
+  border: none;
+  background: none;
+  color: var(--alert);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.writingDelete:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* 캔버스 06절: 태블릿(834 목업) — 본문 620px 중앙 정렬, 소개 문구가 붙고, 목록이 카드 2열 그리드로 바뀐다. */
+@media (min-width: 744px) {
+  .screen {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 44px 0;
+    gap: 26px;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .intro {
+    display: block;
+  }
+
+  .notice {
+    display: none;
+  }
+
+  .addButton {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .row {
+    position: relative;
+    min-height: 0;
+    border-bottom: none;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .rowMain {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    /* 우측 상단에 절대 위치로 겹치는 삭제 버튼(32px + 여백)과 부딪히지 않게 오른쪽 여백을 더 둔다. */
+    padding: 20px 40px 20px 20px;
+    gap: 10px;
+  }
+
+  .rowHead {
+    align-items: baseline;
+  }
+
+  .name {
+    font-size: 15.5px;
+    font-weight: 700;
+    white-space: normal;
+  }
+
+  .date {
+    display: inline;
+    font-size: 10.5px;
+  }
+
+  .meta {
+    display: none;
+  }
+
+  .preview {
+    display: -webkit-box;
+    line-height: 1.7;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .chevron {
+    display: none;
+  }
+
+  .deleteButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* 캔버스 06절: 데스크톱(1280 목업) — 목록이 단일 열로 돌아가고, 우측에 WRITING 패널이 붙는다. */
+@media (min-width: 1180px) {
+  .screen {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+  }
+
+  .main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    padding: 46px 44px;
+    gap: 28px;
+  }
+
+  .addButton {
+    width: auto;
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 13px;
+  }
+
+  .plusVertical,
+  .plusHorizontal {
+    display: none;
+  }
+
+  .addLabel {
+    display: inline;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--on-ink);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .row {
+    position: static;
+    border-radius: 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rowMain {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 20px 16px;
+    gap: 16px;
+  }
+
+  .name {
+    font-size: 15.5px;
+    font-weight: 500;
+  }
+
+  .date {
+    font-size: 11px;
+    padding-top: 3px;
+  }
+
+  .preview {
+    -webkit-line-clamp: 1;
+    line-height: 1.6;
+  }
+
+  .deleteButton {
+    position: static;
+    width: 44px;
+    height: 44px;
+  }
+
+  .writingPanel {
+    display: flex;
+    flex: none;
+    width: 336px;
+    flex-direction: column;
+    gap: 22px;
+    padding: 46px 28px;
+    border-left: 1px solid var(--line);
+    background: var(--surface);
+  }
 }

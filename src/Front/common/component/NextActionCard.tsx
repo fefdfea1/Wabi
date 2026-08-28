@@ -11,9 +11,11 @@ export interface NextActionCardProps {
 export function NextActionCard({ title, description, ctaLabel, onAction }: NextActionCardProps) {
   return (
     <div className={styles.card}>
-      <span className={styles.caption}>NEXT</span>
-      <p className={styles.title}>{title}</p>
-      <p className={styles.description}>{description}</p>
+      <div className={styles.texts}>
+        <span className={styles.caption}>NEXT</span>
+        <p className={styles.title}>{title}</p>
+        <p className={styles.description}>{description}</p>
+      </div>
       <button type="button" className={styles.cta} onClick={onAction}>
         {ctaLabel}
       </button>

@@ -44,15 +44,23 @@
   background: var(--line);
 }
 
-/* discussion.md 11.1절: 데스크톱(>=1024px)에서는 바텀시트가 중앙 모달로 바뀐다 —
-   네 모서리 모두 26px, wabiSheetUp 대신 페이드+미세 확대, 끌어내릴 대상이 아니므로 핸들은 숨긴다. */
-@media (min-width: 1024px) {
+/* 캔버스 06절: 태블릿(744~1179px)은 같은 하단 시트를 최대 폭 620px로 하단 중앙에 붙인다. */
+@media (min-width: 744px) and (max-width: 1179.98px) {
+  .sheet {
+    max-width: 620px;
+  }
+}
+
+/* 캔버스 06절: 데스크톱(>=1180px)에서는 바텀시트가 480px 중앙 모달로 바뀐다 — 네 모서리
+   모두 26px, wabiSheetUp 대신 위에서 8px 내려오며 페이드, 끌어내릴 대상이 아니므로 핸들은 숨긴다. */
+@media (min-width: 1180px) {
   .overlay {
     justify-content: center;
     padding: 24px;
   }
 
   .sheet {
+    max-width: 480px;
     border-radius: 26px;
     animation: wabiModalIn 0.2s ease-out;
   }

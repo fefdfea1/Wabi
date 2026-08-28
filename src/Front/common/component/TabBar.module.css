@@ -6,8 +6,15 @@
   background: var(--surface);
 }
 
-.brand {
+.railLogo,
+.brand,
+.bottomGroup {
   display: none;
+}
+
+.tabList {
+  display: flex;
+  flex: 1;
 }
 
 .tab {
@@ -42,23 +49,111 @@
   font-weight: 500;
 }
 
-/* discussion.md 11절: 태블릿(640~1023px)은 모바일과 같은 하단 탭바를 유지한다. */
+.badge {
+  display: none;
+}
 
-/* discussion.md 11절: 데스크톱(>=1024px) — 같은 <nav> 마크업을 좌측 고정 사이드바로 전환.
-   위치(하단→좌측)와 방향(가로→세로)만 CSS로 바꾸고 마크업은 그대로 재사용한다. */
-@media (min-width: 1024px) {
+.guideLabel {
+  display: none;
+}
+
+.countryButton {
+  display: none;
+}
+
+/* ---- 태블릿 아이콘 레일(744~1179px, 88px) ---- */
+@media (min-width: 744px) and (max-width: 1179.98px) {
   .bar {
     position: sticky;
     top: 0;
     bottom: auto;
     order: -1;
     flex: none;
-    width: 240px;
+    width: 88px;
+    height: 100dvh;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0;
+    gap: 26px;
+    border-top: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .railLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--ink);
+    color: var(--on-ink);
+    font-size: 15px;
+    font-weight: 900;
+  }
+
+  .tabList {
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tab {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    min-height: 56px;
+    border-radius: 14px;
+    gap: 5px;
+  }
+
+  .tab.active {
+    background: var(--sunken);
+  }
+
+  .label {
+    font-size: 10.5px;
+  }
+
+  .tab.active .label {
+    font-weight: 700;
+  }
+
+  .bottomGroup {
+    display: flex;
+    margin-top: auto;
+  }
+
+  .guideButton {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+}
+
+/* ---- 데스크톱 사이드바(>=1180px, 236px) ---- */
+@media (min-width: 1180px) {
+  .bar {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    order: -1;
+    flex: none;
+    width: 236px;
     height: 100dvh;
     flex-direction: column;
     align-items: stretch;
-    gap: 2px;
-    padding: 24px 0;
+    padding: 26px 18px;
+    gap: 30px;
     border-top: none;
     border-right: 1px solid var(--line);
   }
@@ -66,38 +161,138 @@
   .brand {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 24px 20px;
-    margin-bottom: 8px;
-    border-bottom: 1px solid var(--line);
+    gap: 9px;
+    padding: 0 4px 0 8px;
   }
 
   .brandLogo {
-    width: 26px;
-    height: 26px;
+    flex: none;
+    width: 28px;
+    height: 28px;
     border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 900;
     background: var(--ink);
     color: var(--on-ink);
   }
 
   .brandName {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--strong);
   }
 
+  .collapseHint {
+    margin-left: auto;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .collapseBar {
+    width: 2px;
+    height: 14px;
+    border-radius: 1px;
+    background: var(--text);
+  }
+
+  .collapseChevron {
+    font-size: 12px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .tabList {
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
   .tab {
     flex: none;
+    width: auto;
+    min-height: 46px;
+    height: 46px;
     flex-direction: row;
     justify-content: flex-start;
     gap: 12px;
-    min-height: 48px;
-    padding: 0 24px;
+    padding: 0 14px;
+    border-radius: 12px;
+  }
+
+  .tab.active {
+    background: var(--sunken);
+  }
+
+  .label {
+    font-size: 14.5px;
+  }
+
+  .tab.active .label {
+    font-weight: 700;
+  }
+
+  .badge {
+    display: block;
+    margin-left: auto;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .bottomGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .guideButton {
+    width: auto;
+    height: 46px;
+    min-height: 46px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--strong);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+
+  .guideLabel {
+    display: inline;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--strong);
+  }
+
+  .countryButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 12px;
+    background: var(--sunken);
+    border: none;
+    padding: 0 14px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
   }
 }

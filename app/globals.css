@@ -91,15 +91,15 @@ textarea {
   }
 }
 
-/* discussion.md 11.1절: 데스크톱(>=1024px)에서 바텀시트가 중앙 모달로 바뀔 때
-   wabiSheetUp 대신 쓰는 페이드 + 미세한 확대 등장. */
+/* 캔버스 06절: 데스크톱(>=1180px)에서 바텀시트가 480px 중앙 모달로 바뀔 때 wabiSheetUp 대신
+   쓰는 등장 — "위에서 8px 내려오며 페이드로 나타납니다"(스케일이 아니라 위치 이동 + 페이드). */
 @keyframes wabiModalIn {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }

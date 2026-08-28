@@ -13,7 +13,7 @@
   color: var(--strong);
 }
 
-.infoCard {
+.infoLines {
   border-radius: 18px;
   padding: 22px;
   display: flex;
@@ -49,9 +49,96 @@
   color: var(--muted);
 }
 
+/* 캔버스 06절: 태블릿·데스크톱 전용 프로필 카드. 모바일에서는 숨긴다. */
+.profileCard {
+  display: none;
+}
+
+.avatar {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  background: var(--sunken);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.profileTexts {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.profileDepart {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--strong);
+}
+
+/* 태블릿에는 목업에 없고 데스크톱(1180px+)에서만 나타난다 */
+.editButton {
+  display: none;
+  flex: none;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* 태블릿·데스크톱 전용 요약 두 칸 */
+.statsRow {
+  display: none;
+  gap: 12px;
+}
+
+.statCard {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.statLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.statValue {
+  font-family: var(--font-mono), monospace;
+  font-size: 24px;
+  color: var(--strong);
+}
+
 .settings {
   display: flex;
   flex-direction: column;
+}
+
+.settingsHeading {
+  display: none;
+  margin: 0;
+  padding-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--strong);
 }
 
 .settingRow,
@@ -105,37 +192,70 @@
   color: var(--muted);
 }
 
-.countryList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px 4px 20px;
+/* 캔버스 06절: 744px부터 아이콘 레일이 붙으므로 본문은 620px 중앙 정렬로 바뀌고,
+   프로필 카드·요약 두 칸이 나타나며 설정 목록 위에 "설정" 소제목이 붙는다(모바일은 없음).
+   설정 행 높이도 60 → 62로, 화면 제목도 24 → 30으로 한 단계 커진다(확장 규칙). */
+@media (min-width: 744px) {
+  .screen {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 44px 0;
+    gap: 30px;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .infoLines {
+    display: none;
+  }
+
+  .profileCard {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 26px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .statsRow {
+    display: flex;
+  }
+
+  .settingsHeading {
+    display: block;
+  }
+
+  .settingRow,
+  .settingRowStatic,
+  .settingRowButton,
+  .settingRowDate {
+    min-height: 62px;
+  }
 }
 
-.countryOption {
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 500;
-  background: var(--sunken);
-  color: var(--text);
-  border: 1.5px solid transparent;
-  cursor: pointer;
-  text-align: left;
-}
+/* 캔버스 06절: 데스크톱(1180px+) — 프로필 카드가 조금 더 커지고 "정보 수정" 버튼이 붙는다. */
+@media (min-width: 1180px) {
+  .avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+  }
 
-.countryOptionSelected {
-  background: var(--ink);
-  color: var(--on-ink);
-  font-weight: 700;
-}
+  .profileCard {
+    gap: 26px;
+    padding: 28px;
+  }
 
-.countryEmpty {
-  margin: 0;
-  padding: 8px 4px;
-  font-size: 13.5px;
-  color: var(--muted);
+  .profileDepart {
+    font-size: 22px;
+  }
+
+  .editButton {
+    display: flex;
+    align-items: center;
+  }
 }

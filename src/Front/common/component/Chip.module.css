@@ -26,4 +26,11 @@
 button.selected,
 button.unselected {
   cursor: pointer;
+  border: none;
+  /*
+   * discussion.md 3.3절: 실제로 누를 수 있는 요소는 최소 48x48px이어야 한다. Chip 자체의
+   * 시각 규격(높이 36~40)은 span으로 쓰이는 표시 전용 칩(예: 문서 확장자 태그)에는 그대로
+   * 적용하고, button으로 쓰이는(실제 선택 동작이 있는) 칩만 터치 영역을 48px로 키운다.
+   */
+  min-height: 48px;
 }

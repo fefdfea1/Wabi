@@ -1,3 +1,7 @@
+.wrapper {
+  display: contents;
+}
+
 .toggle {
   height: 48px;
   padding: 0 16px;
@@ -8,4 +12,42 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+}
+
+.segment {
+  display: none;
+  background: var(--sunken);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.segmentOption {
+  /*
+   * 캔버스 목업 시각 높이는 34px(태블릿)/32px(데스크톱)이지만, discussion.md 11.2절이 "태블릿의
+   * 탭 대상은 모바일과 같은 최소 48px를 유지"라고 명시적으로 못박고 있어 접근성 규칙을 우선한다.
+   */
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.segmentSelected {
+  background: var(--surface);
+  color: var(--strong);
+  font-weight: 700;
+}
+
+@media (min-width: 744px) {
+  .toggle {
+    display: none;
+  }
+  .segment {
+    display: flex;
+  }
 }

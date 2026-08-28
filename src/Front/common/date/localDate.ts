@@ -56,3 +56,13 @@ export function formatMonthDay(isoTimestamp: string): string | null {
   if (Number.isNaN(date.getTime())) return null;
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
+
+/**
+ * 캔버스 06절 태블릿·데스크톱 목업의 짧은 mono 날짜 표기("5/3"). formatMonthDay와 같은 이유로
+ * 이미 확정된 과거 타임스탬프를 포맷할 뿐이라 렌더 중에 호출해도 하이드레이션 문제가 없다.
+ */
+export function formatShortDate(isoTimestamp: string): string | null {
+  const date = new Date(isoTimestamp);
+  if (Number.isNaN(date.getTime())) return null;
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}

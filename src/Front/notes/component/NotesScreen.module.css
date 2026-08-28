@@ -27,9 +27,9 @@
   color: var(--strong);
 }
 
-/* 태블릿·데스크톱 전용 소개 문구. 모바일 문구(.notice)는 그대로 두고 이걸 대신 숨긴다. */
+/* discussion.md 48.2절: 소개 문구는 모든 폭에서 같은 문장을 보여준다. 예전에는 폭마다 다른
+   문장을 띄웠는데, 같은 화면을 두고 서로 다르게 설명할 이유가 없다. */
 .intro {
-  display: none;
   margin: 0;
   font-size: 14px;
   line-height: 1.6;
@@ -73,11 +73,12 @@
   display: none;
 }
 
+/* 저장 위치 고지. 소개보다 한 단계 물러나 보이되, 42.2절 기준을 넘는 색을 쓴다. */
 .notice {
   margin: 0;
-  font-size: 13.5px;
+  font-size: 12.5px;
   line-height: 1.6;
-  color: var(--text);
+  color: var(--muted);
 }
 
 .list {
@@ -180,14 +181,6 @@
 
   .title {
     font-size: 30px;
-  }
-
-  .intro {
-    display: block;
-  }
-
-  .notice {
-    display: none;
   }
 
   .addButton {

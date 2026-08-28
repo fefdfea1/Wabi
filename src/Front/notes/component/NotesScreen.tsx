@@ -43,7 +43,9 @@ export function NotesScreen({ notes, onOpenAdd, onOpenEdit, onDelete }: NotesScr
         </button>
       </header>
 
-      <p className={styles.notice}>기억해 둘 것을 적어 두세요. 이 기기에만 저장됩니다.</p>
+      {/* discussion.md 48.2절: 소개 문장은 모든 폭에서 같고, 이 줄은 저장 위치 고지만 남긴다.
+          예전에는 모바일에서만 보였는데 사실 고지는 폭에 따라 달라질 이유가 없다. */}
+      <p className={styles.notice}>이 기기에만 저장됩니다.</p>
 
       <div className={styles.list}>
         {notes.length === 0 ? (

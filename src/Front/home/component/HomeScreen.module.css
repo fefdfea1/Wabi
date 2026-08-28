@@ -1,0 +1,201 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 20px 32px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.brandName {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--strong);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guideButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sunken);
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+.countryBadge {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  background: var(--sunken);
+  color: var(--text);
+}
+
+.statusBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ddayCaption {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.ddayLabel {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 60px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  color: var(--strong);
+}
+
+.ddayEmpty {
+  margin: 0;
+  padding: 20px 0 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.progressRow {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding-top: 6px;
+}
+
+.progressLabelRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.progressValue {
+  font-family: var(--font-mono), monospace;
+  color: var(--strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.emptyNext {
+  margin: 0;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.weekBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weekHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+
+.weekTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--strong);
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.emptyList {
+  margin: 0;
+  padding: 20px 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.painBlock {
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--sunken);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  min-height: 48px;
+}
+
+.painTexts {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.painTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--strong);
+}
+
+.painMeta {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.chevron {
+  font-size: 15px;
+  color: var(--muted);
+  opacity: 0.6;
+}

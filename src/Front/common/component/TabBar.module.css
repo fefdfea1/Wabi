@@ -1,0 +1,103 @@
+.bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.brand {
+  display: none;
+}
+
+.tab {
+  flex: 1;
+  min-height: 56px;
+  min-width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.tab.active {
+  color: var(--ink);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: currentColor;
+  opacity: 0.9;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* discussion.md 11절: 태블릿(640~1023px)은 모바일과 같은 하단 탭바를 유지한다. */
+
+/* discussion.md 11절: 데스크톱(>=1024px) — 같은 <nav> 마크업을 좌측 고정 사이드바로 전환.
+   위치(하단→좌측)와 방향(가로→세로)만 CSS로 바꾸고 마크업은 그대로 재사용한다. */
+@media (min-width: 1024px) {
+  .bar {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    order: -1;
+    flex: none;
+    width: 240px;
+    height: 100dvh;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 24px 0;
+    border-top: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 24px 20px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brandLogo {
+    width: 26px;
+    height: 26px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    background: var(--ink);
+    color: var(--on-ink);
+  }
+
+  .brandName {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--strong);
+  }
+
+  .tab {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 48px;
+    padding: 0 24px;
+  }
+}

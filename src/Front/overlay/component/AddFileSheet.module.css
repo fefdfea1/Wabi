@@ -1,0 +1,74 @@
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.headingTitle {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--strong);
+}
+
+.headingDescription {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.optionList {
+  display: flex;
+  flex-direction: column;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 62px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.optionTag {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  background: var(--sunken);
+  color: var(--text);
+}
+
+.optionLabel {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--strong);
+}
+
+.chevron {
+  font-size: 15px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.cancel {
+  height: 50px;
+  border-radius: 13px;
+  font-size: 15px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+}

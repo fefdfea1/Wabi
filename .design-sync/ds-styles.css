@@ -1,0 +1,123 @@
+/* 생성된 파일 — 직접 고치지 마세요. app/globals.css 를 고치고 build-styles.mjs 를 다시 실행하세요. */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * 브라우저 기본(UA) 스타일시트는 button/input/select/textarea의 font-family를 body로부터
+ * 상속시키지 않고 시스템 기본 서체로 따로 지정한다. 그 결과 이 요소들과 그 내부에 중첩된
+ * 모든 텍스트(예: 버튼 안의 span)가 Noto Sans KR 대신 시스템 서체로 렌더된다.
+ * font-size/font-weight는 손대지 않는다 — 각 컴포넌트의 CSS Modules 클래스 선택자가
+ * 이미 지정하고 있고, 클래스 선택자(0,1,0)가 이 요소 선택자(0,0,1)보다 명시도가 높아 덮이지 않는다.
+ * font 축약형은 쓰지 않는다 — font-size/line-height 등 이미 올바르게 상속되고 있는 값까지
+ * 재설정해 의도치 않은 차이를 만들 수 있어, 실제로 깨져 있던 font-family만 좁혀서 고친다.
+ */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+[data-theme="light"] {
+  --bg: #f4f4f3;
+  --surface: #ffffff;
+  --sunken: #ededeb;
+  --line: #e2e2df;
+  --muted: #a5a8a3;
+  --text: #6b6e6a;
+  --strong: #121312;
+  --ink: #121312;
+  --on-ink: #ffffff;
+  --alert: #a6382b;
+}
+
+[data-theme="dark"] {
+  --bg: #0e0f0e;
+  --surface: #171918;
+  --sunken: #202220;
+  --line: #2d302e;
+  --muted: #7c807b;
+  --text: #b7bab6;
+  --strong: #f2f3f1;
+  --ink: #f2f3f1;
+  --on-ink: #0e0f0e;
+  --alert: #e5786b;
+}
+
+@keyframes wabiSheetUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes wabiFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wabiSlideIn {
+  from {
+    transform: translateX(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* discussion.md 11.1절: 데스크톱(>=1024px)에서 바텀시트가 중앙 모달로 바뀔 때
+   wabiSheetUp 대신 쓰는 페이드 + 미세한 확대 등장. */
+@keyframes wabiModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== design-sync 전용 보충 (build-styles.mjs 가 덧붙임) ===== */
+:root {
+  --bg: #f4f4f3;
+  --surface: #ffffff;
+  --sunken: #ededeb;
+  --line: #e2e2df;
+  --muted: #a5a8a3;
+  --text: #6b6e6a;
+  --strong: #121312;
+  --ink: #121312;
+  --on-ink: #ffffff;
+  --alert: #a6382b;
+
+  --font-body: "Noto Sans KR";
+  --font-mono: "JetBrains Mono";
+}

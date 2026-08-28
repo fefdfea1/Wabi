@@ -1,0 +1,18 @@
+.link {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--text);
+}
+
+/* discussion.md 3.2절: mono는 숫자·캡션(라틴 문자)용이다. "출처" 라벨은 한글이라 본문 서체를
+   그대로 상속하고, 도메인 문자열만 라틴 문자이므로 여기에만 mono를 건다. */
+.domain {
+  font-family: var(--font-mono), monospace;
+}

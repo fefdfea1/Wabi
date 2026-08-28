@@ -1,0 +1,46 @@
+{
+  "projectId": "6851b196-3222-4f6e-9943-124a187550ff",
+  "shape": "package",
+  "pkg": "wabi",
+  "globalName": "Wabi",
+  "srcDir": "src/Front/common/component",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": ".design-sync/ds-styles.css",
+  "componentSrcMap": {
+    "BottomSheet": "src/Front/common/component/BottomSheet.tsx",
+    "Button": "src/Front/common/component/Button.tsx",
+    "Chip": "src/Front/common/component/Chip.tsx",
+    "ListRow": "src/Front/common/component/ListRow.tsx",
+    "NextActionCard": "src/Front/common/component/NextActionCard.tsx",
+    "ProgressBar": "src/Front/common/component/ProgressBar.tsx",
+    "Segment": "src/Front/common/component/Segment.tsx",
+    "SourceLink": "src/Front/common/component/SourceLink.tsx",
+    "TabBar": "src/Front/common/component/TabBar.tsx",
+    "TextField": "src/Front/common/component/TextField.tsx"
+  },
+  "extraFonts": [
+    ".design-sync/fonts/wabi-fonts.css"
+  ],
+  "overrides": {
+    "ListRow": {
+      "cardMode": "column"
+    },
+    "NextActionCard": {
+      "cardMode": "column"
+    },
+    "BottomSheet": {
+      "cardMode": "single",
+      "primaryStory": "WithFooter"
+    },
+    "TabBar": {
+      "cardMode": "column"
+    },
+    "SourceLink": {
+      "cardMode": "column"
+    },
+    "TextField": {
+      "cardMode": "column"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}

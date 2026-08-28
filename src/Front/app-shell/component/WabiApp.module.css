@@ -1,0 +1,39 @@
+/*
+ * discussion.md 11절: 모바일(<640) 그대로 → 태블릿(640~1023) 본문 520px 중앙 정렬,
+ * 하단 탭바 유지 → 데스크톱(>=1024) 좌측 240px 사이드바 + 본문 720px. 내비게이션은
+ * TabBar 쪽에서 같은 <nav> 마크업을 미디어 쿼리로만 위치·방향을 바꿔 재사용한다.
+ */
+.shell {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--bg);
+}
+
+.content {
+  flex: 1;
+}
+
+@media (min-width: 640px) {
+  .shell {
+    max-width: 520px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    max-width: none;
+    flex-direction: row;
+    margin: 0;
+  }
+
+  .content {
+    max-width: 720px;
+    width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+  }
+}

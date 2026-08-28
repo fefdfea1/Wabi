@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E9E9E7;font-family:'Noto Sans KR',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#121312;text-decoration:none}a:hover{color:#4A4C4A}
+::-webkit-scrollbar{width:0;height:0}
+@keyframes wabiSheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes wabiFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes wabiSlideIn{from{transform:translateX(14px);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</helmet>
+
+<div style="max-width:1400px;margin:0 auto;padding:56px 48px 110px;display:flex;flex-direction:column;gap:72px">
+
+<header style="display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<div style="width:40px;height:40px;border-radius:13px;background:#121312;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;font-weight:900;letter-spacing:-0.03em">W</div>
+<div style="font-size:27px;font-weight:700;color:#121312;letter-spacing:-0.03em">Wabi Design System</div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B;border:1px solid #DCDCD9;border-radius:999px;padding:5px 11px">v0.1 · mobile first · light + dark</div>
+</div>
+<p style="margin:0;max-width:740px;font-size:15px;line-height:1.8;color:#4A4C4A;text-wrap:pretty">워킹홀리데이를 준비하는 사람과 현지에 도착한 사람을 위한 앱입니다. 할 일은 많지만 한 번에 알아야 할 것은 언제나 하나뿐이라는 전제로 설계했습니다. 색은 무채색으로 고정하고, 강조는 크기와 여백으로만 만듭니다.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#6B6E6A">
+<div style="border:1px solid #DCDCD9;border-radius:8px;padding:7px 12px;background:#fff">출국 전 준비 · 현지 정착</div>
+<div style="border:1px solid #DCDCD9;border-radius:8px;padding:7px 12px;background:#fff">첫 화면 = D-day</div>
+<div style="border:1px solid #DCDCD9;border-radius:8px;padding:7px 12px;background:#fff">다국가 지원</div>
+<div style="border:1px solid #DCDCD9;border-radius:8px;padding:7px 12px;background:#fff">존댓말 · 간결</div>
+</div>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">01</div><h2 style="margin:0;font-size:20px;font-weight:700;color:#121312;letter-spacing:-0.02em">원칙</h2></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:16px;padding:24px 22px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:15px;font-weight:700;color:#121312">한 화면에 블록 3~4개</div>
+<div style="font-size:13px;line-height:1.75;color:#6B6E6A">그 이상 필요하면 다음 화면으로 넘깁니다. 목록은 3줄까지 보여주고 나머지는 '전체 보기'로 감춥니다.</div>
+</div>
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:16px;padding:24px 22px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:15px;font-weight:700;color:#121312">시선 순서를 고정합니다</div>
+<div style="font-size:13px;line-height:1.75;color:#6B6E6A">위에서 아래로 상태 → 다음 행동 → 목록 → 탭바. 화면이 바뀌어도 이 순서는 바뀌지 않습니다.</div>
+</div>
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:16px;padding:24px 22px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:15px;font-weight:700;color:#121312">색이 아니라 크기로 강조합니다</div>
+<div style="font-size:13px;line-height:1.75;color:#6B6E6A">팔레트는 무채색 하나뿐입니다. 중요도는 타이포 크기, 여백, 잉크 대비로만 표현합니다.</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:16px;padding:26px 24px;display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+<div style="font-size:13px;font-weight:700;color:#121312;min-width:96px">시선 흐름</div>
+<div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+<div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">01 상태</div><div style="padding:16px 20px;border-radius:12px;background:#121312;color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.03em">D-12</div></div>
+<div style="color:#C4C6C2;font-size:15px;padding-bottom:16px">→</div>
+<div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">02 다음 행동</div><div style="padding:13px 18px;border-radius:12px;border:1.5px solid #121312;color:#121312;font-size:14px;font-weight:700">보험 가입하기</div></div>
+<div style="color:#C4C6C2;font-size:15px;padding-bottom:14px">→</div>
+<div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">03 목록</div><div style="padding:13px 18px;border-radius:12px;background:#EDEDEB;color:#6B6E6A;font-size:14px;font-weight:500">이번 주 할 일 3</div></div>
+<div style="color:#C4C6C2;font-size:15px;padding-bottom:14px">→</div>
+<div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">04 탭바</div><div style="padding:13px 18px;border-radius:12px;border:1px dashed #D3D4D1;color:#A5A8A3;font-size:14px;font-weight:500">고정 4탭</div></div>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">02</div><h2 style="margin:0;font-size:20px;font-weight:700;color:#121312;letter-spacing:-0.02em">색상 토큰</h2><span style="font-size:12.5px;color:#8C8F8B">무채색 12단계. 유채색은 마감 임박 한 곳에만 쓰는 alert 하나로 제한합니다.</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:center;gap:9px"><div style="width:12px;height:12px;border-radius:999px;background:#fff;border:1px solid #C4C6C2"></div><div style="font-size:14px;font-weight:700;color:#121312">Light</div></div>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F1F1EF"><div style="width:46px;height:32px;border-radius:9px;background:#F4F4F3;border:1px solid #E2E2DF"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">bg</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#F4F4F3</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F1F1EF"><div style="width:46px;height:32px;border-radius:9px;background:#FFFFFF;border:1px solid #E2E2DF"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">surface</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#FFFFFF</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F1F1EF"><div style="width:46px;height:32px;border-radius:9px;background:#EDEDEB"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">sunken</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#EDEDEB</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F1F1EF"><div style="width:46px;height:32px;border-radius:9px;background:#E2E2DF"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">line</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#E2E2DF</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F1F1EF"><div style="width:46px;height:32px;border-radius:9px;background:#A5A8A3"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">muted</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#A5A8A3</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F1F1EF"><div style="width:46px;height:32px;border-radius:9px;background:#6B6E6A"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">text</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#6B6E6A</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F1F1EF"><div style="width:46px;height:32px;border-radius:9px;background:#121312"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">ink / primary</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#121312</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0"><div style="width:46px;height:32px;border-radius:9px;background:#A6382B"></div><div style="flex:1;font-size:13px;font-weight:500;color:#121312">alert</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">#A6382B</div></div>
+</div>
+</div>
+
+<div style="background:#171918;border:1px solid #262927;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:center;gap:9px"><div style="width:12px;height:12px;border-radius:999px;background:#0E0F0E;border:1px solid #3A3D39"></div><div style="font-size:14px;font-weight:700;color:#F2F3F1">Dark</div></div>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #212421"><div style="width:46px;height:32px;border-radius:9px;background:#0E0F0E;border:1px solid #2D302E"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">bg</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#0E0F0E</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #212421"><div style="width:46px;height:32px;border-radius:9px;background:#171918;border:1px solid #2D302E"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">surface</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#171918</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #212421"><div style="width:46px;height:32px;border-radius:9px;background:#202220"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">sunken</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#202220</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #212421"><div style="width:46px;height:32px;border-radius:9px;background:#2D302E"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">line</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#2D302E</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #212421"><div style="width:46px;height:32px;border-radius:9px;background:#7C807B"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">muted</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#7C807B</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #212421"><div style="width:46px;height:32px;border-radius:9px;background:#B7BAB6"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">text</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#B7BAB6</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #212421"><div style="width:46px;height:32px;border-radius:9px;background:#F2F3F1"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">ink / primary</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#F2F3F1</div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:10px 0"><div style="width:46px;height:32px;border-radius:9px;background:#E5786B"></div><div style="flex:1;font-size:13px;font-weight:500;color:#F2F3F1">alert</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7C807B">#E5786B</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">03</div><h2 style="margin:0;font-size:20px;font-weight:700;color:#121312;letter-spacing:-0.02em">타이포 · 간격 · 규격</h2><span style="font-size:12.5px;color:#8C8F8B">Noto Sans KR / 숫자는 JetBrains Mono, tabular-nums</span></div>
+<div style="display:grid;grid-template-columns:1.35fr 1fr;gap:20px;align-items:start">
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid #F1F1EF;padding-bottom:20px"><div style="font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:500;color:#121312;letter-spacing:-0.04em;line-height:1">D-12</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;padding-bottom:6px">display · 44 / 700 / -0.04em</div></div>
+<div style="display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid #F1F1EF;padding-bottom:20px"><div style="font-size:24px;font-weight:700;color:#121312;letter-spacing:-0.03em;line-height:1.2">출국까지 준비할 일</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;padding-bottom:4px">title · 24 / 700</div></div>
+<div style="display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid #F1F1EF;padding-bottom:20px"><div style="font-size:17px;font-weight:700;color:#121312;line-height:1.3">해외 여행자 보험</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;padding-bottom:3px">subtitle · 17 / 700</div></div>
+<div style="display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid #F1F1EF;padding-bottom:20px"><div style="font-size:15px;font-weight:400;color:#4A4C4A;line-height:1.65">보험 증서는 입국 심사에서 요구될 수 있습니다.</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;padding-bottom:3px">body · 15 / 400</div></div>
+<div style="display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid #F1F1EF;padding-bottom:20px"><div style="font-size:13px;font-weight:500;color:#6B6E6A">서류 · 3분 소요</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3">label · 13 / 500</div></div>
+<div style="display:flex;align-items:flex-end;gap:18px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:#A5A8A3;letter-spacing:0.04em">STEP 02 / 05</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3">caption · 11 / mono</div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:13px;font-weight:700;color:#121312">간격 4px 배수</div>
+<div style="display:flex;align-items:flex-end;gap:10px">
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:4px;height:4px;background:#121312"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">4</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:8px;height:8px;background:#121312"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">8</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:12px;height:12px;background:#121312"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">12</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:16px;height:16px;background:#121312"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">16</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:24px;height:24px;background:#121312"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">24</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:32px;height:32px;background:#121312"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">32</div></div>
+</div>
+<div style="font-size:12px;line-height:1.7;color:#8C8F8B">화면 좌우 여백 20px 고정 · 블록 사이 24px · 카드 내부 20px</div>
+</div>
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:13px;font-weight:700;color:#121312">모서리 · 터치 영역</div>
+<div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:44px;height:44px;border-radius:10px;background:#EDEDEB;border:1px solid #E2E2DF"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">10</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:44px;height:44px;border-radius:16px;background:#EDEDEB;border:1px solid #E2E2DF"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">16</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:44px;height:44px;border-radius:22px;background:#EDEDEB;border:1px solid #E2E2DF"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">22</div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:44px;height:44px;border-radius:999px;background:#EDEDEB;border:1px solid #E2E2DF"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#A5A8A3">full</div></div>
+</div>
+<div style="font-size:12px;line-height:1.7;color:#8C8F8B">모든 탭 대상은 최소 48×48px. 리스트 행 높이 64px.</div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">04</div><h2 style="margin:0;font-size:20px;font-weight:700;color:#121312;letter-spacing:-0.02em">컴포넌트</h2><span style="font-size:12.5px;color:#8C8F8B">라이트 기준. 다크는 ink와 surface를 서로 맞바꿉니다.</span></div>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px">
+
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#A5A8A3;letter-spacing:0.06em">BUTTON</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="height:52px;border-radius:14px;background:#121312;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center" style-hover="background:#2C2E2C">보험 가입하기</div>
+<div style="height:52px;border-radius:14px;border:1.5px solid #121312;color:#121312;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff" style-hover="background:#F4F4F3">나중에 하기</div>
+<div style="height:52px;border-radius:14px;background:#EDEDEB;color:#6B6E6A;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center">완료됨</div>
+<div style="display:flex;gap:8px">
+<div style="height:36px;padding:0 14px;border-radius:10px;background:#EDEDEB;color:#121312;font-size:13px;font-weight:500;display:flex;align-items:center">호주</div>
+<div style="height:36px;padding:0 14px;border-radius:10px;background:#121312;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center">캐나다</div>
+<div style="height:36px;padding:0 14px;border-radius:10px;border:1px solid #E2E2DF;color:#6B6E6A;font-size:13px;font-weight:500;display:flex;align-items:center">일본</div>
+</div>
+</div>
+</div>
+
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#A5A8A3;letter-spacing:0.06em">LIST ROW · 64px</div>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:14px;height:64px;border-bottom:1px solid #F1F1EF"><div style="width:22px;height:22px;border-radius:999px;border:1.5px solid #D3D4D1"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px"><div style="font-size:15px;font-weight:500;color:#121312">계좌 개설 예약</div><div style="font-size:12.5px;color:#A5A8A3">도착 후 3일 내</div></div><div style="color:#C4C6C2;font-size:15px">›</div></div>
+<div style="display:flex;align-items:center;gap:14px;height:64px;border-bottom:1px solid #F1F1EF"><div style="width:22px;height:22px;border-radius:999px;background:#121312;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center">✓</div><div style="flex:1;display:flex;flex-direction:column;gap:3px"><div style="font-size:15px;font-weight:500;color:#A5A8A3;text-decoration:line-through">비자 신청</div><div style="font-size:12.5px;color:#C4C6C2">5월 12일 완료</div></div></div>
+<div style="display:flex;align-items:center;gap:14px;height:64px"><div style="width:22px;height:22px;border-radius:999px;border:1.5px solid #A6382B"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px"><div style="font-size:15px;font-weight:500;color:#121312">항공권 예약</div><div style="font-size:12.5px;color:#A6382B;font-weight:500">오늘까지</div></div><div style="color:#C4C6C2;font-size:15px">›</div></div>
+</div>
+</div>
+
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#A5A8A3;letter-spacing:0.06em">NEXT-ACTION CARD</div>
+<div style="border:1.5px solid #121312;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#A5A8A3;letter-spacing:0.06em">NEXT</div>
+<div style="font-size:19px;font-weight:700;color:#121312;letter-spacing:-0.02em;line-height:1.35">해외 여행자 보험 가입</div>
+<div style="font-size:13.5px;line-height:1.6;color:#6B6E6A">입국 심사에서 증서를 요구할 수 있습니다.</div>
+<div style="height:48px;border-radius:12px;background:#121312;color:#fff;font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:center">지금 하기</div>
+</div>
+<div style="background:#F4F4F3;border-radius:16px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:12.5px;color:#8C8F8B">현지 정착</div><div style="font-size:15px;font-weight:700;color:#121312">2 / 9 완료</div></div><div style="color:#C4C6C2;font-size:15px">›</div></div>
+</div>
+
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#A5A8A3;letter-spacing:0.06em">PROGRESS · SEGMENT · TABBAR</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<div style="display:flex;justify-content:space-between;font-size:12.5px;color:#8C8F8B"><span>출국 전 준비</span><span style="font-family:'JetBrains Mono',monospace;color:#121312">8 / 14</span></div>
+<div style="height:6px;border-radius:999px;background:#EDEDEB;overflow:hidden"><div style="width:57%;height:6px;background:#121312"></div></div>
+</div>
+<div style="display:flex;background:#EDEDEB;border-radius:12px;padding:4px">
+<div style="flex:1;height:40px;border-radius:9px;background:#fff;color:#121312;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center">출국 전</div>
+<div style="flex:1;height:40px;border-radius:9px;color:#8C8F8B;font-size:13.5px;font-weight:500;display:flex;align-items:center;justify-content:center">현지 정착</div>
+</div>
+<div style="display:flex;border-top:1px solid #E2E2DF;padding-top:12px">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:6px;background:#121312"></div><div style="font-size:11px;font-weight:700;color:#121312">홈</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:6px;border:1.5px solid #C4C6C2"></div><div style="font-size:11px;color:#A5A8A3">할 일</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:6px;border:1.5px solid #C4C6C2"></div><div style="font-size:11px;color:#A5A8A3">문서</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:999px;border:1.5px solid #C4C6C2"></div><div style="font-size:11px;color:#A5A8A3">나</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8C8F8B">05</div><h2 style="margin:0;font-size:20px;font-weight:700;color:#121312;letter-spacing:-0.02em">동작하는 프로토타입</h2><span style="font-size:12.5px;color:#8C8F8B">탭 이동, 체크, 상세 열기가 실제로 동작합니다.</span></div>
+
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+<div onClick="{{ setLight }}" style="{{ lightBtnStyle }}">라이트</div>
+<div onClick="{{ setDark }}" style="{{ darkBtnStyle }}">다크</div>
+<div style="width:1px;height:26px;background:#DCDCD9"></div>
+<div onClick="{{ setAU }}" style="{{ auBtnStyle }}">호주</div>
+<div onClick="{{ setCA }}" style="{{ caBtnStyle }}">캐나다</div>
+<div onClick="{{ setJP }}" style="{{ jpBtnStyle }}">일본</div>
+</div>
+
+<div style="display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="width:390px;height:812px;border-radius:46px;border:10px solid #1C1C1A;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 18px 44px rgba(0,0,0,0.14);background:{{ t.bg }}">
+  <div style="height:52px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ t.strong }}">
+    <span>9:41</span><span style="letter-spacing:0.08em">LTE ▮</span>
+  </div>
+  <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:8px 20px 32px;display:flex;flex-direction:column;gap:26px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;background:{{ t.ink }};color:{{ t.onInk }}">W</div>
+            <div style="font-size:15px;font-weight:700;letter-spacing:-0.02em;color:{{ t.strong }}">Wabi</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div onClick="{{ openGuide }}" title="가이드" style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ t.sunken }}">
+              <div style="width:15px;height:17px;border-radius:2px 4px 4px 2px;border:1.5px solid {{ t.text }};border-left-width:4px;position:relative"><div style="position:absolute;left:2px;right:2px;top:3px;height:1.5px;background:{{ t.text }};opacity:0.55"></div><div style="position:absolute;left:2px;right:5px;top:7px;height:1.5px;background:{{ t.text }};opacity:0.55"></div></div>
+            </div>
+            <div style="height:32px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:500;line-height:1;white-space:nowrap;display:flex;align-items:center;gap:6px;background:{{ t.sunken }};color:{{ t.text }}"><span style="line-height:1">{{ countryLabel }}</span><span style="opacity:0.5;font-size:10px;line-height:1;display:block;transform:translateY(-1px)">▾</span></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:13.5px;color:{{ t.muted }}">{{ ddayCaption }}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:60px;font-weight:500;letter-spacing:-0.05em;line-height:0.95;color:{{ t.strong }}">{{ ddayLabel }}</div>
+          <div style="display:flex;flex-direction:column;gap:9px;padding-top:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:{{ t.muted }}"><span>준비 진행률</span><span style="font-family:'JetBrains Mono',monospace;color:{{ t.strong }}">{{ progressLabel }}</span></div>
+            <div style="height:6px;border-radius:999px;overflow:hidden;background:{{ t.sunken }}"><div style="height:6px;width:{{ progressPct }};background:{{ t.ink }}"></div></div>
+          </div>
+        </div>
+        <div style="border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px;border:1.5px solid {{ t.ink }}">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.08em;color:{{ t.muted }}">NEXT</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;line-height:1.35;color:{{ t.strong }}">{{ nextTitle }}</div>
+          <div style="font-size:13.5px;line-height:1.6;color:{{ t.text }}">{{ nextDesc }}</div>
+          <div onClick="{{ openNext }}" style="height:50px;border-radius:13px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ t.ink }};color:{{ t.onInk }}">지금 하기</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px">
+            <div style="font-size:15px;font-weight:700;color:{{ t.strong }}">이번 주 할 일</div>
+            <div onClick="{{ goTasks }}" style="font-size:12.5px;cursor:pointer;color:{{ t.muted }}">전체 보기 ›</div>
+          </div>
+          <sc-for list="{{ weekTasks }}" as="row" hint-placeholder-count="3">
+            <div onClick="{{ row.open }}" style="display:flex;align-items:center;gap:14px;height:64px;cursor:pointer;border-bottom:1px solid {{ t.line }}">
+              <div onClick="{{ row.toggle }}" style="{{ row.checkStyle }}">{{ row.mark }}</div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <div style="font-size:15px;font-weight:500;color:{{ row.titleColor }};text-decoration:{{ row.deco }}">{{ row.title }}</div>
+                <div style="font-size:12.5px;color:{{ row.metaColor }}">{{ row.meta }}</div>
+              </div>
+              <div style="font-size:15px;color:{{ t.muted }};opacity:0.6">›</div>
+            </div>
+          </sc-for>
+        </div>
+        <div onClick="{{ openPain }}" style="border-radius:18px;padding:20px;display:flex;align-items:center;gap:14px;cursor:pointer;background:{{ t.sunken }}">
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:15px;font-weight:700;color:{{ t.strong }}">먼저 간 사람들이 힘들어한 것</div>
+            <div style="font-size:12.5px;color:{{ t.muted }}">자주 나온 어려움 6가지와 대처법</div>
+          </div>
+          <div style="font-size:15px;color:{{ t.muted }};opacity:0.6">›</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isTasks }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:8px 20px 32px;display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:24px;font-weight:700;letter-spacing:-0.03em;color:{{ t.strong }}">할 일</div>
+          <div onClick="{{ openAddTask }}" title="할 일 추가" style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:{{ t.ink }}">
+            <div style="position:absolute;width:15px;height:1.8px;border-radius:2px;background:{{ t.onInk }}"></div>
+            <div style="position:absolute;width:1.8px;height:15px;border-radius:2px;background:{{ t.onInk }}"></div>
+          </div>
+        </div>
+        <div style="display:flex;border-radius:13px;padding:4px;background:{{ t.sunken }}">
+          <div onClick="{{ setPre }}" style="{{ segPreStyle }}">출국 전</div>
+          <div onClick="{{ setPost }}" style="{{ segPostStyle }}">현지 정착</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:{{ t.muted }}"><span>{{ phaseLabel }}</span><span style="font-family:'JetBrains Mono',monospace;color:{{ t.strong }}">{{ phaseProgressLabel }}</span></div>
+          <div style="height:6px;border-radius:999px;overflow:hidden;background:{{ t.sunken }}"><div style="height:6px;width:{{ phaseProgressPct }};background:{{ t.ink }}"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ phaseTasks }}" as="row" hint-placeholder-count="6">
+            <div onClick="{{ row.open }}" style="display:flex;align-items:center;gap:14px;height:64px;cursor:pointer;border-bottom:1px solid {{ t.line }}">
+              <div onClick="{{ row.toggle }}" style="{{ row.checkStyle }}">{{ row.mark }}</div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <div style="font-size:15px;font-weight:500;color:{{ row.titleColor }};text-decoration:{{ row.deco }}">{{ row.title }}</div>
+                <div style="font-size:12.5px;color:{{ row.metaColor }}">{{ row.meta }}</div>
+              </div>
+              <div style="font-size:15px;color:{{ t.muted }};opacity:0.6">›</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDocs }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:8px 20px 32px;display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:24px;font-weight:700;letter-spacing:-0.03em;color:{{ t.strong }}">문서</div>
+          <div onClick="{{ openUpload }}" title="파일 추가" style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:{{ t.ink }}">
+            <div style="position:absolute;width:15px;height:1.8px;border-radius:2px;background:{{ t.onInk }}"></div>
+            <div style="position:absolute;width:1.8px;height:15px;border-radius:2px;background:{{ t.onInk }}"></div>
+          </div>
+        </div>
+        <div style="font-size:13.5px;line-height:1.6;color:{{ t.text }}">입국 심사와 계약에서 자주 요구되는 서류만 모아둡니다.</div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ docs }}" as="d" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:14px;height:64px;border-bottom:1px solid {{ t.line }}">
+              <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;background:{{ t.sunken }};color:{{ t.text }}">{{ d.ext }}</div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <div style="font-size:15px;font-weight:500;color:{{ t.strong }}">{{ d.name }}</div>
+                <div style="font-size:12.5px;color:{{ t.muted }}">{{ d.meta }}</div>
+              </div>
+              <div style="font-size:15px;color:{{ t.muted }};opacity:0.6">›</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMe }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:8px 20px 32px;display:flex;flex-direction:column;gap:24px">
+        <div style="font-size:24px;font-weight:700;letter-spacing:-0.03em;color:{{ t.strong }}">나</div>
+        <div style="border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:6px;background:{{ t.surface }};border:1px solid {{ t.line }}">
+          <div style="font-size:12.5px;color:{{ t.muted }}">{{ countryLabel }} 워킹홀리데이</div>
+          <div style="font-size:19px;font-weight:700;letter-spacing:-0.02em;color:{{ t.strong }}">{{ departLabel }} 출국</div>
+          <div style="font-size:13px;color:{{ t.text }}">비자 만료 {{ visaLabel }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div onClick="{{ toggleTheme }}" style="display:flex;align-items:center;height:60px;cursor:pointer;border-bottom:1px solid {{ t.line }}">
+            <div style="flex:1;font-size:15px;color:{{ t.strong }}">화면 모드</div>
+            <div style="font-size:13.5px;color:{{ t.muted }}">{{ themeLabel }} ›</div>
+          </div>
+          <div style="display:flex;align-items:center;height:60px;border-bottom:1px solid {{ t.line }}"><div style="flex:1;font-size:15px;color:{{ t.strong }}">알림</div><div style="font-size:13.5px;color:{{ t.muted }}">마감 3일 전 ›</div></div>
+          <div style="display:flex;align-items:center;height:60px"><div style="flex:1;font-size:15px;color:{{ t.strong }}">국가 변경</div><div style="font-size:13.5px;color:{{ t.muted }}">{{ countryLabel }} ›</div></div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="flex:none;display:flex;padding:10px 0 26px;border-top:1px solid {{ t.line }};background:{{ t.surface }}">
+    <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="4">
+      <div onClick="{{ tab.go }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0;cursor:pointer">
+        <div style="{{ tab.iconStyle }}"></div>
+        <div style="font-size:11px;font-weight:{{ tab.weight }};color:{{ tab.color }}">{{ tab.label }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ painOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:flex-end">
+      <div onClick="{{ closePain }}" style="position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.4);animation:wabiFadeIn 0.2s ease-out"></div>
+      <div style="position:relative;max-height:84%;display:flex;flex-direction:column;border-radius:26px 26px 0 0;animation:wabiSheetUp 0.34s cubic-bezier(0.22,0.72,0.24,1);background:{{ t.surface }}">
+        <div style="flex:none;padding:12px 0 0;display:flex;justify-content:center"><div style="width:38px;height:4px;border-radius:999px;background:{{ t.line }}"></div></div>
+        <sc-if value="{{ painListMode }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;overflow-y:auto;padding:22px 20px 28px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:21px;font-weight:700;letter-spacing:-0.02em;color:{{ t.strong }}">먼저 간 사람들이 힘들어한 것</div>
+              <div style="font-size:13.5px;color:{{ t.muted }}">미리 알면 대처가 쉬워지는 순서로 정리했습니다.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <sc-for list="{{ painItems }}" as="p" hint-placeholder-count="6">
+                <div onClick="{{ p.open }}" style="display:flex;align-items:center;gap:14px;min-height:66px;padding:14px 0;cursor:pointer;border-bottom:1px solid {{ t.line }}">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;width:20px;flex:none;color:{{ t.muted }}">{{ p.num }}</div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+                    <div style="font-size:15px;font-weight:500;line-height:1.45;color:{{ t.strong }}">{{ p.title }}</div>
+                    <div style="font-size:12.5px;color:{{ t.muted }}">{{ p.when }}</div>
+                  </div>
+                  <div style="font-size:15px;color:{{ t.muted }};opacity:0.6">›</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ painAnswerMode }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;overflow-y:auto;padding:16px 20px 28px;display:flex;flex-direction:column;gap:18px;animation:wabiSlideIn 0.24s ease-out">
+            <div onClick="{{ backToPainList }}" style="font-size:13px;font-weight:500;cursor:pointer;color:{{ t.muted }}">‹ 목록</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.08em;color:{{ t.muted }}">{{ painAnswer.when }}</div>
+              <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;line-height:1.35;color:{{ t.strong }}">{{ painAnswer.title }}</div>
+            </div>
+            <div style="font-size:15px;line-height:1.8;color:{{ t.text }};white-space:pre-line">{{ painAnswer.body }}</div>
+            <div style="display:flex;flex-direction:column;gap:10px;padding-top:2px">
+              <div style="font-size:13px;font-weight:700;color:{{ t.strong }}">대처법</div>
+              <sc-for list="{{ painAnswer.points }}" as="p" hint-placeholder-count="3">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="width:5px;height:5px;border-radius:999px;margin-top:8px;flex:none;background:{{ t.muted }}"></div>
+                  <div style="flex:1;font-size:14px;line-height:1.7;color:{{ t.text }}">{{ p.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="flex:none;padding:12px 20px 26px;border-top:1px solid {{ t.line }}">
+          <div onClick="{{ closePain }}" style="height:50px;border-radius:13px;font-size:15px;font-weight:500;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ t.text }};border:1.5px solid {{ t.line }}">닫기</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ addTaskOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:flex-end">
+      <div onClick="{{ closeAddTask }}" style="position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.4);animation:wabiFadeIn 0.2s ease-out"></div>
+      <div style="position:relative;display:flex;flex-direction:column;border-radius:26px 26px 0 0;animation:wabiSheetUp 0.34s cubic-bezier(0.22,0.72,0.24,1);background:{{ t.surface }}">
+        <div style="flex:none;padding:12px 0 0;display:flex;justify-content:center"><div style="width:38px;height:4px;border-radius:999px;background:{{ t.line }}"></div></div>
+        <div style="padding:22px 20px 0;display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:21px;font-weight:700;letter-spacing:-0.02em;color:{{ t.strong }}">할 일 추가</div>
+            <div style="font-size:13.5px;color:{{ t.muted }}">제목만 있어도 등록됩니다.</div>
+          </div>
+          <input value="{{ newTitle }}" onChange="{{ onNewTitle }}" placeholder="예: 국제운전면허증 발급" style="height:54px;border-radius:14px;padding:0 16px;font-family:'Noto Sans KR',sans-serif;font-size:15px;outline:none;background:{{ t.sunken }};color:{{ t.strong }};border:1.5px solid {{ t.line }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:13px;font-weight:700;color:{{ t.strong }}">언제 할 일인가요?</div>
+            <div style="display:flex;gap:10px">
+              <div onClick="{{ setNewPre }}" style="{{ newPreStyle }}">출국 전</div>
+              <div onClick="{{ setNewPost }}" style="{{ newPostStyle }}">현지 정착</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:13px;font-weight:700;color:{{ t.strong }}">마감</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ dueOptions }}" as="d" hint-placeholder-count="4">
+                <div onClick="{{ d.pick }}" style="{{ d.style }}">{{ d.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;padding:24px 20px 26px;display:flex;flex-direction:column;gap:10px">
+          <div onClick="{{ submitTask }}" style="{{ submitStyle }}">등록하기</div>
+          <div onClick="{{ closeAddTask }}" style="height:48px;border-radius:14px;font-size:14.5px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ t.text }};border:1.5px solid {{ t.line }}">취소</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ uploadOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:flex-end">
+      <div onClick="{{ closeUpload }}" style="position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.4);animation:wabiFadeIn 0.2s ease-out"></div>
+      <div style="position:relative;display:flex;flex-direction:column;border-radius:26px 26px 0 0;animation:wabiSheetUp 0.34s cubic-bezier(0.22,0.72,0.24,1);background:{{ t.surface }}">
+        <div style="flex:none;padding:12px 0 0;display:flex;justify-content:center"><div style="width:38px;height:4px;border-radius:999px;background:{{ t.line }}"></div></div>
+        <div style="padding:22px 20px 8px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:21px;font-weight:700;letter-spacing:-0.02em;color:{{ t.strong }}">파일 추가</div>
+          <div style="font-size:13.5px;color:{{ t.muted }}">서류는 기기에만 저장되며 만료일 알림에 사용됩니다.</div>
+        </div>
+        <div style="padding:14px 20px 0;display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ uploadOptions }}" as="o" hint-placeholder-count="3">
+            <div onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:14px;height:62px;cursor:pointer;border-bottom:1px solid {{ t.line }}">
+              <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;background:{{ t.sunken }};color:{{ t.text }}">{{ o.tag }}</div>
+              <div style="flex:1;font-size:15px;font-weight:500;color:{{ t.strong }}">{{ o.label }}</div>
+              <div style="font-size:15px;color:{{ t.muted }};opacity:0.6">›</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:none;padding:16px 20px 26px">
+          <div onClick="{{ closeUpload }}" style="height:50px;border-radius:13px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ t.text }};border:1.5px solid {{ t.line }}">취소</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ guideOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:flex-end">
+      <div onClick="{{ closeGuide }}" style="position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.4);animation:wabiFadeIn 0.2s ease-out"></div>
+      <div style="position:relative;max-height:82%;display:flex;flex-direction:column;border-radius:26px 26px 0 0;animation:wabiSheetUp 0.34s cubic-bezier(0.22,0.72,0.24,1);background:{{ t.surface }}">
+        <div style="flex:none;padding:12px 0 0;display:flex;justify-content:center"><div style="width:38px;height:4px;border-radius:999px;background:{{ t.line }}"></div></div>
+        <sc-if value="{{ guideListMode }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;overflow-y:auto;padding:22px 20px 30px;display:flex;flex-direction:column;gap:22px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:21px;font-weight:700;letter-spacing:-0.02em;color:{{ t.strong }}">현재 어떤 상황인가요?</div>
+              <div style="font-size:13.5px;color:{{ t.muted }}">상황에 맞는 질문만 모아 보여드립니다.</div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <div onClick="{{ setGuidePre }}" style="{{ guidePreStyle }}">출국 전</div>
+              <div onClick="{{ setGuidePost }}" style="{{ guidePostStyle }}">현지 도착</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <sc-for list="{{ guideItems }}" as="q" hint-placeholder-count="5">
+                <div onClick="{{ q.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:14px 0;cursor:pointer;border-bottom:1px solid {{ t.line }}">
+                  <div style="flex:1;font-size:15px;font-weight:500;line-height:1.45;color:{{ t.strong }}">{{ q.title }}</div>
+                  <div style="font-size:15px;color:{{ t.muted }};opacity:0.6">›</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ guideAnswerMode }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;overflow-y:auto;padding:16px 20px 30px;display:flex;flex-direction:column;gap:18px;animation:wabiSlideIn 0.24s ease-out">
+            <div onClick="{{ backToGuideList }}" style="font-size:13px;font-weight:500;cursor:pointer;color:{{ t.muted }}">‹ {{ guideSituationLabel }}</div>
+            <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;line-height:1.35;color:{{ t.strong }}">{{ guideAnswer.title }}</div>
+            <div style="font-size:15px;line-height:1.8;color:{{ t.text }};white-space:pre-line">{{ guideAnswer.body }}</div>
+            <div style="display:flex;flex-direction:column;gap:10px;padding-top:2px">
+              <sc-for list="{{ guideAnswer.points }}" as="p" hint-placeholder-count="3">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="width:5px;height:5px;border-radius:999px;margin-top:8px;flex:none;background:{{ t.muted }}"></div>
+                  <div style="flex:1;font-size:14px;line-height:1.7;color:{{ t.text }}">{{ p.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="flex:none;padding:12px 20px 26px;border-top:1px solid {{ t.line }}">
+          <div onClick="{{ closeGuide }}" style="height:50px;border-radius:13px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ t.sunken }};color:{{ t.strong }}">닫기</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;background:{{ t.bg }}">
+      <div style="height:52px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ t.strong }}"><span>9:41</span><span style="letter-spacing:0.08em">LTE ▮</span></div>
+      <div style="padding:0 20px;height:52px;flex:none;display:flex;align-items:center"><div onClick="{{ closeDetail }}" style="font-size:19px;cursor:pointer;color:{{ t.strong }}">‹</div></div>
+      <div style="flex:1;overflow-y:auto;padding:8px 20px 28px;display:flex;flex-direction:column;gap:26px">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.08em;color:{{ t.muted }}">{{ detail.tag }}</div>
+          <div style="font-size:26px;font-weight:700;letter-spacing:-0.03em;line-height:1.3;color:{{ t.strong }}">{{ detail.title }}</div>
+          <div style="font-size:13.5px;color:{{ detail.dueColor }}">{{ detail.meta }}</div>
+        </div>
+        <div style="font-size:15px;line-height:1.75;color:{{ t.text }}">{{ detail.body }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-if value="{{ detailHasItems }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:13px;font-weight:700;color:{{ t.strong }}">준비물</div>
+          </sc-if>
+          <sc-for list="{{ detail.items }}" as="it" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;height:48px;border-bottom:1px solid {{ t.line }}">
+              <div style="width:6px;height:6px;border-radius:999px;background:{{ t.muted }}"></div>
+              <div style="flex:1;font-size:14.5px;color:{{ t.text }}">{{ it.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex:none;padding:14px 20px 28px;border-top:1px solid {{ t.line }};background:{{ t.surface }};display:flex;flex-direction:column;gap:10px">
+        <div onClick="{{ completeDetail }}" style="{{ detailCtaStyle }}">{{ detailCtaLabel }}</div>
+        <sc-if value="{{ detailIsDone }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ undoDetail }}" style="height:48px;border-radius:14px;font-size:14.5px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ t.text }};border:1.5px solid {{ t.line }}">완료 취소하기</div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+<div style="font-size:12px;color:#8C8F8B;text-align:center">홈 · 할 일 · 문서 · 나 — 체크와 상세 이동이 동작합니다</div>
+</div>
+
+<div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:16px">
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:15px;font-weight:700;color:#121312">화면별 정보 예산</div>
+<div style="display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.6;color:#6B6E6A">
+<div style="display:flex;gap:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;min-width:44px;padding-top:2px">홈</div><div>D-day · 진행률 · NEXT 카드 · 이번 주 할 일 3줄. 그 외 아무것도 두지 않습니다.</div></div>
+<div style="display:flex;gap:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;min-width:44px;padding-top:2px">할 일</div><div>세그먼트로 출국 전/현지 정착을 나눕니다. 완료 항목은 흐리게 남겨 진행감을 줍니다.</div></div>
+<div style="display:flex;gap:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;min-width:44px;padding-top:2px">문서</div><div>파일 이름과 만료일만. 미리보기는 상세에서 엽니다.</div></div>
+<div style="display:flex;gap:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A5A8A3;min-width:44px;padding-top:2px">나</div><div>국가·출국일·비자 만료 3줄과 설정 3개.</div></div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #E2E2DF;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:15px;font-weight:700;color:#121312">카피 규칙</div>
+<div style="display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.6;color:#6B6E6A">
+<div>존댓말, 한 문장. 감탄사와 느낌표는 쓰지 않습니다.</div>
+<div>행동 버튼은 동사로 끝냅니다. "지금 하기", "가입하기", "예약하기".</div>
+<div>마감은 상대 표현으로. "오늘까지", "도착 후 3일 내".</div>
+<div>숫자는 단위와 붙여 씁니다. "8 / 14", "D-12".</div>
+</div>
+</div>
+<div style="background:#121312;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:12px">
+<div style="font-size:15px;font-weight:700;color:#F2F3F1">다음으로 할 수 있는 것</div>
+<div style="font-size:13px;line-height:1.75;color:#A5A8A3">국가별 할 일 데이터 채우기 · 온보딩(국가/출국일 입력) 3단계 · 문서 업로드 플로우 · 마감 알림 규칙 정의</div>
+</div>
+</div>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;darkMode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;프로토타입&quot;},&quot;country&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;AU&quot;,&quot;CA&quot;,&quot;JP&quot;],&quot;default&quot;:&quot;AU&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;프로토타입&quot;},&quot;dday&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:180,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;프로토타입&quot;}}">
+const COUNTRIES = {
+  AU: { label: '호주', depart: '9월 9일', visa: '2027년 9월 8일' },
+  CA: { label: '캐나다', depart: '10월 2일', visa: '2027년 10월 1일' },
+  JP: { label: '일본', depart: '11월 20일', visa: '2027년 11월 19일' }
+};
+
+const TASKS = [
+  { id: 'visa', phase: 'pre', title: '비자 신청', meta: '서류 · 승인까지 3주', week: false, tag: '출국 전 · 서류', body: '온라인으로 신청하고 승인 메일을 받으면 끝입니다. 승인까지 평균 3주가 걸리니 항공권보다 먼저 진행하시는 편이 안전합니다.', items: ['여권 스캔본', '증명사진 1장', '해외 결제 가능 카드'], done: true },
+  { id: 'insurance', phase: 'pre', title: '해외 여행자 보험 가입', meta: '오늘까지', week: true, urgent: true, tag: '출국 전 · 필수', body: '입국 심사에서 증서를 요구할 수 있습니다. 체류 기간 전체를 덮는 상품을 고르고, 증서 PDF는 문서 탭에 저장해 두시면 됩니다.', items: ['체류 기간 전체 보장', '의료비 한도 확인', '증서 PDF 저장'] },
+  { id: 'flight', phase: 'pre', title: '항공권 예약', meta: '비자 승인 후', week: true, tag: '출국 전 · 예약', body: '비자 승인 메일을 받은 뒤 예약하시는 것을 권합니다. 편도로 끊는 경우 입국 심사에서 잔고 증명을 요구할 수 있습니다.', items: ['비자 승인 메일', '잔고 증명 준비', '수하물 규정 확인'] },
+  { id: 'money', phase: 'pre', title: '초기 자금 환전 계획', meta: '이번 주', week: true, tag: '출국 전 · 자금', body: '첫 달 생활비와 보증금을 합쳐 계산합니다. 전액 환전보다 현지 계좌 개설 후 송금하는 편이 유리한 경우가 많습니다.', items: ['첫 달 생활비', '집 보증금', '비상금 별도 보관'] },
+  { id: 'account', phase: 'post', title: '현지 은행 계좌 개설', meta: '도착 후 3일 내', week: false, tag: '현지 정착 · 금융', body: '급여 계좌가 없으면 채용이 늦어집니다. 지점 예약 후 여권과 주소 증명을 가져가면 당일 개설이 가능합니다.', items: ['여권', '주소 증명', '입국 도장 확인'] },
+  { id: 'tax', phase: 'post', title: '세금 번호 신청', meta: '계좌 개설 후', week: false, tag: '현지 정착 · 행정', body: '세금 번호가 없으면 최고 세율이 적용됩니다. 온라인 신청 후 우편으로 번호를 받습니다.', items: ['현지 주소', '계좌 정보', '비자 번호'] },
+  { id: 'sim', phase: 'post', title: '유심 개통', meta: '도착 당일', week: false, tag: '현지 정착 · 통신', body: '공항에서 개통하면 편하지만 요금이 비싼 편입니다. 첫 달은 선불 유심으로 쓰고 이후 갈아타는 방법도 있습니다.', items: ['여권', '결제 카드', '기존 번호 로밍 해제'], done: true },
+  { id: 'house', phase: 'post', title: '집 계약', meta: '도착 후 2주 내', week: false, tag: '현지 정착 · 주거', body: '계약 전 보증금 반환 조건과 최소 거주 기간을 확인하십시오. 구두 약속은 남지 않습니다.', items: ['보증금 조건', '최소 거주 기간', '계약서 사본'] },
+  { id: 'medi', phase: 'post', title: '의료 등록', meta: '한 달 내', week: false, tag: '현지 정착 · 의료', body: '거주지 근처 병원에 등록해 두면 급할 때 대기 시간이 줄어듭니다.', items: ['보험 증서', '주소 증명'] }
+];
+
+const GUIDE = {
+  pre: [
+    { id: 'g1', title: '비자는 언제 신청하는 게 좋나요?', body: '출국 예정일 기준 두 달 전이 안전합니다.\n승인까지 평균 3주가 걸리고, 서류 보완 요청이 오면 더 길어집니다.', points: ['항공권보다 비자를 먼저 진행합니다', '여권 유효기간이 체류 기간보다 길어야 합니다', '승인 메일은 PDF로 저장해 두십시오'] },
+    { id: 'g2', title: '초기 자금은 얼마나 필요한가요?', body: '첫 달 생활비와 집 보증금을 합쳐 계산합니다.\n일을 구하기까지 보통 2~4주가 걸린다고 보고 여유를 둡니다.', points: ['첫 달 생활비 + 보증금 + 비상금', '전액 환전보다 현지 계좌 송금이 유리한 경우가 많습니다', '입국 심사에서 잔고 증명을 요구할 수 있습니다'] },
+    { id: 'g3', title: '보험은 꼭 들어야 하나요?', body: '국가에 따라 의무이며, 의무가 아니어도 사실상 필수입니다.\n현지 의료비는 보험 없이 감당하기 어렵습니다.', points: ['체류 기간 전체를 덮는 상품을 고릅니다', '의료비 한도와 치과 포함 여부를 확인합니다', '증서 PDF는 문서 탭에 저장합니다'] },
+    { id: 'g4', title: '한국에서 미리 정리할 것이 있나요?', body: '출국 전에 처리하지 않으면 현지에서 해결이 번거로운 항목들입니다.', points: ['건강보험 일시 정지 신청', '통신사 번호 유지 또는 해지', '자동 결제와 공과금 정리', '가족에게 위임장이 필요한지 확인'] },
+    { id: 'g5', title: '짐은 어느 정도가 적당한가요?', body: '현지에서 살 수 있는 것은 사는 편이 저렴합니다.\n한국에서만 구하기 어려운 것에 무게를 씁니다.', points: ['상비약과 처방약은 영문 처방전과 함께', '전자기기 어댑터는 미리 준비', '겨울 옷은 현지 계절을 먼저 확인'] }
+  ],
+  post: [
+    { id: 'h1', title: '도착 첫 주에 무엇부터 해야 하나요?', body: '유심, 계좌, 세금 번호 순서로 진행하면 막히지 않습니다.\n이 세 가지가 없으면 일을 구하기 어렵습니다.', points: ['도착 당일 유심 개통', '3일 내 은행 계좌 개설 예약', '계좌 개설 후 세금 번호 신청'] },
+    { id: 'h2', title: '세금 번호가 없으면 어떻게 되나요?', body: '급여에 최고 세율이 적용되는 경우가 많습니다.\n번호를 받은 뒤 고용주에게 전달하면 정정됩니다.', points: ['온라인 신청 후 우편으로 번호 수령', '신청에 현지 주소가 필요합니다', '연말 환급 신청 시 반드시 필요합니다'] },
+    { id: 'h3', title: '집 계약할 때 확인할 것은?', body: '보증금 반환 조건과 최소 거주 기간이 가장 많은 분쟁 원인입니다.\n구두 약속은 남지 않습니다.', points: ['계약서 사본을 반드시 받습니다', '입주 전 상태를 사진으로 기록합니다', '공과금 포함 여부를 확인합니다'] },
+    { id: 'h4', title: '일자리는 어떻게 찾나요?', body: '온라인 공고와 직접 방문을 함께 씁니다.\n현지 번호와 계좌가 있으면 회신율이 올라갑니다.', points: ['이력서는 현지 형식으로 한 장', '급여 지급 주기와 최저임금을 확인', '현금 지급 제안은 세금과 보상 문제를 확인'] },
+    { id: 'h5', title: '아플 때는 어디로 가야 하나요?', body: '응급이 아니면 등록한 동네 병원을 먼저 찾습니다.\n응급실은 대기와 비용이 큽니다.', points: ['거주지 근처 병원에 미리 등록', '보험사 청구 절차를 저장해 둡니다', '처방약 이름은 성분명으로 기록'] }
+  ]
+};
+
+const PAIN = [
+  { id: 'p1', num: '01', when: '도착 첫 주', title: '집과 일을 동시에 구해야 하는 압박', body: '계좌와 세금 번호가 없으면 채용이 미뤄지고, 일이 없으면 집 계약에서 밀립니다.\n두 가지를 동시에 해결하려다 조건이 나쁜 계약을 받는 경우가 많습니다.', points: ['첫 2~3주는 단기 숙소로 두고 일을 먼저 찾습니다', '급하게 보증금을 넣기 전 계약 조건을 문서로 받습니다', '급여 계좌·세금 번호를 도착 3일 내 처리합니다'] },
+  { id: 'p2', num: '02', when: '첫 달', title: '예상보다 빠르게 줄어드는 초기 자금', body: '보증금, 유심, 교통 카드, 생활용품이 첫 2주에 몰립니다.\n첫 급여는 보통 3~4주 뒤에 들어옵니다.', points: ['첫 급여일까지의 생활비를 따로 떼어 둡니다', '가구·생활용품은 중고로 시작합니다', '비상금은 다른 계좌에 두고 건드리지 않습니다'] },
+  { id: 'p3', num: '03', when: '한 달 전후', title: '영어가 문제가 아니라 전화가 문제', body: '대면 대화는 되지만 전화 응대와 서류 용어에서 막힙니다.\n집 문의와 채용 회신이 대부분 전화로 옵니다.', points: ['자기소개와 문의 문장을 미리 적어 두고 읽습니다', '통화 후 요점을 문자로 다시 확인합니다', '서류 용어는 캡처해 두고 반복해서 봅니다'] },
+  { id: 'p4', num: '04', when: '두세 달', title: '고립감과 무기력', body: '일과 집이 정리되면 오히려 관계가 비어 있다는 것이 드러납니다.\n한국 시차 때문에 연락도 어긋납니다.', points: ['주 1회 고정 약속을 하나 만듭니다', '취미·운동처럼 목적이 있는 모임을 고릅니다', '한국 통화는 요일을 정해 습관으로 만듭니다'] },
+  { id: 'p5', num: '05', when: '근로 시작 후', title: '부당한 근로 조건을 늦게 알아차림', body: '최저임금 미달, 현금 지급, 휴게 시간 미보장이 대표적입니다.\n첫 급여명세서를 받고 나서야 확인되는 경우가 많습니다.', points: ['근무 시간을 매일 직접 기록합니다', '급여명세서를 반드시 요구합니다', '문제가 있으면 노동 관련 기관에 문의합니다'] },
+  { id: 'p6', num: '06', when: '귀국 전', title: '정리에 걸리는 시간을 과소평가', body: '계좌 해지, 세금 환급, 보증금 반환, 통신 해지에 몇 주가 걸립니다.\n출국 후에는 처리가 훨씬 어렵습니다.', points: ['귀국 한 달 전부터 정리 목록을 만듭니다', '세금 환급은 계좌 해지 전에 신청합니다', '보증금 반환 조건과 사진 기록을 확인합니다'] }
+];
+
+const LIGHT = { bg: '#F4F4F3', surface: '#FFFFFF', sunken: '#EDEDEB', line: '#E2E2DF', muted: '#A5A8A3', text: '#6B6E6A', strong: '#121312', ink: '#121312', onInk: '#FFFFFF', alert: '#A6382B' };
+const DARK = { bg: '#0E0F0E', surface: '#171918', sunken: '#202220', line: '#2D302E', muted: '#7C807B', text: '#B7BAB6', strong: '#F2F3F1', ink: '#F2F3F1', onInk: '#0E0F0E', alert: '#E5786B' };
+
+class Component extends DCLogic {
+  state = { dark: null, country: null, tab: 'home', phase: 'pre', detail: null, done: null, guide: false, guideSit: 'pre', guideQ: null };
+
+  get dark() { return this.state.dark === null ? (this.props.darkMode ?? false) : this.state.dark; }
+  get country() { return this.state.country || this.props.country || 'AU'; }
+  get done() {
+    if (this.state.done) return this.state.done;
+    const d = {};
+    TASKS.forEach(t => { if (t.done) d[t.id] = true; });
+    return d;
+  }
+
+  toggle(id) {
+    const next = Object.assign({}, this.done);
+    next[id] = !next[id];
+    this.setState({ done: next });
+  }
+
+  row(t, tt) {
+    const isDone = !!this.done[t.id];
+    const urgent = t.urgent && !isDone;
+    return {
+      id: t.id,
+      title: t.title,
+      meta: isDone ? '완료' : t.meta,
+      mark: isDone ? '✓' : '',
+      titleColor: isDone ? tt.muted : tt.strong,
+      deco: isDone ? 'line-through' : 'none',
+      metaColor: urgent ? tt.alert : tt.muted,
+      checkStyle: isDone
+        ? `width:22px;height:22px;flex:none;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;background:${tt.ink};color:${tt.onInk}`
+        : `width:22px;height:22px;flex:none;border-radius:999px;cursor:pointer;border:1.5px solid ${urgent ? tt.alert : tt.line}`,
+      toggle: (e) => { if (e) e.stopPropagation(); this.toggle(t.id); },
+      open: () => this.setState({ detail: t.id })
+    };
+  }
+
+  renderVals() {
+    const dark = this.dark;
+    const t = dark ? DARK : LIGHT;
+    const c = COUNTRIES[this.country] || COUNTRIES.AU;
+    const dday = this.props.dday ?? 12;
+    const done = this.done;
+    const ALL = TASKS.concat(this.state.custom || []);
+    const total = ALL.length;
+    const doneCount = ALL.filter(x => done[x.id]).length;
+    const phase = this.state.phase;
+    const phaseAll = ALL.filter(x => x.phase === phase);
+    const phaseDone = phaseAll.filter(x => done[x.id]).length;
+    const next = ALL.find(x => !done[x.id]) || ALL[0];
+    const detailTask = this.state.detail ? ALL.find(x => x.id === this.state.detail) : null;
+    const tab = this.state.tab;
+
+    const pill = (on) => `height:38px;padding:0 15px;border-radius:10px;font-size:13px;line-height:1;white-space:nowrap;flex:none;font-weight:${on ? 700 : 500};display:flex;align-items:center;justify-content:center;cursor:pointer;background:${on ? '#121312' : '#FFFFFF'};color:${on ? '#FFFFFF' : '#6B6E6A'};border:1px solid ${on ? '#121312' : '#E2E2DF'}`;
+    const gseg = (on) => `flex:1;height:50px;border-radius:13px;font-size:15px;line-height:1;white-space:nowrap;font-weight:${on ? 700 : 500};display:flex;align-items:center;justify-content:center;cursor:pointer;background:${on ? t.ink : 'transparent'};color:${on ? t.onInk : t.text};border:1.5px solid ${on ? t.ink : t.line}`;
+    const seg = (on) => `flex:1;height:42px;border-radius:10px;font-size:13.5px;line-height:1;white-space:nowrap;font-weight:${on ? 700 : 500};display:flex;align-items:center;justify-content:center;cursor:pointer;background:${on ? t.surface : 'transparent'};color:${on ? t.strong : t.muted}`;
+
+    const tabs = [
+      { key: 'home', label: '홈', shape: '7px' },
+      { key: 'tasks', label: '할 일', shape: '7px' },
+      { key: 'docs', label: '문서', shape: '7px' },
+      { key: 'me', label: '나', shape: '999px' }
+    ].map(x => {
+      const on = tab === x.key;
+      return {
+        label: x.label,
+        weight: on ? 700 : 500,
+        color: on ? t.strong : t.muted,
+        iconStyle: on
+          ? `width:20px;height:20px;border-radius:${x.shape};background:${t.ink}`
+          : `width:20px;height:20px;border-radius:${x.shape};border:1.5px solid ${t.muted};opacity:0.65`,
+        go: () => this.setState({ tab: x.key, detail: null })
+      };
+    });
+
+    const detail = detailTask ? {
+      tag: detailTask.tag,
+      title: detailTask.title,
+      meta: done[detailTask.id] ? '완료됨' : detailTask.meta,
+      dueColor: (detailTask.urgent && !done[detailTask.id]) ? t.alert : t.muted,
+      body: detailTask.body,
+      items: detailTask.items.map(l => ({ label: l }))
+    } : { tag: '', title: '', meta: '', dueColor: t.muted, body: '', items: [] };
+
+    const dDone = detailTask ? !!done[detailTask.id] : false;
+
+    return {
+      t,
+      countryLabel: c.label,
+      departLabel: c.depart,
+      visaLabel: c.visa,
+      ddayLabel: 'D-' + dday,
+      ddayCaption: c.label + ' 출국까지',
+      progressLabel: doneCount + ' / ' + total,
+      progressPct: Math.round((doneCount / total) * 100) + '%',
+      phaseLabel: phase === 'pre' ? '출국 전 준비' : '현지 정착',
+      phaseProgressLabel: phaseDone + ' / ' + phaseAll.length,
+      phaseProgressPct: Math.round((phaseDone / phaseAll.length) * 100) + '%',
+      nextTitle: next.title,
+      nextDesc: next.body.split('.')[0] + '.',
+      openNext: () => this.setState({ detail: next.id }),
+      goTasks: () => this.setState({ tab: 'tasks' }),
+      weekTasks: ALL.filter(x => x.week).map(x => this.row(x, t)),
+      addTaskOpen: !!this.state.addTask,
+      openAddTask: () => this.setState({ addTask: true, newTitle: '', newPhase: this.state.phase, newDue: '이번 주' }),
+      closeAddTask: () => this.setState({ addTask: false }),
+      newTitle: this.state.newTitle || '',
+      onNewTitle: (e) => this.setState({ newTitle: e.target.value }),
+      setNewPre: () => this.setState({ newPhase: 'pre' }),
+      setNewPost: () => this.setState({ newPhase: 'post' }),
+      newPreStyle: gseg((this.state.newPhase || 'pre') === 'pre'),
+      newPostStyle: gseg((this.state.newPhase || 'pre') === 'post'),
+      dueOptions: ['오늘까지', '이번 주', '이번 달', '도착 후'].map(label => {
+        const on = (this.state.newDue || '이번 주') === label;
+        return {
+          label,
+          style: `height:40px;padding:0 14px;border-radius:11px;font-size:13.5px;font-weight:${on ? 700 : 500};display:flex;align-items:center;cursor:pointer;background:${on ? t.ink : 'transparent'};color:${on ? t.onInk : t.text};border:1.5px solid ${on ? t.ink : t.line}`,
+          pick: () => this.setState({ newDue: label })
+        };
+      }),
+      submitStyle: (this.state.newTitle || '').trim()
+        ? `height:52px;border-radius:14px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;background:${t.ink};color:${t.onInk}`
+        : `height:52px;border-radius:14px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;background:${t.sunken};color:${t.muted}`,
+      submitTask: () => {
+        const title = (this.state.newTitle || '').trim();
+        if (!title) return;
+        const ph = this.state.newPhase || 'pre';
+        const due = this.state.newDue || '이번 주';
+        const task = {
+          id: 'my' + Date.now(),
+          phase: ph,
+          title,
+          meta: due,
+          week: due === '오늘까지' || due === '이번 주',
+          urgent: due === '오늘까지',
+          tag: (ph === 'pre' ? '출국 전' : '현지 정착') + ' · 직접 추가',
+          body: '직접 등록한 할 일입니다.',
+          items: []
+        };
+        this.setState({
+          custom: (this.state.custom || []).concat([task]),
+          addTask: false,
+          newTitle: '',
+          phase: ph
+        });
+      },
+      phaseTasks: phaseAll.map(x => this.row(x, t)),
+      docs: [
+        { ext: 'PDF', name: '보험 증서', meta: '2027년 9월까지 유효' },
+        { ext: 'PDF', name: '비자 승인서', meta: '5월 12일 발급' },
+        { ext: 'JPG', name: '여권 사본', meta: '만료 2031년 4월' },
+        { ext: 'PDF', name: '잔고 증명서', meta: '3개월 이내 발급 필요' }
+      ].concat(this.state.added || []),
+      uploadOpen: !!this.state.upload,
+      openUpload: () => this.setState({ upload: true }),
+      closeUpload: () => this.setState({ upload: false }),
+      uploadOptions: [
+        { tag: 'CAM', label: '사진 촬영', ext: 'JPG', name: '새 문서' },
+        { tag: 'IMG', label: '사진 앨범에서 가져오기', ext: 'JPG', name: '가져온 사진' },
+        { tag: 'PDF', label: '파일에서 선택', ext: 'PDF', name: '가져온 파일' }
+      ].map(o => ({
+        tag: o.tag,
+        label: o.label,
+        pick: () => this.setState({
+          upload: false,
+          added: (this.state.added || []).concat([{ ext: o.ext, name: o.name, meta: '방금 추가' }])
+        })
+      })),
+      tabs,
+      isHome: tab === 'home',
+      isTasks: tab === 'tasks',
+      isDocs: tab === 'docs',
+      isMe: tab === 'me',
+      detailOpen: !!detailTask,
+      detail,
+      closeDetail: () => this.setState({ detail: null }),
+      completeDetail: () => { if (detailTask && !dDone) this.toggle(detailTask.id); this.setState({ detail: null }); },
+      detailHasItems: !!(detailTask && detailTask.items && detailTask.items.length),
+      detailIsDone: dDone,
+      undoDetail: () => { if (detailTask && dDone) this.toggle(detailTask.id); },
+      detailCtaLabel: dDone ? '완료됨' : '완료로 표시하기',
+      detailCtaStyle: dDone
+        ? `height:52px;border-radius:14px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;background:${t.sunken};color:${t.muted}`
+        : `height:52px;border-radius:14px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;background:${t.ink};color:${t.onInk}`,
+      painOpen: !!this.state.pain,
+      openPain: () => this.setState({ pain: true, painQ: null }),
+      closePain: () => this.setState({ pain: false, painQ: null }),
+      backToPainList: () => this.setState({ painQ: null }),
+      painListMode: !!this.state.pain && !this.state.painQ,
+      painAnswerMode: !!this.state.pain && !!this.state.painQ,
+      painItems: PAIN.map(p => ({
+        num: p.num, title: p.title, when: p.when,
+        open: () => this.setState({ painQ: p.id })
+      })),
+      painAnswer: (() => {
+        const p = PAIN.find(x => x.id === this.state.painQ) || { title: '', when: '', body: '', points: [] };
+        return { title: p.title, when: p.when, body: p.body, points: p.points.map(l => ({ label: l })) };
+      })(),
+      guideOpen: this.state.guide,
+      guideListMode: this.state.guide && !this.state.guideQ,
+      guideAnswerMode: this.state.guide && !!this.state.guideQ,
+      guideSituationLabel: this.state.guideSit === 'pre' ? '출국 전' : '현지 도착',
+      guideItems: (GUIDE[this.state.guideSit] || []).map(q => ({
+        title: q.title,
+        open: () => this.setState({ guideQ: q.id })
+      })),
+      guideAnswer: (() => {
+        const all = GUIDE.pre.concat(GUIDE.post);
+        const q = all.find(x => x.id === this.state.guideQ) || { title: '', body: '', points: [] };
+        return { title: q.title, body: q.body, points: q.points.map(p => ({ label: p })) };
+      })(),
+      openGuide: () => this.setState({ guide: true, guideQ: null }),
+      closeGuide: () => this.setState({ guide: false, guideQ: null }),
+      backToGuideList: () => this.setState({ guideQ: null }),
+      setGuidePre: () => this.setState({ guideSit: 'pre', guideQ: null }),
+      setGuidePost: () => this.setState({ guideSit: 'post', guideQ: null }),
+      guidePreStyle: gseg(this.state.guideSit === 'pre'),
+      guidePostStyle: gseg(this.state.guideSit === 'post'),
+      themeLabel: dark ? '다크' : '라이트',
+      toggleTheme: () => this.setState({ dark: !dark }),
+      setLight: () => this.setState({ dark: false }),
+      setDark: () => this.setState({ dark: true }),
+      lightBtnStyle: pill(!dark),
+      darkBtnStyle: pill(dark),
+      setAU: () => this.setState({ country: 'AU' }),
+      setCA: () => this.setState({ country: 'CA' }),
+      setJP: () => this.setState({ country: 'JP' }),
+      auBtnStyle: pill(this.country === 'AU'),
+      caBtnStyle: pill(this.country === 'CA'),
+      jpBtnStyle: pill(this.country === 'JP'),
+      setPre: () => this.setState({ phase: 'pre' }),
+      setPost: () => this.setState({ phase: 'post' }),
+      segPreStyle: seg(phase === 'pre'),
+      segPostStyle: seg(phase === 'post')
+    };
+  }
+}
+</script>
+</body>
+</html>

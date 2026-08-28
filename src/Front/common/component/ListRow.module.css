@@ -1,0 +1,99 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--line);
+}
+
+.checkButton {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.circleUrgent {
+  border-color: var(--alert);
+}
+
+.circleDone {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-ink);
+}
+
+.body {
+  flex: 1;
+  min-height: 64px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0 4px 0 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.texts {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleDone {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.meta {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.metaUrgent {
+  color: var(--alert);
+  font-weight: 500;
+}
+
+.metaDone {
+  color: var(--muted);
+}
+
+.chevron {
+  flex: none;
+  font-size: 15px;
+  color: var(--muted);
+  opacity: 0.6;
+}

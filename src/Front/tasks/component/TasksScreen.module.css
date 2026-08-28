@@ -1,0 +1,81 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 20px 32px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--strong);
+}
+
+.addButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  border: none;
+  cursor: pointer;
+}
+
+.plusVertical,
+.plusHorizontal {
+  position: absolute;
+  background: var(--on-ink);
+  border-radius: 2px;
+}
+
+.plusVertical {
+  width: 1.8px;
+  height: 15px;
+}
+
+.plusHorizontal {
+  width: 15px;
+  height: 1.8px;
+}
+
+.progressRow {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.progressLabelRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.progressValue {
+  font-family: var(--font-mono), monospace;
+  color: var(--strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  margin: 0;
+  padding: 20px 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}

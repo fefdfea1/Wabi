@@ -1,0 +1,25 @@
+.track {
+  display: flex;
+  background: var(--sunken);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.option {
+  flex: 1;
+  min-height: 48px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.selected {
+  background: var(--surface);
+  color: var(--strong);
+  font-weight: 700;
+}

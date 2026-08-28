@@ -1,0 +1,137 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.listHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.listTitle {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--strong);
+}
+
+.listDescription {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.questionList {
+  display: flex;
+  flex-direction: column;
+}
+
+.questionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 14px 0;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.questionTitle {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--strong);
+}
+
+.chevron {
+  font-size: 15px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.empty {
+  margin: 0;
+  padding: 16px 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: wabiSlideIn 0.24s ease-out;
+}
+
+.backLink {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.answerTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  color: var(--strong);
+}
+
+.answerBody {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-line;
+}
+
+.points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.point {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.pointDot {
+  width: 5px;
+  height: 5px;
+  margin-top: 8px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+.closeButton {
+  height: 50px;
+  border-radius: 13px;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--sunken);
+  color: var(--strong);
+  border: none;
+  cursor: pointer;
+}

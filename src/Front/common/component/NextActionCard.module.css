@@ -1,0 +1,42 @@
+.card {
+  border: 1.5px solid var(--ink);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.caption {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  color: var(--strong);
+}
+
+.description {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.cta {
+  height: 50px;
+  border-radius: 13px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  background: var(--ink);
+  color: var(--on-ink);
+  cursor: pointer;
+}

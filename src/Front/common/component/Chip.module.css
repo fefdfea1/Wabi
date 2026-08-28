@@ -1,0 +1,29 @@
+.chip {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  border: none;
+  white-space: nowrap;
+}
+
+.unselected {
+  background: var(--sunken);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.selected {
+  background: var(--ink);
+  color: var(--on-ink);
+  font-weight: 700;
+}
+
+button.selected,
+button.unselected {
+  cursor: pointer;
+}

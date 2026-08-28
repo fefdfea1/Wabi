@@ -32,9 +32,9 @@ export function NotesScreen({ notes, onOpenAdd, onOpenEdit, onDelete }: NotesScr
       <header className={styles.header}>
         <div className={styles.headingBlock}>
           <h1 className={styles.title}>메모</h1>
-          <p className={styles.intro}>
-            계좌 번호, 집주인 연락처, 병원 이름처럼 잊으면 곤란한 것을 적어 두는 곳입니다.
-          </p>
+          {/* discussion.md 48절: 예시(계좌 번호·집주인 연락처·병원 이름)를 들지 않는다 —
+              적을 것을 앱이 정해 주는 것처럼 읽히고, 민감한 값을 적으라고 권하는 셈이 된다. */}
+          <p className={styles.intro}>기억해야 하는 메모를 적어두는 곳입니다.</p>
         </div>
         <button type="button" className={styles.addButton} onClick={onOpenAdd} aria-label="메모 추가">
           <span aria-hidden="true" className={styles.plusVertical} />

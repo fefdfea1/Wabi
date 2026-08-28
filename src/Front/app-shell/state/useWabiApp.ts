@@ -172,13 +172,12 @@ export function useWabiApp() {
   const doneCount = allTasks.filter((task) => countryDone[task.id]).length;
   const phaseTasksUnsorted = allTasks.filter((task) => task.phase === phase);
   const phaseDoneCount = phaseTasksUnsorted.filter((task) => countryDone[task.id]).length;
-  // discussion.md 21.3절: 이제 목록 전체가 이용자가 넣은 것이라 기본 제공/직접 추가 구분이
-  // 필요 없어졌다 — createdAt 내림차순으로만 정렬한다(sortTasksForDisplay에 빈 builtin 배열을
-  // 넘겨 재사용한다).
-  const phaseTasks = sortTasksForDisplay([], phaseTasksUnsorted);
+  // discussion.md 40절: 마감이 이른 것이 위, 마감을 정하지 않은 것은 맨 아래. 홈과 할 일 탭이
+  // 같은 함수를 써야 두 화면의 순서가 어긋나지 않는다.
+  const phaseTasks = sortTasksForDisplay(phaseTasksUnsorted);
   // discussion.md 39절: 홈의 "이번 주 할 일"도 할 일 탭과 같은 순서로 보여준다 — 거르기만 하면
   // 저장된 순서(만든 순)가 그대로 나와, 같은 할 일이 두 화면에서 다른 자리에 놓인다.
-  const weekTasks = sortTasksForDisplay([], allTasks.filter((task) => task.week));
+  const weekTasks = sortTasksForDisplay(allTasks.filter((task) => task.week));
   const nextTask = pickNextTask(allTasks, countryDone);
   const nextDescription = nextTask ? firstSentence(nextTask.body) : "";
 

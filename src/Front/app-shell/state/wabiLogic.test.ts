@@ -136,35 +136,49 @@ function runAssertions(): number {
   check("pickNextTask: 모두 완료면 첫 항목 폴백", pickNextTask(tasks, { a: true, b: true })?.id, "a");
   check("pickNextTask: 빈 목록이면 null", pickNextTask([], {}), null);
 
-  // --- sortTasksForDisplay (discussion.md 21.3절, 시간대 무관) ---
-  function task(id: string, createdAt?: string): Task {
-    return { id, phase: "pre", title: id, meta: "", week: false, urgent: false, tag: "", body: "", items: [], done: false, createdAt };
+  // --- sortTasksForDisplay (discussion.md 40절, 시간대 무관) ---
+  function task(id: string, dueDate?: string, createdAt?: string): Task {
+    return { id, phase: "pre", title: id, tag: "", body: "", items: [], done: false, dueDate, createdAt };
   }
-  const builtinA = task("builtin-a");
-  const builtinB = task("builtin-b");
-  const customOld = task("custom-old", "2026-08-01T00:00:00.000Z");
-  const customNew = task("custom-new", "2026-08-27T00:00:00.000Z");
-  const customNoCreatedAt = task("custom-broken");
+  const due03 = task("due-03", "2026-09-03", "2026-08-01T00:00:00.000Z");
+  const due01 = task("due-01", "2026-09-01", "2026-08-02T00:00:00.000Z");
+  const due10 = task("due-10", "2026-09-10", "2026-08-03T00:00:00.000Z");
+  const noDueOld = task("nodue-old", undefined, "2026-08-01T00:00:00.000Z");
+  const noDueNew = task("nodue-new", undefined, "2026-08-05T00:00:00.000Z");
+  const noDueBroken = task("nodue-broken");
 
   check(
-    "sortTasksForDisplay: 직접 추가한 할 일이 기본 제공보다 위",
-    sortTasksForDisplay([builtinA, builtinB], [customOld]).map((t) => t.id),
-    ["custom-old", "builtin-a", "builtin-b"],
+    "sortTasksForDisplay: 마감이 이른 할 일이 위",
+    sortTasksForDisplay([due03, due10, due01]).map((t) => t.id),
+    ["due-01", "due-03", "due-10"],
   );
   check(
-    "sortTasksForDisplay: 직접 추가한 것끼리는 createdAt 내림차순(최근이 위)",
-    sortTasksForDisplay([builtinA], [customOld, customNew]).map((t) => t.id),
-    ["custom-new", "custom-old", "builtin-a"],
+    "sortTasksForDisplay: 마감을 정하지 않은 할 일은 항상 맨 아래",
+    sortTasksForDisplay([noDueNew, due10, noDueOld, due01]).map((t) => t.id),
+    ["due-01", "due-10", "nodue-new", "nodue-old"],
   );
   check(
-    "sortTasksForDisplay: 기본 제공 할 일의 순서는 그대로 유지",
-    sortTasksForDisplay([builtinB, builtinA], []).map((t) => t.id),
-    ["builtin-b", "builtin-a"],
+    "sortTasksForDisplay: 마감 없는 것끼리는 최근에 만든 것이 위",
+    sortTasksForDisplay([noDueOld, noDueNew]).map((t) => t.id),
+    ["nodue-new", "nodue-old"],
   );
   check(
-    "sortTasksForDisplay: createdAt 없는 직접 추가 항목은 가장 오래된 것으로 취급되지만 버려지지 않음",
-    sortTasksForDisplay([builtinA], [customNew, customNoCreatedAt, customOld]).map((t) => t.id),
-    ["custom-new", "custom-old", "custom-broken", "builtin-a"],
+    "sortTasksForDisplay: 마감이 같으면 최근에 만든 것이 위",
+    sortTasksForDisplay([
+      task("same-old", "2026-09-01", "2026-08-01T00:00:00.000Z"),
+      task("same-new", "2026-09-01", "2026-08-09T00:00:00.000Z"),
+    ]).map((t) => t.id),
+    ["same-new", "same-old"],
+  );
+  check(
+    "sortTasksForDisplay: createdAt이 없는 항목도 버려지지 않고 맨 뒤에 남는다",
+    sortTasksForDisplay([noDueBroken, noDueNew, due01]).map((t) => t.id),
+    ["due-01", "nodue-new", "nodue-broken"],
+  );
+  check(
+    "sortTasksForDisplay: 원본 배열을 바꾸지 않는다",
+    (() => { const input = [due10, due01]; sortTasksForDisplay(input); return input.map((t) => t.id); })(),
+    ["due-10", "due-01"],
   );
 
   // --- firstSentence (시간대 무관) ---

@@ -65,6 +65,9 @@ export function deriveDueDisplay(
 }
 
 /**
+ * discussion.md 40절: 마감이 이른 할 일이 위에 오고, 마감을 정하지 않은 할 일은 항상 맨 아래로
+ * 간다. 홈과 할 일 탭이 같은 함수를 쓰므로 두 화면의 순서가 어긋나지 않는다.
+ *
  * discussion.md 21.3절: 할 일 목록 화면 전용 정렬. 직접 추가한 할 일이 기본 제공 할 일보다
  * 위에 오고, 직접 추가한 것끼리는 createdAt 내림차순(가장 최근에 만든 것이 맨 위)이다. 기본
  * 제공 할 일의 순서는 조사해서 넣은 준비 순서이므로 그대로 둔다(builtinTasks를 재정렬하지 않고
@@ -78,9 +81,20 @@ export function deriveDueDisplay(
  * pickNextTask(다음 할 일 카드)·완료 개수 계산에는 이 함수의 결과를 넘기면 안 된다 — 그쪽은
  * 마감일·긴급도로 고르는 별개 규칙이라 원래 순서를 그대로 써야 한다.
  */
-export function sortTasksForDisplay(builtinTasks: Task[], customTasks: Task[]): Task[] {
-  const sortedCustom = [...customTasks].sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
-  return sortedCustom.concat(builtinTasks);
+export function sortTasksForDisplay(tasks: Task[]): Task[] {
+  return [...tasks].sort((a, b) => {
+    const aDue = a.dueDate ?? "";
+    const bDue = b.dueDate ?? "";
+
+    // 마감이 있는 할 일이 먼저 온다 — 마감을 정하지 않은 것은 언제 해도 되는 일이라 뒤로 민다.
+    if (!aDue !== !bDue) return aDue ? -1 : 1;
+
+    // 둘 다 마감이 있으면 이른 것이 위. ISO yyyy-mm-dd는 사전순 비교가 곧 날짜순이다.
+    if (aDue && bDue && aDue !== bDue) return aDue < bDue ? -1 : 1;
+
+    // 마감이 같거나 둘 다 없으면 최근에 만든 것이 위(21.3절).
+    return (b.createdAt ?? "").localeCompare(a.createdAt ?? "");
+  });
 }
 
 /**

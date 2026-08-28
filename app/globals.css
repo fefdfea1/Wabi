@@ -39,14 +39,21 @@ textarea {
 /* discussion.md 20.11절 4번: 네이티브 폼 컨트롤(날짜 입력의 달력 아이콘, 스크롤바 등)은
    브라우저가 직접 그려 CSS로 색을 바꿀 수 없다 — color-scheme을 선언해야 테마에 맞게
    렌더된다. 다크에서 달력 아이콘이 배경과 구분되지 않던 문제가 이것이다. */
+/*
+ * discussion.md 42.2절(PM 실측): --muted가 라이트 모드 세 배경(bg/surface/sunken) 위에서
+ * 2.19~2.41:1로 WCAG 기준(4.5:1)의 절반에도 못 미쳤다 — 대부분의 보조 설명 문구가 여기 해당했다.
+ * --muted만 어둡게 하면 --text와 눈으로 구분되지 않으므로 두 값을 함께 옮긴다. 아래 값은 세
+ * 배경 모두에서 실측 4.5:1을 넘도록 골랐다(app/globals.css의 이 값을 바꾸면 대비도 함께
+ * 재야 한다 — 배경 세 개 각각).
+ */
 [data-theme="light"] {
   color-scheme: light;
   --bg: #f4f4f3;
   --surface: #ffffff;
   --sunken: #ededeb;
   --line: #e2e2df;
-  --muted: #a5a8a3;
-  --text: #6b6e6a;
+  --muted: #65685f;
+  --text: #454842;
   --strong: #121312;
   --ink: #121312;
   --on-ink: #ffffff;
@@ -59,7 +66,9 @@ textarea {
   --surface: #171918;
   --sunken: #202220;
   --line: #2d302e;
-  --muted: #7c807b;
+  /* discussion.md 42.2절: --surface 위에서 4.40:1로 아슬아슬하게 미달이었다. --text는 이미
+     8:1 이상이라 손대지 않는다. */
+  --muted: #868a84;
   --text: #b7bab6;
   --strong: #f2f3f1;
   --ink: #f2f3f1;

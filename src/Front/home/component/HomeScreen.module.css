@@ -103,7 +103,10 @@
 .linkButton {
   background: none;
   border: none;
-  padding: 0;
+  /* discussion.md 42.3절(PM 실측): padding 0이면 손가락으로 누르기엔 19px 높이라 너무 작다.
+     weekHeader가 align-items: baseline이라 위아래 padding을 늘려도 텍스트의 베이스라인
+     위치(=주변 배치)는 그대로 유지되고, 누를 수 있는 상자만 커진다. 글자 크기는 손대지 않는다. */
+  padding: 12px 0;
   font-size: 12.5px;
   color: var(--muted);
   cursor: pointer;

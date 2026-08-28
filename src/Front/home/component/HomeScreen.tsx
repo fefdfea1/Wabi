@@ -75,7 +75,7 @@ export function HomeScreen({
               {doneCount} / {total}
             </span>
           </div>
-          <ProgressBar value={doneCount} max={total} />
+          <ProgressBar value={doneCount} max={total} ariaLabel="준비 진행률" />
         </div>
       </section>
 

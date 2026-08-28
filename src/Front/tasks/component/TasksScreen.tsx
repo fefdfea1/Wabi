@@ -53,7 +53,11 @@ export function TasksScreen({
             {phaseDoneCount} / {phaseTasks.length}
           </span>
         </div>
-        <ProgressBar value={phaseDoneCount} max={phaseTasks.length} />
+        <ProgressBar
+          value={phaseDoneCount}
+          max={phaseTasks.length}
+          ariaLabel={phase === "pre" ? "출국 전 준비 진행률" : "현지 정착 진행률"}
+        />
       </div>
 
       <div className={styles.list}>

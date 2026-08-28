@@ -50,12 +50,20 @@ export function NotesPanel({ collapsed, notes, onQuickAdd, onOpenEdit, onDelete,
   }
 
   return (
-    <aside className={[styles.panel, collapsed ? styles.collapsed : ""].filter(Boolean).join(" ")}>
+    <aside
+      className={[styles.panel, collapsed ? styles.collapsed : ""].filter(Boolean).join(" ")}
+      // discussion.md 42.1절(PM 실측): 폭만 0으로 접으면 Tab 순회·클릭·접근성 트리에서는
+      // 여전히 살아 있어, 키보드 사용자가 화면 밖 요소에 갇힌다. inert는 이 세 가지를 한 번에
+      // 막는다. collapsed는 접기로 정해지는 즉시(애니메이션 시작과 동시에) true가 되므로
+      // 여기 그대로 연결하면 애니메이션이 끝나기를 기다리지 않고 바로 막힌다.
+      inert={collapsed}
+    >
       <div className={styles.inner}>
         <span className={styles.title}>내 메모</span>
         <textarea
           ref={textareaRef}
           className={styles.body}
+          aria-label="메모 입력"
           placeholder="여기에 바로 적어 두세요"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}

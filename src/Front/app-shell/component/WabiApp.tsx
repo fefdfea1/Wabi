@@ -14,7 +14,7 @@ import { AddTaskSheet } from "@/Front/overlay/component/AddTaskSheet";
 import { NoteEditorSheet } from "@/Front/overlay/component/NoteEditorSheet";
 import { CountryPickerSheet } from "@/Front/overlay/component/CountryPickerSheet";
 import { TaskDetailScreen } from "@/Front/task-detail/component/TaskDetailScreen";
-import { DUE_OPTIONS, useWabiApp } from "@/Front/app-shell/state/useWabiApp";
+import { useWabiApp } from "@/Front/app-shell/state/useWabiApp";
 import styles from "./WabiApp.module.css";
 
 export function WabiApp() {
@@ -155,14 +155,12 @@ export function WabiApp() {
           onTitleChange={wabi.setAddTaskTitle}
           phase={wabi.addTaskPhase}
           onPhaseChange={wabi.setAddTaskPhase}
-          due={wabi.addTaskDue}
-          onDueChange={wabi.setAddTaskDue}
-          dueOptions={DUE_OPTIONS}
           dueDate={wabi.addTaskDueDate}
           onDueDateChange={wabi.setAddTaskDueDate}
           minDate={wabi.todayIso}
           recommendedTasks={wabi.recommendedTasks}
-          onPickRecommended={wabi.pickRecommendedTask}
+          selectedRecommendationId={wabi.addTaskSelectedRecommendationId}
+          onSelectRecommended={wabi.selectRecommendedTask}
           onSubmit={wabi.submitAddTask}
           onClose={wabi.closeAddTask}
         />

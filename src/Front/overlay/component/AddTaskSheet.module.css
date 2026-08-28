@@ -31,92 +31,162 @@
   color: var(--strong);
 }
 
-.dueOptions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.dueOption {
-  min-height: 48px;
-  padding: 0 14px;
-  border-radius: 11px;
-  font-size: 13.5px;
-  font-weight: 500;
-  background: transparent;
-  color: var(--text);
-  border: 1.5px solid var(--line);
-  cursor: pointer;
-}
-
-.dueOptionSelected {
-  background: var(--ink);
-  color: var(--on-ink);
-  font-weight: 700;
-  border-color: var(--ink);
-}
-
 .dueDateLabel {
   margin: 2px 0 0;
   font-size: 12.5px;
   color: var(--muted);
 }
 
-/* discussion.md 23.2절: 조사된 할 일 중 지금 phase·국가에 맞고 아직 목록에 없는 것을 보여준다.
-   누르면 즉시 추가된다(23.3절) — 20.13절 2번과 같은 원칙으로 누르는 중임을 sunken 배경으로 보여준다. */
+/* discussion.md 25.7절: 소제목이 없는 대신, 제목 입력 바로 아래에 붙듯이 놓되 맞닿지는 않을
+   정도만 띄운다 — 추천이 제목을 채우는 보조 수단이라는 관계가 거리로 드러나야 한다. 음수
+   margin으로 BottomSheet .body의 기본 gap(20px)을 줄인다(25.4-1절의 "간격을 키운다"를 뒤집음). */
+.recommendedGroup {
+  margin-top: -12px;
+}
+
+/* discussion.md 23.2절: 조사된 할 일 중 지금 phase·국가에 맞고 아직 목록에 없는 것을 보여준다. */
 .recommendedList {
   display: flex;
   flex-direction: column;
 }
 
+/* discussion.md 25.7절: 각 항목의 구분선을 행이 아니라 이 묶음(행 + 펼친 자료)에 준다 —
+   펼쳤을 때 행과 그 자신의 자료 사이에는 선이 없고, 다음 항목과의 경계에만 선이 남는다. */
+.recommendedItem {
+  border-bottom: 1px solid var(--line);
+}
+
+.recommendedItem:last-child {
+  border-bottom: none;
+}
+
 .recommendedRow {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: stretch;
+  gap: 6px;
   min-height: 52px;
+}
+
+/* discussion.md 25.7절: 제목 부분을 누르면 25.3절대로 제목칸을 채운다 — 20.13절 2번과 같은
+   원칙으로 누르는 중임을 sunken 배경으로 보여준다. */
+.recommendedTitleButton {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
   padding: 0 4px;
   border: none;
-  border-bottom: 1px solid var(--line);
   background: none;
   cursor: pointer;
   text-align: left;
 }
 
-.recommendedRow:last-child {
-  border-bottom: none;
-}
-
-.recommendedRow:active,
-.recommendedRow:focus-visible {
-  background: var(--sunken);
-}
-
 @media (hover: hover) {
-  .recommendedRow:hover {
+  .recommendedTitleButton:hover {
     background: var(--sunken);
   }
 }
 
+/* :active/:focus-visible을 hover 미디어쿼리 뒤에 둔다(20.13절 6번과 같은 이유 — 마우스를
+   올린 채 누르면 소스 순서가 늦은 쪽이 이겨야 한다). */
+.recommendedTitleButton:active,
+.recommendedTitleButton:focus-visible {
+  background: var(--sunken);
+}
+
+/* discussion.md 25.3절: 누른 항목은 고른 상태로 표시돼야 한다 — 다른 추천을 누르면 이 표시가
+   그쪽으로 옮겨간다(동시에 둘이 골라지지 않는다). */
+.recommendedRowSelected {
+  background: var(--sunken);
+}
+
 .recommendedTitle {
-  flex: 1;
-  min-width: 0;
   font-size: 14.5px;
   font-weight: 500;
   color: var(--strong);
 }
 
-.recommendedAdd {
+.recommendedRowSelected .recommendedTitle {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* discussion.md 25.7절: "!"는 조사해 둔 자료를 펼치는 버튼이다 — 경고가 아니라 읽을 거리
+   표시라 --alert 색을 쓰지 않는다(중립색). 펼친 상태(aria-expanded)는 ink로 채워 보여준다. */
+.recommendedInfoButton {
   flex: none;
-  width: 28px;
-  height: 28px;
+  align-self: center;
+  width: 30px;
+  height: 30px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
   background: var(--sunken);
-  color: var(--strong);
-  font-size: 15px;
-  line-height: 1;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .recommendedInfoButton:hover {
+    background: var(--line);
+  }
+}
+
+.recommendedInfoButton:active,
+.recommendedInfoButton:focus-visible {
+  background: var(--line);
+}
+
+.recommendedInfoButton[aria-expanded="true"] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* discussion.md 25.7절: 상세 화면과 같은 자료(body·items·sourceUrl)를 그 항목 바로 아래에
+   펼친다 — 시트 위에 또 시트를 띄우지 않는다. */
+.recommendedDetail {
+  padding: 0 4px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recommendedDetailBody {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.recommendedDetailItems {
+  display: flex;
+  flex-direction: column;
+}
+
+.recommendedDetailItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  font-size: 13px;
+  color: var(--text);
+  border-bottom: 1px solid var(--line);
+}
+
+.recommendedDetailItem:last-child {
+  border-bottom: none;
+}
+
+.recommendedDetailItemDot {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--muted);
 }
 
 .submit {

@@ -35,11 +35,14 @@ export function readStoredNotes(): NoteRecord[] {
   }
 }
 
-export function writeStoredNotes(notes: NoteRecord[]): void {
-  if (typeof window === "undefined") return;
+/** discussion.md 24.1절: 저장 실패(용량 초과·프라이빗 모드 등)를 조용히 삼키지 않는다 —
+ *  writeStoredAvatar와 같은 방식으로 성공 여부를 호출부에 알린다. */
+export function writeStoredNotes(notes: NoteRecord[]): boolean {
+  if (typeof window === "undefined") return false;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    return true;
   } catch {
-    // 프라이빗 모드 등 저장소 접근이 막힌 환경에서는 조용히 무시한다(theme/departureDate와 동일 패턴).
+    return false;
   }
 }

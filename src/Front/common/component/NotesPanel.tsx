@@ -13,7 +13,8 @@ export interface NotesPanelProps {
    */
   collapsed: boolean;
   notes: NoteRecord[];
-  onQuickAdd: (body: string) => void;
+  /** discussion.md 24.1절: 저장 성공 여부를 돌려준다 — 실패하면 입력창을 비우지 않는다. */
+  onQuickAdd: (body: string) => boolean;
   onOpenEdit: (id: string) => void;
   onDelete: (id: string) => void;
   /** discussion.md 19.7절: 홈에만 붙는 하단(margin-top: auto) 요소. 그 한 가지만 다르고 나머지는 동일하다. */
@@ -41,10 +42,11 @@ export function NotesPanel({ collapsed, notes, onQuickAdd, onOpenEdit, onDelete,
   const [draft, setDraft] = useState("");
   const canSave = draft.trim().length > 0;
 
+  // discussion.md 24.1절: 저장에 성공했을 때만 입력창을 비운다 — 실패하면 이용자가 방금
+  // 쓴 글을 잃지 않아야 한다.
   function submit() {
     if (!canSave) return;
-    onQuickAdd(draft);
-    setDraft("");
+    if (onQuickAdd(draft)) setDraft("");
   }
 
   return (

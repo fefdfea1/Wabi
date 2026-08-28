@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { COUNTRIES, GUIDE_BY_COUNTRY, PAIN_BY_COUNTRY, TASKS_BY_COUNTRY } from "@/Front/common/data/tasks";
 import { formatDateOnly, formatKoreanDate } from "@/Front/common/date/localDate";
+import { generateId } from "@/Front/common/id/generateId";
 import { clearStoredAvatar, processAvatarFile, readStoredAvatar, writeStoredAvatar } from "@/Front/common/storage/avatar";
 import { readStoredCustomTasks, writeStoredCustomTasks } from "@/Front/common/storage/customTasks";
 import { readStoredDepartureDate, writeStoredDepartureDate } from "@/Front/common/storage/departureDate";
 import { readStoredNotes, writeStoredNotes } from "@/Front/common/storage/notes";
 import type {
   CountryCode,
-  DueOption,
   GuideSituation,
   NoteRecord,
   Task,
@@ -19,8 +19,6 @@ import type {
 import { computeDDay, computeVisaExpiry, deriveDueDisplay, firstSentence, pickNextTask, sortTasksForDisplay } from "./wabiLogic";
 
 export type SheetKind = "guide" | "pain" | "addTask" | "noteEditor" | "countryPicker" | null;
-
-export const DUE_OPTIONS: DueOption[] = ["오늘까지", "이번 주", "이번 달", "도착 후"];
 
 /** COUNTRIES에 실제로 등록된 국가 코드마다 빈 값을 채운 Record를 만든다(하드코딩 대신 데이터 기반). */
 function emptyByCountry<T>(): Record<CountryCode, T[]> {
@@ -87,11 +85,30 @@ export function useWabiApp() {
   const [guideQuestionId, setGuideQuestionId] = useState<string | null>(null);
   const [painItemId, setPainItemId] = useState<string | null>(null);
 
-  const [addTaskTitle, setAddTaskTitle] = useState("");
-  const [addTaskPhase, setAddTaskPhase] = useState<TaskPhase>("pre");
-  const [addTaskDue, setAddTaskDue] = useState<DueOption>("이번 주");
-  // discussion.md 19.3절: 고정 선택지 대신 달력으로 직접 고른 마감(ISO yyyy-mm-dd). 비어 있으면
-  // 고정 선택지(addTaskDue)를 쓴다 — 둘은 상호 배타적이다(AddTaskSheet에서 강제).
+  // discussion.md 25.1절/25.3절: 제목·phase는 추천을 고르면 원본 값으로 채워지고, 이용자가
+  // 직접 고치면(키 입력) 그 선택이 풀려야 한다 — 그래서 raw setter(...State)와, 그 위에서
+  // 선택 해제까지 함께 하는 wrapper(바깥에 노출하는 setAddTaskTitle/setAddTaskPhase)로 나눈다.
+  // 추천을 고르는 selectRecommendedTask는 raw setter를 써서 선택을 지우지 않는다.
+  const [addTaskTitle, setAddTaskTitleState] = useState("");
+  const [addTaskPhase, setAddTaskPhaseState] = useState<TaskPhase>("pre");
+  // discussion.md 25.4절: 추천을 고른 상태(제목·phase를 직접 고치지 않은 상태)로 등록하면
+  // 원본 body·items·sourceUrl·tag·id가 함께 들어간다. 제목을 고치거나 phase를 바꾸면 null로
+  // 풀리고 평범한 직접 추가 할 일이 된다.
+  const [addTaskSelectedRecommendationId, setAddTaskSelectedRecommendationId] = useState<string | null>(null);
+
+  function setAddTaskTitle(value: string) {
+    setAddTaskTitleState(value);
+    setAddTaskSelectedRecommendationId(null);
+  }
+
+  function setAddTaskPhase(value: TaskPhase) {
+    setAddTaskPhaseState(value);
+    setAddTaskSelectedRecommendationId(null);
+  }
+
+  // discussion.md 25.5절: 마감 고정 선택지(오늘까지/이번 주/이번 달/도착 후)를 없애고 날짜
+  // 직접 선택만 남긴다 — DueOption·addTaskDue 관련 상태도 함께 지웠다. 마감은 선택 사항이라
+  // 비워 둔 채 등록할 수 있다.
   const [addTaskDueDate, setAddTaskDueDate] = useState("");
 
   // discussion.md 19.3절: dueDate가 있는 할 일의 meta/urgent/week를 오늘 날짜 기준으로 다시
@@ -291,9 +308,9 @@ export function useWabiApp() {
   }
 
   function openAddTask() {
-    setAddTaskTitle("");
-    setAddTaskPhase(phase);
-    setAddTaskDue("이번 주");
+    setAddTaskTitleState("");
+    setAddTaskPhaseState(phase);
+    setAddTaskSelectedRecommendationId(null);
     setAddTaskDueDate("");
     setSheet("addTask");
   }
@@ -301,72 +318,88 @@ export function useWabiApp() {
     setSheet(null);
   }
 
+  /**
+   * discussion.md 25.3절: 추천을 누르면 제목칸을 채우고 그 항목의 phase에 맞춰 phase도 함께
+   * 바꾼다 — 목록에는 아직 추가되지 않는다(등록은 submitAddTask 하나뿐, 25.1절). raw
+   * setter(...State)를 써서 이 자체가 "직접 고침"으로 취급돼 선택이 풀리지 않게 한다. 다른
+   * 추천을 누르면 이 함수가 다시 호출돼 그대로 교체된다.
+   */
+  function selectRecommendedTask(source: Task) {
+    setAddTaskTitleState(source.title);
+    setAddTaskPhaseState(source.phase);
+    setAddTaskSelectedRecommendationId(source.id);
+  }
+
+  /**
+   * discussion.md 25.4절: 추천을 고른 상태(제목·phase를 직접 고치지 않은 상태)로 등록하면
+   * 원본 body·items·sourceUrl·tag·id가 그대로 들어간다 — 제목만 남기고 버리면 출처 없는
+   * 주장만 남는다. 제목을 고치거나 phase를 바꾸면 addTaskSelectedRecommendationId가 이미
+   * null로 풀려 있으므로(setAddTaskTitle/setAddTaskPhase) 평범한 직접 추가 할 일이 된다.
+   */
   function submitAddTask() {
     const title = addTaskTitle.trim();
     if (!title || !countryCode) return;
     const code = countryCode;
 
-    // discussion.md 19.3절: 날짜를 직접 골랐으면 그 값이 우선이다. 등록 시점에도 한 번 계산해
-    // 두지만(즉시 표시용), 실제로 화면에 보이는 값은 allTasks에서 today 기준으로 다시 계산한다.
+    // discussion.md 25.5절: 마감은 이제 날짜 직접 선택뿐이고 선택 사항이다 — 비어 있으면
+    // meta/week/urgent 셋 다 넣지 않는다(22절, 고정 선택지 폴백이 없어졌다).
     const dueDisplay = addTaskDueDate ? deriveDueDisplay(addTaskDueDate, new Date()) : null;
 
-    const newTask: Task = {
-      id: `custom-${Date.now()}`,
-      phase: addTaskPhase,
-      title,
-      meta: dueDisplay ? dueDisplay.meta : addTaskDue,
-      week: dueDisplay ? dueDisplay.week : addTaskDue === "오늘까지" || addTaskDue === "이번 주",
-      urgent: dueDisplay ? dueDisplay.urgent : addTaskDue === "오늘까지",
-      tag: `${addTaskPhase === "pre" ? "출국 전" : "현지 정착"} · 직접 추가`,
-      body: "직접 등록한 할 일입니다.",
-      items: [],
-      done: false,
-      dueDate: dueDisplay ? addTaskDueDate : undefined,
-      // discussion.md 21.2절/21.3절: 정렬 전용(화면에는 표시하지 않는다) — 목록 화면에서 직접
-      // 추가한 할 일을 최근 만든 순으로 위에 올리는 데 쓴다.
-      createdAt: new Date().toISOString(),
-    };
+    const selectedSource = addTaskSelectedRecommendationId
+      ? countryTasks.find((task) => task.id === addTaskSelectedRecommendationId)
+      : null;
 
-    setCustomTasks((prev) => {
-      const next = { ...prev, [code]: (prev[code] ?? []).concat(newTask) };
-      writeStoredCustomTasks(next);
-      return next;
-    });
-    setPhase(addTaskPhase);
+    const newTask: Task = selectedSource
+      ? {
+          id: selectedSource.id,
+          phase: selectedSource.phase,
+          title,
+          tag: selectedSource.tag,
+          body: selectedSource.body,
+          items: selectedSource.items,
+          done: false,
+          sourceUrl: selectedSource.sourceUrl,
+          meta: dueDisplay ? dueDisplay.meta : undefined,
+          week: dueDisplay ? dueDisplay.week : undefined,
+          urgent: dueDisplay ? dueDisplay.urgent : undefined,
+          dueDate: dueDisplay ? addTaskDueDate : undefined,
+          createdAt: new Date().toISOString(),
+        }
+      : {
+          // discussion.md 24.2절: Date.now() 기반 id는 같은 밀리초에 두 개가 만들어지면 겹쳐서
+          // 하나를 지울 때 filter가 둘 다 지운다 — crypto.randomUUID()로 바꾼다(보안 컨텍스트가
+          // 아니면 시각+난수로 물러선다, generateId 참고). 추천을 고른 채 등록한 항목은 위
+          // 분기에서 원본 id를 그대로 쓰므로 이 문제와 무관하다.
+          id: generateId("custom"),
+          phase: addTaskPhase,
+          title,
+          tag: `${addTaskPhase === "pre" ? "출국 전" : "현지 정착"} · 직접 추가`,
+          body: "직접 등록한 할 일입니다.",
+          items: [],
+          done: false,
+          meta: dueDisplay ? dueDisplay.meta : undefined,
+          week: dueDisplay ? dueDisplay.week : undefined,
+          urgent: dueDisplay ? dueDisplay.urgent : undefined,
+          dueDate: dueDisplay ? addTaskDueDate : undefined,
+          // discussion.md 21.2절/21.3절: 정렬 전용(화면에는 표시하지 않는다) — 목록 화면에서 직접
+          // 추가한 할 일을 최근 만든 순으로 위에 올리는 데 쓴다.
+          createdAt: new Date().toISOString(),
+        };
+
+    // discussion.md 24.1절: 저장 실패를 조용히 삼키지 않는다 — 알리고, 입력을 지우지 않으며
+    // (시트를 닫지 않고 return), 화면 상태(customTasks)도 저장에 성공했을 때만 바꾼다.
+    const next = { ...customTasks, [code]: (customTasks[code] ?? []).concat(newTask) };
+    if (!writeStoredCustomTasks(next)) {
+      window.alert("할 일을 저장하지 못했습니다. 저장 공간이 가득 찼거나 브라우저가 저장을 막고 있을 수 있습니다.");
+      return;
+    }
+
+    setCustomTasks(next);
+    setPhase(newTask.phase);
     setSheet(null);
-    setAddTaskTitle("");
+    setAddTaskTitleState("");
+    setAddTaskSelectedRecommendationId(null);
     setAddTaskDueDate("");
-  }
-
-  /**
-   * discussion.md 23.3절: 추천에서 하나를 고르면 조사된 title·body·items·sourceUrl·tag·phase를
-   * 그대로 복사해 이용자의 할 일이 된다 — 출처 링크가 따라와야 상세에서 근거를 볼 수 있다.
-   * meta·week·urgent는 넣지 않는다(22절, 마감을 함께 고를 때만 계산해 붙인다). id는 원본 id를
-   * 그대로 써서 이미 추가했는지 판별하는 기준(recommendedTasks에서 감추기)이 된다. 저장은
-   * 21절과 같은 wabi:custom-tasks다. 시트는 닫지 않는다 — 여러 개를 이어서 고를 수 있어야 한다
-   * (23.6절: 추천을 전부 추가하면 추천 영역이 사라진다).
-   */
-  function pickRecommendedTask(source: Task) {
-    if (!countryCode) return;
-    const code = countryCode;
-    const newTask: Task = {
-      id: source.id,
-      phase: source.phase,
-      title: source.title,
-      tag: source.tag,
-      body: source.body,
-      items: source.items,
-      done: false,
-      sourceUrl: source.sourceUrl,
-      createdAt: new Date().toISOString(),
-    };
-
-    setCustomTasks((prev) => {
-      const next = { ...prev, [code]: (prev[code] ?? []).concat(newTask) };
-      writeStoredCustomTasks(next);
-      return next;
-    });
-    setPhase(addTaskPhase);
   }
 
   /**
@@ -378,11 +411,16 @@ export function useWabiApp() {
     if (!detailTask || !countryCode) return;
     const code = countryCode;
     const id = detailTask.id;
-    setCustomTasks((prev) => {
-      const next = { ...prev, [code]: (prev[code] ?? []).filter((task) => task.id !== id) };
-      writeStoredCustomTasks(next);
-      return next;
-    });
+    const next = { ...customTasks, [code]: (customTasks[code] ?? []).filter((task) => task.id !== id) };
+
+    // discussion.md 24.1절: 삭제 저장이 실패하면 상세 화면을 닫지 않는다 — 실제로는 남아 있는데
+    // 목록으로 돌아가 사라진 것처럼 보이면 안 된다.
+    if (!writeStoredCustomTasks(next)) {
+      window.alert("할 일을 삭제하지 못했습니다. 다시 시도해 주세요.");
+      return;
+    }
+
+    setCustomTasks(next);
     setDetailTaskId(null);
   }
 
@@ -408,49 +446,65 @@ export function useWabiApp() {
     setNoteBody("");
   }
 
-  /** 저장 시점의 전체 타임스탬프를 남긴다 — 같은 날 여러 메모를 고쳐도 정렬 순서가 정확하다. */
+  /**
+   * 저장 시점의 전체 타임스탬프를 남긴다 — 같은 날 여러 메모를 고쳐도 정렬 순서가 정확하다.
+   * discussion.md 24.1절: 저장 실패를 조용히 삼키지 않는다 — 알리고, 입력을 지우지 않으며
+   * (closeNoteEditor를 부르지 않고 return), 저장에 성공했을 때만 화면 상태(notes)를 바꾼다.
+   */
   function saveNote() {
     const body = noteBody.trim();
     if (!body) return;
     const updatedAt = new Date().toISOString();
 
-    setNotes((prev) => {
-      let next: NoteRecord[];
-      if (editingNoteId) {
-        next = prev.map((n) => (n.id === editingNoteId ? { ...n, body, updatedAt } : n));
-      } else {
-        next = prev.concat({ id: `note-${Date.now()}`, body, updatedAt });
-      }
-      writeStoredNotes(next);
-      return next;
-    });
+    const next: NoteRecord[] = editingNoteId
+      ? notes.map((n) => (n.id === editingNoteId ? { ...n, body, updatedAt } : n))
+      : notes.concat({ id: generateId("note"), body, updatedAt });
 
+    if (!writeStoredNotes(next)) {
+      window.alert("메모를 저장하지 못했습니다. 저장 공간이 가득 찼거나 브라우저가 저장을 막고 있을 수 있습니다.");
+      return;
+    }
+
+    setNotes(next);
     closeNoteEditor();
   }
 
   /**
    * discussion.md 19.7절: 홈·메모가 공유하는 우측 336 패널의 "바로 적는" textarea. 별도 모달을
    * 띄우지 않고, 저장하기를 누르면 곧바로 메모 한 편을 만들고 입력창을 비운다.
+   * discussion.md 24.1절: 성공 여부를 돌려준다 — 호출부(NotesPanel)가 저장에 성공했을 때만
+   * 입력창을 비워야 실패 시 이용자가 방금 쓴 글을 잃지 않는다.
    */
-  function quickAddNote(body: string) {
+  function quickAddNote(body: string): boolean {
     const trimmed = body.trim();
-    if (!trimmed) return;
+    if (!trimmed) return false;
     const updatedAt = new Date().toISOString();
-    setNotes((prev) => {
-      const next = prev.concat({ id: `note-${Date.now()}`, body: trimmed, updatedAt });
-      writeStoredNotes(next);
-      return next;
-    });
+    const next = notes.concat({ id: generateId("note"), body: trimmed, updatedAt });
+
+    if (!writeStoredNotes(next)) {
+      window.alert("메모를 저장하지 못했습니다. 저장 공간이 가득 찼거나 브라우저가 저장을 막고 있을 수 있습니다.");
+      return false;
+    }
+
+    setNotes(next);
+    return true;
   }
 
-  /** discussion.md 16.3절: 삭제는 목록 행에서, 확인을 한 번 받는다. */
+  /**
+   * discussion.md 16.3절: 삭제는 목록 행에서, 확인을 한 번 받는다.
+   * discussion.md 24.1절: 삭제 저장이 실패하면 화면 목록을 바꾸지 않는다 — 실제로는 남아
+   * 있는데 지워진 것처럼 보이면 안 된다.
+   */
   function deleteNote(id: string) {
     if (!window.confirm("메모를 삭제할까요?")) return;
-    setNotes((prev) => {
-      const next = prev.filter((n) => n.id !== id);
-      writeStoredNotes(next);
-      return next;
-    });
+    const next = notes.filter((n) => n.id !== id);
+
+    if (!writeStoredNotes(next)) {
+      window.alert("메모를 삭제하지 못했습니다. 다시 시도해 주세요.");
+      return;
+    }
+
+    setNotes(next);
     if (editingNoteId === id) closeNoteEditor();
   }
 
@@ -537,13 +591,12 @@ export function useWabiApp() {
     setAddTaskTitle,
     addTaskPhase,
     setAddTaskPhase,
-    addTaskDue,
-    setAddTaskDue,
     addTaskDueDate,
     setAddTaskDueDate,
     todayIso,
     recommendedTasks,
-    pickRecommendedTask,
+    addTaskSelectedRecommendationId,
+    selectRecommendedTask,
     submitAddTask,
 
     notes: sortedNotes,

@@ -82,9 +82,6 @@ export type TabId = "home" | "tasks" | "notes" | "me";
 
 export type ThemeMode = "light" | "dark";
 
-/** 할 일 추가 시트의 마감 선택지 */
-export type DueOption = "오늘까지" | "이번 주" | "이번 달" | "도착 후";
-
 /**
  * 메모 탭에서 localStorage에 저장하는 메모 한 편. discussion.md 19.7절(사용자 지시): 우측 336
  * 패널을 홈·메모가 공유하는 하나의 컴포넌트로 합치면서 제목 입력칸을 없앴다 — title을 채울

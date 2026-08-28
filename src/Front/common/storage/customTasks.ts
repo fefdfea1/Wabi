@@ -60,11 +60,14 @@ export function readStoredCustomTasks(): Record<CountryCode, Task[]> {
   }
 }
 
-export function writeStoredCustomTasks(tasks: Record<CountryCode, Task[]>): void {
-  if (typeof window === "undefined") return;
+/** discussion.md 24.1절: writeStoredNotes와 같은 이유로 성공 여부를 돌려준다 — 저장이 안 됐는데
+ *  이용자에게는 된 것처럼 보이면 안 된다. */
+export function writeStoredCustomTasks(tasks: Record<CountryCode, Task[]>): boolean {
+  if (typeof window === "undefined") return false;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    return true;
   } catch {
-    // 프라이빗 모드 등 저장소 접근이 막힌 환경에서는 조용히 무시한다(notes.ts와 같은 패턴).
+    return false;
   }
 }

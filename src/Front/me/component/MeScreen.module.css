@@ -76,6 +76,27 @@
   padding: 0;
   overflow: hidden;
   cursor: pointer;
+  /* discussion.md 24.3절: 사진이라 옅게 흐려져도 자연스럽고, 누르면 바꿀 수 있다는 느낌을
+     준다. 값은 1px을 넘지 않는다 — hover는 더 옅게, active는 조금 더. */
+  transition: filter 0.15s ease-out;
+}
+
+@media (hover: hover) {
+  .avatarButton:hover {
+    filter: blur(0.4px);
+  }
+}
+
+/* :active를 hover 미디어쿼리 뒤에 둔다 — 마우스를 올린 채 누르면(둘 다 true) 같은 우선순위에서
+   소스 순서가 늦은 쪽이 이겨야 더 강한 active 값이 hover를 덮는다(AppHeader와 같은 이유). */
+.avatarButton:active {
+  filter: blur(0.8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatarButton {
+    transition: none;
+  }
 }
 
 .avatarImage {
@@ -175,7 +196,9 @@
 }
 
 /* discussion.md 20.13절 4번: position:relative는 ThemeToggle의 모바일 토글(투명 오버레이
-   버튼)이 이 행 전체를 기준으로 덮을 수 있게 한다. */
+   버튼)이 이 행 전체를 기준으로 덮을 수 있게 한다.
+   discussion.md 24.3절/24.6절: box-shadow(번지는 그림자) transition을 여기 기본 상태에 둬서
+   .settingRowStatic(반응 없음, 전환 대상 아님)은 그대로 두고 .settingRow만 전환이 걸리게 한다. */
 .settingRow,
 .settingRowStatic {
   position: relative;
@@ -186,17 +209,42 @@
   border-bottom: 1px solid var(--line);
 }
 
+.settingRow {
+  transition: box-shadow 0.15s ease-out;
+}
+
 /* discussion.md 21.6절: ThemeToggle은 inset:0 오버레이라 자기 배경을 칠하면 뒤의 라벨을
    덮는다. 눌린 표시는 행이 그린다. .toggle은 다른 모듈이라 해시된 클래스명을 여기서 쓸 수
    없으므로 요소 선택자(button)로 짚는다 — 이 행에 든 버튼은 토글 하나뿐이다.
-   hover는 색을 바꾸지 않는다(21.6절): ThemeToggle이 scale로만 반응한다. */
+   hover는 색을 바꾸지 않는다(21.6절): ThemeToggle이 scale로만 반응한다.
+   discussion.md 24.6절(PM 실측): 21.6절에서 hover 배경을 뺀 뒤 남은 반응(토글 글자 scale 0.97)이
+   텍스트만 있는 요소에서는 눈에 띄지 않았다 — 번지는 그림자(box-shadow, 오프셋 없이 blur 반경만)를
+   더한다. 그림자는 색 변화가 아니므로 21.6절과 함께 성립한다. */
+@media (hover: hover) {
+  .settingRow:has(button:hover) {
+    box-shadow: 0 0 10px color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+}
+
+/* :active/:focus-visible을 hover 미디어쿼리 뒤에 둔다 — 마우스를 올린 채 누르면(둘 다 true)
+   같은 우선순위에서 소스 순서가 늦은 쪽이 이겨야 더 강한 값이 hover를 덮는다(AppHeader와
+   같은 이유, 20.13절 6번). */
 .settingRow:has(button:active),
 .settingRow:has(button:focus-visible) {
   background: var(--sunken);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--ink) 32%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settingRow {
+    transition: none;
+  }
 }
 
 /* discussion.md 20.13절 2번: 누르는 중(모든 구간)·마우스 오버(데스크톱 전용)·키보드 포커스
-   모두 sunken 배경으로 보여준다(새 색을 만들지 않는다). */
+   모두 sunken 배경으로 보여준다(새 색을 만들지 않는다).
+   discussion.md 24.3절: 번지는 그림자를 함께 준다 — 오프셋 없이 blur 반경만 줘서 글자는
+   또렷하게 두고 테두리만 부드럽게 번진다. */
 .settingRowButton {
   display: flex;
   align-items: center;
@@ -208,16 +256,27 @@
   width: 100%;
   text-align: left;
   cursor: pointer;
-}
-
-.settingRowButton:active,
-.settingRowButton:focus-visible {
-  background: var(--sunken);
+  transition: box-shadow 0.15s ease-out;
 }
 
 @media (hover: hover) {
   .settingRowButton:hover {
     background: var(--sunken);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+}
+
+/* :active/:focus-visible을 hover 미디어쿼리 뒤에 둔다(20.13절 6번과 같은 이유 — 마우스를
+   올린 채 누르면 소스 순서가 늦은 쪽이 이겨야 더 강한 값이 hover를 덮는다). */
+.settingRowButton:active,
+.settingRowButton:focus-visible {
+  background: var(--sunken);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--ink) 32%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settingRowButton {
+    transition: none;
   }
 }
 
@@ -231,18 +290,29 @@
   min-height: 60px;
   padding: 0 14px;
   cursor: pointer;
+  transition: box-shadow 0.15s ease-out;
 }
 
 /* discussion.md 20.13절 2번: .dateInput은 opacity:0이라 자신에게 배경을 줘도 안 보인다 —
-   :has()로 입력의 상태를 보고 보이는 행(label) 쪽에 배경을 준다. */
-.settingRowDate:has(.dateInput:active),
-.settingRowDate:has(.dateInput:focus-visible) {
-  background: var(--sunken);
-}
-
+   :has()로 입력의 상태를 보고 보이는 행(label) 쪽에 배경을 준다.
+   discussion.md 24.3절: 번지는 그림자도 같은 방식으로 더한다. */
 @media (hover: hover) {
   .settingRowDate:has(.dateInput:hover) {
     background: var(--sunken);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+}
+
+/* :active/:focus-visible을 hover 미디어쿼리 뒤에 둔다(20.13절 6번과 같은 이유). */
+.settingRowDate:has(.dateInput:active),
+.settingRowDate:has(.dateInput:focus-visible) {
+  background: var(--sunken);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--ink) 32%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settingRowDate {
+    transition: none;
   }
 }
 

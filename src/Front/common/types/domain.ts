@@ -53,17 +53,22 @@ export interface PainItem {
   sourceUrl?: string;
 }
 
-export type TabId = "home" | "tasks" | "docs" | "me";
+export type TabId = "home" | "tasks" | "notes" | "me";
 
 export type ThemeMode = "light" | "dark";
 
 /** 할 일 추가 시트의 마감 선택지 */
 export type DueOption = "오늘까지" | "이번 주" | "이번 달" | "도착 후";
 
-/** 문서 탭의 파일 항목. 사용자가 기기에서 직접 추가하는 클라이언트 전용 데이터라 출처 URL은 두지 않는다. */
-export interface DocItem {
+/**
+ * 메모 탭에서 localStorage에 저장하는 메모 한 편. discussion.md 16절(문서 탭을 메모 탭으로):
+ * 이용자가 직접 적는 짧은 글이라 제목을 따로 두지 않고, 목록에서는 본문 첫 줄을 제목처럼 보여준다.
+ */
+export interface NoteRecord {
   id: string;
-  ext: string;
-  name: string;
-  meta: string;
+  body: string;
+  /** 마지막으로 저장한 시각의 전체 ISO 타임스탬프(예: "2026-08-28T13:45:00.000Z").
+   *  같은 날 여러 메모를 고치는 경우에도 "최근 수정 순" 정렬이 정확하도록 날짜뿐 아니라
+   *  시각까지 담는다. 화면에는 이 값에서 뽑은 "8월 28일" 같은 날짜만 보여준다. */
+  updatedAt: string;
 }

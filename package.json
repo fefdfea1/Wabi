@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:wabi-logic": "node src/Front/app-shell/state/wabiLogic.test.ts"
+    "test:local-date": "node src/Front/common/date/localDate.test.ts",
+    "test:wabi-logic": "node src/Front/app-shell/state/wabiLogic.test.ts",
+    "test": "npm run test:local-date && npm run test:wabi-logic"
   },
   "dependencies": {
     "next": "^16.3.3",

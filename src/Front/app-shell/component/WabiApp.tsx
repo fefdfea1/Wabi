@@ -4,12 +4,12 @@ import { COUNTRIES } from "@/Front/common/data/tasks";
 import { TabBar } from "@/Front/common/component/TabBar";
 import { HomeScreen } from "@/Front/home/component/HomeScreen";
 import { TasksScreen } from "@/Front/tasks/component/TasksScreen";
-import { DocsScreen } from "@/Front/docs/component/DocsScreen";
+import { NotesScreen } from "@/Front/notes/component/NotesScreen";
 import { MeScreen } from "@/Front/me/component/MeScreen";
 import { GuideSheet } from "@/Front/overlay/component/GuideSheet";
 import { PainSheet } from "@/Front/overlay/component/PainSheet";
 import { AddTaskSheet } from "@/Front/overlay/component/AddTaskSheet";
-import { AddFileSheet } from "@/Front/overlay/component/AddFileSheet";
+import { NoteEditorSheet } from "@/Front/overlay/component/NoteEditorSheet";
 import { TaskDetailScreen } from "@/Front/task-detail/component/TaskDetailScreen";
 import { DUE_OPTIONS, useWabiApp } from "@/Front/app-shell/state/useWabiApp";
 import styles from "./WabiApp.module.css";
@@ -52,7 +52,14 @@ export function WabiApp() {
           />
         ) : null}
 
-        {wabi.tab === "docs" ? <DocsScreen docs={wabi.docs} onOpenAddFile={wabi.openAddFile} /> : null}
+        {wabi.tab === "notes" ? (
+          <NotesScreen
+            notes={wabi.notes}
+            onOpenAdd={wabi.openAddNote}
+            onOpenEdit={wabi.openEditNote}
+            onDelete={wabi.deleteNote}
+          />
+        ) : null}
 
         {wabi.tab === "me" ? (
           <MeScreen
@@ -110,7 +117,15 @@ export function WabiApp() {
         />
       ) : null}
 
-      {wabi.sheet === "addFile" ? <AddFileSheet onPick={wabi.pickUploadOption} onClose={wabi.closeAddFile} /> : null}
+      {wabi.sheet === "noteEditor" ? (
+        <NoteEditorSheet
+          isEditing={!!wabi.editingNoteId}
+          body={wabi.noteBody}
+          onBodyChange={wabi.setNoteBody}
+          onSave={wabi.saveNote}
+          onClose={wabi.closeNoteEditor}
+        />
+      ) : null}
 
       {wabi.detailTask ? (
         <TaskDetailScreen

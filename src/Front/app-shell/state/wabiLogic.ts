@@ -1,34 +1,7 @@
 import type { Task } from "@/Front/common/types/domain";
-
-const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
-
-/**
- * "YYYY-MM-DD" 날짜 전용 문자열을 로컬 자정으로 파싱한다.
- *
- * `new Date("YYYY-MM-DD")`는 ECMA-262 Date Time String Format 규칙상 이 문자열을 **UTC 자정**으로
- * 해석한다. 그 결과를 이후 `setHours(0,0,0,0)`이나 `getFullYear`/`getMonth`/`getDate` 같은 **로컬
- * 시간대** 접근자와 섞어 쓰면, UTC보다 느린 시간대(예: America/Toronto, UTC-4)에서는 그 UTC 자정이
- * 전날 저녁에 해당해 날짜가 하루 앞으로 밀린다(QA 재현: 2026-08-28 기준 출국일 2026-09-09가
- * America/Toronto에서 D-11·9월 8일로 나옴 — 정답은 D-12·9월 9일).
- *
- * `new Date(year, monthIndex, day)`처럼 숫자를 따로따로 넘기는 생성자는 항상 로컬 자정을 만들기
- * 때문에 이 문제가 없다. 파싱할 수 없는 값이면 Invalid Date를 반환하고, 호출부가
- * `Number.isNaN(date.getTime())`로 확인한다.
- */
-function parseLocalDateOnly(iso: string): Date {
-  const match = DATE_ONLY_PATTERN.exec(iso);
-  if (!match) return new Date(NaN);
-  const [, year, month, day] = match;
-  return new Date(Number(year), Number(month) - 1, Number(day));
-}
-
-/** 로컬 연/월/일을 "YYYY-MM-DD"로 되돌린다. `toISOString()`은 UTC 기준이라 여기 쓰면 같은 하루-밀림 문제가 재발한다. */
-function formatDateOnly(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
+// 상대 경로 + .ts 확장자를 쓴다(다른 파일들의 @/Front/* 별칭과 다름) — 이 파일은
+// wabiLogic.test.ts가 Node로 직접 실행하는데, Node는 tsconfig의 경로 별칭을 모른다.
+import { formatDateOnly, parseLocalDateOnly } from "../../common/date/localDate.ts";
 
 /**
  * discussion.md 7절: "NEXT 카드는 미완료 항목 중 첫 번째를 보여주고" — 미완료가 하나도 없으면
@@ -79,11 +52,4 @@ export function computeVisaExpiry(departureDateIso: string, stayDurationDays: nu
   const expiry = new Date(departure);
   expiry.setDate(expiry.getDate() + stayDurationDays);
   return formatDateOnly(expiry);
-}
-
-/** 화면 표시용 한국어 날짜 포맷("2027년 9월 8일"). 고정 입력을 그대로 포맷할 뿐 "오늘"을 참조하지 않는다. */
-export function formatKoreanDate(iso: string): string | null {
-  const date = parseLocalDateOnly(iso);
-  if (Number.isNaN(date.getTime())) return null;
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 }

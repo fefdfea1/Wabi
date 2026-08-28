@@ -1,12 +1,4 @@
-import type {
-  Country,
-  CountryCode,
-  DocItem,
-  GuideItem,
-  GuideSituation,
-  PainItem,
-  Task,
-} from "@/Front/common/types/domain";
+import type { Country, CountryCode, GuideItem, GuideSituation, PainItem, Task } from "@/Front/common/types/domain";
 
 /**
  * discussion.md 6.2절: 여기의 값은 Research-team이 공식 출처로 확인한 것만 담는다.
@@ -449,9 +441,3 @@ export const PAIN_BY_COUNTRY: Record<CountryCode, PainItem[]> = {
     },
   ],
 };
-
-/**
- * 문서 탭의 초기 파일 목록. 실제 파일 업로드는 이번 범위 밖이라 항상 빈 배열로 시작하고,
- * 사용자가 '파일 추가 시트'에서 고른 항목만 클라이언트 상태로 쌓인다.
- */
-export const DOCS: DocItem[] = [];

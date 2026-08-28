@@ -1,29 +1,24 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { COUNTRIES, DOCS, GUIDE_BY_COUNTRY, PAIN_BY_COUNTRY, TASKS_BY_COUNTRY } from "@/Front/common/data/tasks";
+import { COUNTRIES, GUIDE_BY_COUNTRY, PAIN_BY_COUNTRY, TASKS_BY_COUNTRY } from "@/Front/common/data/tasks";
+import { formatKoreanDate } from "@/Front/common/date/localDate";
 import { readStoredDepartureDate, writeStoredDepartureDate } from "@/Front/common/storage/departureDate";
+import { readStoredNotes, writeStoredNotes } from "@/Front/common/storage/notes";
 import type {
   CountryCode,
-  DocItem,
   DueOption,
   GuideSituation,
+  NoteRecord,
   Task,
   TabId,
   TaskPhase,
 } from "@/Front/common/types/domain";
-import { computeDDay, computeVisaExpiry, firstSentence, formatKoreanDate, pickNextTask } from "./wabiLogic";
+import { computeDDay, computeVisaExpiry, firstSentence, pickNextTask } from "./wabiLogic";
 
-export type SheetKind = "guide" | "pain" | "addTask" | "addFile" | null;
-export type UploadKind = "camera" | "album" | "file";
+export type SheetKind = "guide" | "pain" | "addTask" | "noteEditor" | null;
 
 export const DUE_OPTIONS: DueOption[] = ["오늘까지", "이번 주", "이번 달", "도착 후"];
-
-const UPLOAD_PRESETS: Record<UploadKind, { ext: string; name: string }> = {
-  camera: { ext: "JPG", name: "촬영한 사진" },
-  album: { ext: "JPG", name: "앨범에서 가져온 사진" },
-  file: { ext: "PDF", name: "가져온 파일" },
-};
 
 /** COUNTRIES에 실제로 등록된 국가 코드마다 빈 값을 채운 Record를 만든다(하드코딩 대신 데이터 기반). */
 function emptyByCountry<T>(): Record<CountryCode, T[]> {
@@ -63,8 +58,22 @@ export function useWabiApp() {
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [done, setDone] = useState<Record<CountryCode, Record<string, boolean>>>(seedDone);
   const [customTasks, setCustomTasks] = useState<Record<CountryCode, Task[]>>(emptyByCountry<Task>);
-  const [docs, setDocs] = useState<DocItem[]>(DOCS);
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
+
+  // 메모(localStorage) — discussion.md 16절. 초기값은 항상 빈 배열(서버·최초 클라이언트 렌더가
+  // 같아 안전)이고, 실제 목록은 마운트 후 localStorage에서 읽어온다.
+  const [notes, setNotes] = useState<NoteRecord[]>([]);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [noteBody, setNoteBody] = useState("");
+
+  useEffect(() => {
+    setNotes(readStoredNotes());
+  }, []);
+
+  const sortedNotes = useMemo(
+    () => [...notes].sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0)),
+    [notes],
+  );
 
   const [sheet, setSheet] = useState<SheetKind>(null);
   const [guideSituation, setGuideSituation] = useState<GuideSituation>("pre");
@@ -229,17 +238,56 @@ export function useWabiApp() {
     setAddTaskTitle("");
   }
 
-  function openAddFile() {
-    setSheet("addFile");
-  }
-  function closeAddFile() {
-    setSheet(null);
+  /** discussion.md 16.3절: 새 메모 추가 — 편집 대상 없이 빈 본문으로 시트를 연다. */
+  function openAddNote() {
+    setEditingNoteId(null);
+    setNoteBody("");
+    setSheet("noteEditor");
   }
 
-  function pickUploadOption(kind: UploadKind) {
-    const preset = UPLOAD_PRESETS[kind];
-    setDocs((prev) => prev.concat({ id: `doc-${Date.now()}`, ext: preset.ext, name: preset.name, meta: "방금 추가" }));
+  /** 기존 메모를 눌러 편집 — 본문을 채워 시트를 연다. */
+  function openEditNote(id: string) {
+    const target = notes.find((n) => n.id === id);
+    if (!target) return;
+    setEditingNoteId(id);
+    setNoteBody(target.body);
+    setSheet("noteEditor");
+  }
+
+  function closeNoteEditor() {
     setSheet(null);
+    setEditingNoteId(null);
+    setNoteBody("");
+  }
+
+  /** 저장 시점의 전체 타임스탬프를 남긴다 — 같은 날 여러 메모를 고쳐도 정렬 순서가 정확하다. */
+  function saveNote() {
+    const body = noteBody.trim();
+    if (!body) return;
+    const updatedAt = new Date().toISOString();
+
+    setNotes((prev) => {
+      let next: NoteRecord[];
+      if (editingNoteId) {
+        next = prev.map((n) => (n.id === editingNoteId ? { ...n, body, updatedAt } : n));
+      } else {
+        next = prev.concat({ id: `note-${Date.now()}`, body, updatedAt });
+      }
+      writeStoredNotes(next);
+      return next;
+    });
+
+    closeNoteEditor();
+  }
+
+  /** discussion.md 16.3절: 삭제는 목록 행에서, 확인을 한 번 받는다. */
+  function deleteNote(id: string) {
+    if (!window.confirm("메모를 삭제할까요?")) return;
+    setNotes((prev) => {
+      const next = prev.filter((n) => n.id !== id);
+      writeStoredNotes(next);
+      return next;
+    });
   }
 
   function toggleCountryPicker() {
@@ -317,9 +365,14 @@ export function useWabiApp() {
     setAddTaskDue,
     submitAddTask,
 
-    docs,
-    openAddFile,
-    closeAddFile,
-    pickUploadOption,
+    notes: sortedNotes,
+    editingNoteId,
+    noteBody,
+    setNoteBody,
+    openAddNote,
+    openEditNote,
+    closeNoteEditor,
+    saveNote,
+    deleteNote,
   };
 }

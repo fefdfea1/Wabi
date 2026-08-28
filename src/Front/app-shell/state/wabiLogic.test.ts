@@ -14,14 +14,7 @@
 
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import {
-  computeDDay,
-  computeVisaExpiry,
-  firstSentence,
-  formatDDay,
-  formatKoreanDate,
-  pickNextTask,
-} from "./wabiLogic.ts";
+import { computeDDay, computeVisaExpiry, firstSentence, formatDDay, pickNextTask } from "./wabiLogic.ts";
 import type { Task } from "../../common/types/domain.ts";
 
 const REQUIRED_TIMEZONES = ["Asia/Seoul", "UTC", "America/Toronto"];
@@ -95,11 +88,8 @@ function runAssertions(): number {
   check("computeVisaExpiry: +0일이면 출국일 그대로", computeVisaExpiry("2026-09-09", 0), "2026-09-09");
   check("computeVisaExpiry: 파싱 불가 문자열이면 null", computeVisaExpiry("bad", 365), null);
 
-  // --- formatKoreanDate ---
-  check("formatKoreanDate: 2026-09-09", formatKoreanDate("2026-09-09"), "2026년 9월 9일");
-  check("formatKoreanDate: 한 자리 월/일도 0 없이", formatKoreanDate("2026-01-05"), "2026년 1월 5일");
-  check("formatKoreanDate: 연말 경계", formatKoreanDate("2026-12-31"), "2026년 12월 31일");
-  check("formatKoreanDate: 파싱 불가 문자열이면 null", formatKoreanDate(""), null);
+  // formatKoreanDate 테스트는 src/Front/common/date/localDate.test.ts로 옮겼다
+  // (구현이 그쪽으로 이동했다 — npm run test:local-date).
 
   // --- pickNextTask (시간대 무관, 회귀 확인용으로 함께 포함) ---
   const tasks: Task[] = [

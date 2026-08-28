@@ -1,0 +1,21 @@
+.field {
+  width: 100%;
+  min-height: 160px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  outline: none;
+  background: var(--sunken);
+  color: var(--strong);
+  border: 1.5px solid var(--line);
+  resize: none;
+}
+
+.field::placeholder {
+  color: var(--muted);
+}
+
+.field:focus {
+  border-color: var(--ink);
+}

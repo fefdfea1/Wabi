@@ -4,7 +4,7 @@ import styles from "./TabBar.module.css";
 const TABS: { id: TabId; label: string }[] = [
   { id: "home", label: "홈" },
   { id: "tasks", label: "할 일" },
-  { id: "docs", label: "문서" },
+  { id: "notes", label: "메모" },
   { id: "me", label: "나" },
 ];
 

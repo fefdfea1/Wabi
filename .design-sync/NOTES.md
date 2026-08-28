@@ -82,11 +82,26 @@ export LD_LIBRARY_PATH="$PWD/root/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
 
 **QA에 주는 함의**: 미리보기 카드에서 서체를 측정할 때 판정 기준을 앱의 `body`가 아니라 **카드 자체의 `body`**로 잡아야 합니다. 앱 문자열과 대조하면 이 한 단계 차이 때문에 없는 결함이 잡힙니다.
 
+## `.d.ts` props 는 손으로 씁니다 — `cfg.dtsPropsFor`
+
+**합성 모드의 가장 큰 함정입니다.** `dist` 도 shipped `.d.ts` 도 없어 props 추출이 전부 실패하고, 손대지 않으면 11종 전부 `[key: string]: unknown` 즉 사실상 `any` 로 나갑니다. `package-validate.mjs` 는 "all .d.ts parse cleanly" 로 통과시킵니다 — **문법이 맞는지만 보지 내용이 비었는지는 보지 않습니다.** 첫 동기화에서 이걸 놓쳐 계약이 빈 채로 업로드됐고, 2차 동기화에서야 발견해 `cfg.dtsPropsFor` 로 11종을 손으로 채웠습니다.
+
+`.d.ts` 는 디자인 에이전트가 코딩할 때 참조하는 API 계약입니다. 비어 있으면 에이전트가 `Button` 에 `variant` 가 있는지도 모른 채 추측합니다.
+
+**컴포넌트를 추가하면 `componentSrcMap` 과 `dtsPropsFor` 두 곳에 모두 넣으세요.** 그리고 빌드 후 반드시 확인하세요.
+
+```sh
+grep -l "\[key: string\]: unknown" ds-bundle/components/general/*/*.d.ts
+```
+
+이 명령이 아무것도 출력하지 않아야 정상입니다. 출력되는 컴포넌트는 계약이 빈 것입니다.
+
 ## Re-sync 위험 목록
 
 - **`.next` 의존** — 폰트가 `.next/static/media`를 참조합니다. 앱을 빌드하지 않은 새 클론에서는 `[FONT_DANGLING]`이 뜹니다. 앱을 먼저 빌드하세요.
 - **폰트 파일명 해시** — next/font가 만드는 파일명은 빌드마다 바뀔 수 있습니다. 폰트가 깨지면 `wabi-fonts.css`를 개발 서버에서 다시 뽑으세요.
 - **`ds-styles.css`는 생성물** — 직접 고친 내용은 다음 빌드에 날아갑니다. `app/globals.css`나 `build-styles.mjs`를 고치세요.
-- **PC 반응형이 보류 상태** — `Project-plan/discussion.md` 11절이 보류 중입니다. 재개되면 컴포넌트 CSS가 바뀌어 미리보기 렌더가 달라질 수 있습니다.
-- **`componentSrcMap`이 10종을 전부 명시** — 공통 컴포넌트를 추가하면 여기에도 넣어야 동기화됩니다. 합성 모드라 `.d.ts` 자동 발견에 기댈 수 없습니다.
+- **PC 반응형은 재개·완료됨** — `Project-plan/discussion.md` 11절. 세 구간 모두 QA 통과 상태입니다.
+- **`componentSrcMap` 과 `dtsPropsFor` 가 11종을 전부 명시** — 공통 컴포넌트를 추가하면 두 곳 모두에 넣어야 합니다. 합성 모드라 자동 발견에 기댈 수 없습니다.
+- **문구·라벨 변경은 렌더 해시에 안 잡힐 수 있음** — `TabBar` 라벨을 `문서` 에서 `메모` 로 바꿨을 때 verdict 는 `unchanged` 로 나왔습니다. 라벨은 번들 안에 있고 `.html` 은 런타임에 번들에서 컴포넌트를 불러 렌더하는 껍데기라, 컴포넌트 아티팩트는 그대로이기 때문입니다. 번들이 업로드되면 반영되므로 정상입니다. 번들에서 한글을 grep 할 때는 esbuild 가 비ASCII 를 대문자 16진 이스케이프(`\uBA54\uBAA8`)로 바꾼다는 점에 주의하세요.
 - **한글 콘텐츠 검증 불가** — 이 컨테이너에는 한글 시스템 폰트가 없습니다. 번들이 폰트를 싣고 있어 카드는 정상이지만, 폰트를 싣지 않는 실험을 하면 두부가 됩니다. 그건 환경 문제이지 결함이 아닙니다.

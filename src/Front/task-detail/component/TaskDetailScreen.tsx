@@ -83,7 +83,10 @@ export function TaskDetailScreen({ task, done, isCustom, onClose, onComplete, on
                 <p className={[styles.meta, dueColorClassName].join(" ")}>{done ? "완료됨" : task.meta}</p>
               ) : null}
             </div>
-            <p className={styles.body}>{task.body}</p>
+            {/* discussion.md 37.1절: 이용자가 직접 적은 할 일은 이제 body가 비어 있을 수 있다
+                (앱이 "직접 등록한 할 일입니다." 같은 문구를 대신 지어내지 않는다) — 비어 있으면
+                이 자리도 그리지 않는다(같은 원칙, 빈 줄을 남기지 않는다). */}
+            {task.body ? <p className={styles.body}>{task.body}</p> : null}
             {hasItems ? (
               <div className={styles.itemsBlock}>
                 <p className={styles.itemsHeading}>준비물</p>

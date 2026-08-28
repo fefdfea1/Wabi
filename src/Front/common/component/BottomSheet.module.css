@@ -161,9 +161,16 @@
 
 /* discussion.md 20.13절 1번(PM 실측): 넘치는 게 맞는데 휠·터치 모두 scrollTop이 안 움직이던
    문제 — touch-action을 명시해 세로 스크롤이 브라우저 기본 동작으로 확실히 허용되게 하고,
-   overscroll-behavior로 끝까지 스크롤했을 때 뒤 배경으로 스크롤이 새는 것을 막는다. */
+   overscroll-behavior로 끝까지 스크롤했을 때 뒤 배경으로 스크롤이 새는 것을 막는다.
+   discussion.md 33.1절(PM 실측): .sheet는 max-height(774px 등)로 세로 공간이 제한되는데, 이
+   .body(flex:1)의 min-height 기본값(auto)이 자기 내용(제목 입력칸 등)의 최소 크기를 바닥으로
+   삼아 그 제한을 무시하고 커져 버렸다 — 32절과 같은 함정이다. 스크롤할 곳이 없어진 넘치는
+   압력이 flex-shrink:1인 자식(제목 입력칸)에게 대신 가 찌그러졌다. min-height:0으로 이 상자
+   자신이 .sheet의 남는 높이만큼만 차지하게 하면, 이미 있던 overflow-y:auto가 넘치는 내용을
+   올바르게 흡수한다. */
 .body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;

@@ -52,7 +52,6 @@ export function WabiApp() {
             done={wabi.done}
             painCount={wabi.painItems.length}
             onToggleTask={wabi.toggleTask}
-            onOpenDetail={wabi.openDetail}
             onDeleteTask={wabi.requestDeleteTask}
             onOpenPain={wabi.openPain}
             onGoTasks={() => wabi.goTab("tasks")}

@@ -5,8 +5,10 @@ import { COUNTRIES, GUIDE_BY_COUNTRY, PAIN_BY_COUNTRY, TASKS_BY_COUNTRY } from "
 import { formatDateOnly, formatKoreanDate } from "@/Front/common/date/localDate";
 import { generateId } from "@/Front/common/id/generateId";
 import { clearStoredAvatar, processAvatarFile, readStoredAvatar, writeStoredAvatar } from "@/Front/common/storage/avatar";
+import { readStoredCountry, writeStoredCountry } from "@/Front/common/storage/country";
 import { readStoredCustomTasks, writeStoredCustomTasks } from "@/Front/common/storage/customTasks";
 import { readStoredDepartureDate, writeStoredDepartureDate } from "@/Front/common/storage/departureDate";
+import { readStoredDone, writeStoredDone } from "@/Front/common/storage/done";
 import { readStoredNotes, writeStoredNotes } from "@/Front/common/storage/notes";
 import type {
   CountryCode,
@@ -54,8 +56,29 @@ function emptyDoneByCountry(): Record<CountryCode, Record<string, boolean>> {
 export function useWabiApp() {
   const [tab, setTab] = useState<TabId>("home");
   const [phase, setPhase] = useState<TaskPhase>("pre");
-  const [countryCode, setCountryCode] = useState<CountryCode | null>(COUNTRIES[0]?.code ?? null);
+  // discussion.md 35.4절: 초기값을 COUNTRIES[0](호주)로 두면 SSR·첫 페인트에 항상 호주 내용이
+  // 그려지고, 마운트 후 실제 저장된 국가로 바뀌며 깜빡인다 — 국가는 테마와 달리 속성 하나가
+  // 아니라 렌더 결과 전체를 좌우해 인라인 스크립트로 미리 풀 수 없다. 초기값을 null로 둬
+  // 저장된 국가를 읽기 전에는 국가에 딸린 내용(할 일·다음 할 일·국가 배지 등)이 아예 그려지지
+  // 않게 한다 — countryCode가 null이면 countryTasks/countryCustomTasks/countryDone 등 아래
+  // 파생값들이 이미 전부 빈 값으로 갈라지므로(각각의 `countryCode ? ... : ...`) 화면 대부분이
+  // 자연히 빈 상태로 그려진다.
+  const [countryCode, setCountryCode] = useState<CountryCode | null>(null);
+
+  useEffect(() => {
+    const stored = readStoredCountry();
+    setCountryCode(stored ?? COUNTRIES[0]?.code ?? null);
+  }, []);
+
+  // discussion.md 35.1절/35.2절(PM 실측): 완료 표시는 이 앱의 중심(준비 진행률)인데 저장 계층이
+  // 아예 없었다 — toggleTask가 메모리 상태만 바꾸고 새로고침하면 전부 해제됐다. notes와 같은
+  // 패턴(초기값은 빈 Record, 마운트 후 읽어온다)을 따른다.
   const [done, setDone] = useState<Record<CountryCode, Record<string, boolean>>>(emptyDoneByCountry);
+
+  useEffect(() => {
+    setDone((prev) => ({ ...prev, ...readStoredDone() }));
+  }, []);
+
   // discussion.md 21.1절: 직접 추가한 할 일(localStorage, notes와 같은 자리). 초기값은 항상
   // 빈 Record(서버·최초 클라이언트 렌더가 같아 안전)이고, 실제 값은 마운트 후 읽어온다.
   const [customTasks, setCustomTasks] = useState<Record<CountryCode, Task[]>>(emptyByCountry<Task>);
@@ -260,13 +283,23 @@ export function useWabiApp() {
 
   const painAnswer = painItemId ? (countryPain.find((p) => p.id === painItemId) ?? null) : null;
 
+  /**
+   * discussion.md 35.2절(PM 실측): 준비 진행률이 이 앱의 중심인데 저장 계층이 아예 없어
+   * 새로고침하면 전부 해제됐다. 국가별로 나눠 저장한다(호주에서 체크한 것이 캐나다로 넘어가면
+   * 안 된다) — writeStoredDone이 실패하면 알리고 화면 상태(done)를 바꾸지 않는다(24.1절).
+   */
   function toggleTask(id: string) {
     if (!countryCode) return;
     const code = countryCode;
-    setDone((prev) => {
-      const current = prev[code] ?? {};
-      return { ...prev, [code]: { ...current, [id]: !current[id] } };
-    });
+    const current = done[code] ?? {};
+    const next = { ...done, [code]: { ...current, [id]: !current[id] } };
+
+    if (!writeStoredDone(next)) {
+      window.alert("완료 표시를 저장하지 못했습니다. 저장 공간이 가득 찼거나 브라우저가 저장을 막고 있을 수 있습니다.");
+      return;
+    }
+
+    setDone(next);
   }
 
   function goTab(next: TabId) {
@@ -389,7 +422,10 @@ export function useWabiApp() {
           phase: addTaskPhase,
           title,
           tag: `${addTaskPhase === "pre" ? "출국 전" : "현지 정착"} · 직접 추가`,
-          body: "직접 등록한 할 일입니다.",
+          // discussion.md 37.1절: 이용자가 적지 않은 것을 앱이 대신 지어내지 않는다(22절과 같은
+          // 원칙) — "직접 등록한 할 일입니다."는 아무 정보도 안 주면서 자리만 차지했다. 빈
+          // body는 NextActionCard가 그 설명 자리를 아예 그리지 않는 신호가 된다.
+          body: "",
           items: [],
           done: false,
           meta: dueDisplay ? dueDisplay.meta : undefined,
@@ -577,8 +613,18 @@ export function useWabiApp() {
     setSheet(null);
   }
 
-  /** 국가를 바꾸면 이전 국가의 할 일 상세는 더 이상 유효하지 않으므로 닫는다(7절 탭 이동 규칙과 같은 이유). */
+  /**
+   * 국가를 바꾸면 이전 국가의 할 일 상세는 더 이상 유효하지 않으므로 닫는다(7절 탭 이동 규칙과
+   * 같은 이유). discussion.md 35.2절/35.3절(PM 실측): 저장 계층이 없어 새로고침하면 항상
+   * 호주로 돌아갔다 — 메모·출국일과 같은 방식으로 저장한다. 저장에 실패하면 알리고 화면
+   * 상태(선택된 국가·시트)를 바꾸지 않는다(24.1절) — 저장 안 된 선택이 된 것처럼 보이면 안 된다.
+   */
   function selectCountry(code: CountryCode) {
+    if (!writeStoredCountry(code)) {
+      window.alert("국가를 저장하지 못했습니다. 저장 공간이 가득 찼거나 브라우저가 저장을 막고 있을 수 있습니다.");
+      return;
+    }
+
     setCountryCode(code);
     setSheet(null);
     setDetailTaskId(null);

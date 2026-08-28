@@ -197,7 +197,10 @@
   background: var(--muted);
 }
 
+/* discussion.md 33.2절: 입력칸·버튼은 flex-shrink:0으로 둔다(방어적 — 이 두 버튼은 .footer가
+   이미 flex:none이라 원래도 안전하지만, 명시해 어떤 상태에서도 높이가 유지됨을 확실히 한다). */
 .submit {
+  flex-shrink: 0;
   height: 52px;
   border-radius: 14px;
   font-size: 15px;
@@ -216,6 +219,7 @@
 }
 
 .cancel {
+  flex-shrink: 0;
   height: 48px;
   border-radius: 14px;
   font-size: 14.5px;

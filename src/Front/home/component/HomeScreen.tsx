@@ -16,9 +16,6 @@ export interface HomeScreenProps {
   done: Record<string, boolean>;
   painCount: number;
   onToggleTask: (id: string) => void;
-  /** discussion.md 27.3절: 상세는 이제 다음 할 일 카드("지금 하기")에서만 연다 — 아래 "이번 주
-   *  할 일" 목록 행은 같은 ListRow를 쓰지만 27.1절대로 토글만 하고 상세를 열지 않는다. */
-  onOpenDetail: (id: string) => void;
   /** discussion.md 27.2절: 목록 행의 삭제 버튼이 누르는 확인 시트를 연다. */
   onDeleteTask: (id: string) => void;
   onOpenPain: () => void;
@@ -45,7 +42,6 @@ export function HomeScreen({
   done,
   painCount,
   onToggleTask,
-  onOpenDetail,
   onDeleteTask,
   onOpenPain,
   onGoTasks,
@@ -87,8 +83,8 @@ export function HomeScreen({
         <NextActionCard
           title={nextTask.title}
           description={nextDescription}
-          ctaLabel="지금 하기"
-          onAction={() => onOpenDetail(nextTask.id)}
+          dueLabel={nextTask.meta}
+          urgent={!!nextTask.urgent}
         />
       ) : (
         <p className={styles.emptyNext}>아직 등록된 할 일이 없습니다.</p>

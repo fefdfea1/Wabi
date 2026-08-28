@@ -21,9 +21,12 @@
   min-width: 0;
 }
 
-/* discussion.md 19.7절: 우측 336 패널(NotesPanel)의 홈 전용 footer(margin-top: auto로 바닥에 붙는다). */
+/* discussion.md 19.7절: 우측 336 패널(NotesPanel)의 홈 전용 footer.
+   discussion.md 32.2절: 목록(.list)이 이제 flex:1로 남는 높이를 스스로 채우므로, 이 카드는
+   그 뒤에 자연히 바닥에 온다 — margin-top:auto(옛 방식)는 더 이상 필요 없고, flex:none으로
+   줄어들지 않게만 고정한다(이게 32.1절에서 먼저 찌그러지던 카드다, 84→48px). */
 .panelPainCard {
-  margin-top: auto;
+  flex: none;
   border-radius: 16px;
   background: var(--sunken);
   border: none;

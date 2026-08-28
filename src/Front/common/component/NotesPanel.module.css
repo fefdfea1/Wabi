@@ -4,13 +4,17 @@
   display: none;
 }
 
+/* discussion.md 32.2절: 제목·입력칸·저장하기는 줄어들지 않는다(flex:none) — 목록만 남는
+   높이를 채우고 넘치면 스크롤한다(.list 참고). */
 .title {
+  flex: none;
   font-size: 14px;
   font-weight: 700;
   color: var(--strong);
 }
 
 .body {
+  flex: none;
   height: 200px;
   border-radius: 14px;
   padding: 14px 16px;
@@ -25,6 +29,7 @@
 }
 
 .save {
+  flex: none;
   height: 48px;
   border-radius: 13px;
   border: none;
@@ -40,7 +45,17 @@
   cursor: default;
 }
 
+/* discussion.md 32.2절: 목록이 남는 높이를 채우고(flex:1) 넘치면 이 목록만 스크롤한다
+   (overflow-y:auto) — 형제(제목·입력칸·저장하기·먼저 간 사람들이 힘들어한 것)는 제자리다.
+   min-height:0이 반드시 필요하다 — flex 항목의 min-height 기본값(auto)은 내용(메모 전체)의
+   최소 크기를 바닥으로 삼아 flex:1이 있어도 그보다 작아지지 않고, 그 압력을 형제가 대신
+   받아 찌그러진다(26.1절 삭제 버튼의 min-width:auto와 같은 함정). 화면이 아주 낮아 고정
+   요소만으로도 넘칠 때를 대비해 min-height로 바닥을 둔다 — 목록이 0이 돼 안 보이면 안 된다.
+   그 경우의 초과분은 .panel 자체의 overflow-y:auto(아래)가 받아 패널 전체가 스크롤된다. */
 .list {
+  flex: 1;
+  min-height: 96px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -155,11 +170,18 @@
    마운트돼 있고 collapsed일 때 폭 0으로 접힐 뿐, 통째로 언마운트되지 않는다. 안쪽 내용은
    고정 폭(.inner)이라 접히는 동안 줄바꿈 없이 그대로 폭만큼만 잘려 보인다(overflow:hidden). */
 @media (min-width: 1180px) {
+  /* discussion.md 32.2절: 세로 여백(옛 .inner margin:46px 0)을 여기 padding으로 옮겼다 —
+     box-sizing:border-box라 이 padding은 이미 고정된 width:336/height:100dvh 안에 포함되고,
+     .inner는 이 안쪽(패딩 뺀) 공간을 align-items:stretch(기본값)로 그대로 채운다.
+     overflow-y:auto는 화면이 아주 낮아 .list가 min-height까지 줄어도 고정 요소들과 함께
+     넘칠 때만 쓰이는 마지막 대비책이다(평소엔 .list 안쪽 스크롤만으로 충분해 여기까지 안 온다). */
   .panel {
     display: flex;
     flex: none;
     width: 336px;
     height: 100dvh;
+    box-sizing: border-box;
+    padding: 46px 28px;
     position: sticky;
     top: 0;
     overflow-x: hidden;
@@ -173,15 +195,27 @@
 
   /* discussion.md 20.7절: width만 0으로 접으면 border-left-width(1px)가 남아 실측 폭이 1px가
      된다 — "접힌 띠도 남기지 않는다"(20.1절)가 되려면 테두리 폭도 함께 0이어야 한다. */
+  /* discussion.md 32.2절(실측 재확인): padding을 .panel로 옮긴 뒤(위) box-sizing:border-box에서
+     width:0을 줘도 가로 padding(28px×2=56px)이 바닥이 돼 실제로는 56px로 남았다 — 26.1절과
+     같은 함정이 여기도 있었다. padding도 함께 0으로 눌러야 진짜 0이 된다. */
   .panel.collapsed {
     width: 0;
+    padding-left: 0;
+    padding-right: 0;
     border-left-width: 0;
   }
 
+  /* discussion.md 32.2절(PM 실측): .panel(행 flex, align-items:stretch 기본값)이 .inner를
+     패널 높이(padding 뺀 만큼)로 늘려 주는 것까지는 맞지만, .inner 자신의 min-height 기본값
+     (auto)이 내용(메모 전체) 크기를 바닥으로 삼아 그 늘어난 값을 무시하고 내용만큼 커져
+     버렸다 — 26.1절과 같은 함정이다. min-height:0으로 눌러 실제로 패널 높이만큼만 차지하게
+     한다. 세로 여백은 .inner의 margin 대신 .panel의 padding으로 옮겼다 — margin과 height:100%
+     식 계산을 함께 쓰면 마진만큼 패널 밖으로 넘치므로, padding으로 옮기고 .inner는 그
+     안쪽(패딩 뺀) 공간을 stretch로 그대로 채우게 한다. */
   .inner {
     flex: none;
     width: 280px;
-    margin: 46px 28px;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 22px;

@@ -1,4 +1,4 @@
-import { BottomSheet, Button, ListRow } from "wabi";
+import { BottomSheet, ListRow } from "wabi";
 
 const noop = () => {};
 
@@ -25,7 +25,7 @@ export function WithFooter() {
       <BottomSheet
         titleId="pain-title"
         onClose={noop}
-        footer={<Button variant="secondary">닫기</Button>}
+        footer={<button type="button">닫기</button>}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <h2 id="pain-title" style={{ margin: 0, fontSize: 21, fontWeight: 700, letterSpacing: "-0.02em", color: "var(--strong)" }}>

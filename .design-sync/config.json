@@ -8,7 +8,6 @@
   "cssEntry": ".design-sync/ds-styles.css",
   "componentSrcMap": {
     "BottomSheet": "src/Front/common/component/BottomSheet.tsx",
-    "Button": "src/Front/common/component/Button.tsx",
     "Chip": "src/Front/common/component/Chip.tsx",
     "ListRow": "src/Front/common/component/ListRow.tsx",
     "NextActionCard": "src/Front/common/component/NextActionCard.tsx",
@@ -49,7 +48,6 @@
   "readmeHeader": ".design-sync/conventions.md",
   "dtsPropsFor": {
     "BottomSheet": "  /** 제목 요소의 id. aria-labelledby로 연결된다. */\n  titleId: string;\n  /** 딤 영역 클릭과 Esc 키 모두 이 핸들러를 부른다. */\n  onClose: () => void;\n  children: React.ReactNode;\n  /** 본문이 길어져도 항상 하단에 남는 고정 액션 영역. */\n  footer?: React.ReactNode;",
-    "Button": "  /** primary는 ink 배경, secondary는 1.5px ink 테두리. 기본값 primary. */\n  variant?: \"primary\" | \"secondary\";\n  children?: React.ReactNode;\n  disabled?: boolean;\n  onClick?: React.MouseEventHandler<HTMLButtonElement>;\n  className?: string;\n  /** 그 밖의 button 속성을 그대로 받는다. */\n  [key: string]: unknown;",
     "Chip": "  label: React.ReactNode;\n  /** true면 ink 배경 + 700, false면 sunken 배경 + 500. */\n  selected?: boolean;\n  /** 없으면 button이 아니라 span으로 렌더된다(가짜 클릭 어포던스 방지). */\n  onClick?: () => void;",
     "ListRow": "  title: string;\n  /** 제목 아래 한 줄. 마감이나 상태를 상대 표현으로 쓴다. */\n  meta: string;\n  /** true면 제목이 muted + 취소선이 되고 화살표가 사라진다. */\n  done: boolean;\n  /** done이 false일 때만 적용된다. 체크 테두리와 meta가 alert 색이 된다. */\n  urgent: boolean;\n  /** 체크 원에서만 발생한다. 행 클릭으로 전파되지 않는다. */\n  onToggle: () => void;\n  /** 행 본문 클릭. 상세를 여는 데 쓴다. */\n  onOpen: () => void;",
     "NextActionCard": "  title: string;\n  /** 한 문장으로. 본문의 첫 문장만 쓰는 것이 관례다. */\n  description: string;\n  /** 동사로 끝낸다. 예: \"지금 하기\". */\n  ctaLabel: string;\n  onAction: () => void;",

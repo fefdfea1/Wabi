@@ -1418,3 +1418,21 @@ PM이 코드를 훑어 찾은 두 가지입니다.
 - 홈 우측 패널과 메모 탭 **양쪽에서 시작한 삭제가 모두 동작하는지**
 - 저장이 실패하면 알리고 시트가 닫히지 않는지
 - 딤을 클릭했을 때 취소로 동작하는지
+
+## 31. 쓰이지 않던 Button 컴포넌트를 지웁니다 (2026-08-28)
+
+`Button`은 디자인 시스템 11종 중 하나였지만 **앱 화면 어디에서도 쓰이지 않았습니다.** 각 화면이 자기 module CSS의 버튼 클래스를 쓰고 있어 겹치는 자리가 없었습니다. 사용자가 지우기로 정했습니다.
+
+지운 것과 함께 정리한 것입니다.
+
+| 대상 | 처리 |
+|---|---|
+| `src/Front/common/component/Button.tsx` · `Button.module.css` | 삭제 |
+| `.design-sync/previews/Button.tsx` | 삭제 |
+| `.design-sync/config.json`의 `componentSrcMap` · `dtsPropsFor` | `Button` 항목 삭제 |
+| `.design-sync/previews/BottomSheet.tsx` | `footer`에서 `Button`을 쓰고 있어 평범한 `<button>`으로 바꿈 |
+| `.design-sync/conventions.md` · `NOTES.md` | 11종 → 10종, 예시로 들던 이름 교체 |
+
+**동기화 설정을 함께 지운 이유**는, 설정에 남아 있으면 다음 동기화 때 없는 파일을 읽으려다 실패하기 때문입니다. `BottomSheet` 미리보기도 `Button`을 쓰고 있어 그대로 두면 묶음이 깨집니다.
+
+타입 검사와 빌드를 통과했고 정적 프리렌더도 유지됩니다. 앱 화면에는 아무 변화가 없습니다 — 애초에 쓰이지 않던 코드입니다.

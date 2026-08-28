@@ -41,7 +41,7 @@
 
 스타일을 쓰기 전에 `_ds/<folder>/styles.css`와 그것이 `@import`하는 `_ds_bundle.css`를 읽으세요. 토큰 정의와 컴포넌트 스타일이 거기 그대로 있습니다. 컴포넌트별 API는 `<Name>.d.ts`, 사용법은 `<Name>.prompt.md`입니다.
 
-컴포넌트는 11종입니다: `BottomSheet`, `Button`, `Chip`, `ListRow`, `NextActionCard`, `ProgressBar`, `Segment`, `SourceLink`, `TabBar`, `TextArea`, `TextField`.
+컴포넌트는 10종입니다: `BottomSheet`, `Chip`, `ListRow`, `NextActionCard`, `ProgressBar`, `Segment`, `SourceLink`, `TabBar`, `TextArea`, `TextField`.
 
 ## 카피 규칙
 

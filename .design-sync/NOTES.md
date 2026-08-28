@@ -86,7 +86,7 @@ export LD_LIBRARY_PATH="$PWD/root/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
 
 **합성 모드의 가장 큰 함정입니다.** `dist` 도 shipped `.d.ts` 도 없어 props 추출이 전부 실패하고, 손대지 않으면 11종 전부 `[key: string]: unknown` 즉 사실상 `any` 로 나갑니다. `package-validate.mjs` 는 "all .d.ts parse cleanly" 로 통과시킵니다 — **문법이 맞는지만 보지 내용이 비었는지는 보지 않습니다.** 첫 동기화에서 이걸 놓쳐 계약이 빈 채로 업로드됐고, 2차 동기화에서야 발견해 `cfg.dtsPropsFor` 로 11종을 손으로 채웠습니다.
 
-`.d.ts` 는 디자인 에이전트가 코딩할 때 참조하는 API 계약입니다. 비어 있으면 에이전트가 `Button` 에 `variant` 가 있는지도 모른 채 추측합니다.
+`.d.ts` 는 디자인 에이전트가 코딩할 때 참조하는 API 계약입니다. 비어 있으면 에이전트가 `Chip` 에 `variant` 가 있는지도 모른 채 추측합니다.
 
 **컴포넌트를 추가하면 `componentSrcMap` 과 `dtsPropsFor` 두 곳에 모두 넣으세요.** 그리고 빌드 후 반드시 확인하세요.
 

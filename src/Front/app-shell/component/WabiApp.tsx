@@ -30,6 +30,7 @@ export function WabiApp() {
         패널 자체가 필요 없다). 할 일·나 화면은 여전히 이 패널을 전혀 쓰지 않는다(11.6절).
       */}
       <main className={styles.content}>
+        <div className={styles.screens}>
         {/* discussion.md 20.13절 7번: 모바일·태블릿 헤더를 모든 탭에서 같은 자리에 공용으로
             띄운다(데스크톱은 자기 CSS에서 숨고 사이드바가 대신한다). */}
         <AppHeader
@@ -47,7 +48,7 @@ export function WabiApp() {
             total={wabi.total}
             nextTask={wabi.nextTask}
             nextDescription={wabi.nextDescription}
-            weekTasks={wabi.weekTasks}
+            homeTasks={wabi.homeTasks}
             done={wabi.done}
             painCount={wabi.painItems.length}
             onToggleTask={wabi.toggleTask}
@@ -95,7 +96,8 @@ export function WabiApp() {
             onAvatarChange={wabi.updateAvatar}
             onAvatarClear={wabi.requestClearAvatar}
           />
-        ) : null}
+          ) : null}
+        </div>
 
         {/* discussion.md 43절: 베타 기간 동안 본문 맨 아래에 제보처를 둔다. 네 탭 모두에서
             보여야 하므로 각 화면이 아니라 본문 컨테이너 끝에 놓는다. */}

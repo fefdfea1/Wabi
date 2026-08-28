@@ -133,7 +133,7 @@ function runAssertions(): number {
     { id: "b", phase: "pre", title: "B", meta: "", week: false, urgent: false, tag: "", body: "", items: [], done: false },
   ];
   check("pickNextTask: 첫 미완료 항목", pickNextTask(tasks, { a: true })?.id, "b");
-  check("pickNextTask: 모두 완료면 첫 항목 폴백", pickNextTask(tasks, { a: true, b: true })?.id, "a");
+  check("pickNextTask: 모두 완료면 null — 마지막 할 일이 계속 남지 않는다(45절)", pickNextTask(tasks, { a: true, b: true }), null);
   check("pickNextTask: 빈 목록이면 null", pickNextTask([], {}), null);
 
   // --- sortTasksForDisplay (discussion.md 40절, 시간대 무관) ---

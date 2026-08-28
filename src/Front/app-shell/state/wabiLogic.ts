@@ -8,8 +8,9 @@ import { formatDateOnly, parseLocalDateOnly } from "../../common/date/localDate.
  * 첫 항목으로 폴백한다(캔버스 `ALL.find(x => !done[x.id]) || ALL[0]`). 목록이 비어 있으면 null.
  */
 export function pickNextTask(tasks: Task[], done: Record<string, boolean>): Task | null {
-  if (tasks.length === 0) return null;
-  return tasks.find((task) => !done[task.id]) ?? tasks[0];
+  // discussion.md 45절: 모두 끝냈으면 null이다 — 예전에는 첫 항목으로 되돌아가는 바람에,
+  // 다 끝낸 뒤에도 마지막 할 일이 "다음 할 일"로 계속 남아 있었다.
+  return tasks.find((task) => !done[task.id]) ?? null;
 }
 
 /** discussion.md 7절: NEXT 카드 설명은 본문의 첫 문장만(마침표 기준). */

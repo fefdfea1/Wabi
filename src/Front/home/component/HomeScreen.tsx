@@ -12,7 +12,7 @@ export interface HomeScreenProps {
   total: number;
   nextTask: Task | null;
   nextDescription: string;
-  weekTasks: Task[];
+  homeTasks: Task[];
   done: Record<string, boolean>;
   painCount: number;
   onToggleTask: (id: string) => void;
@@ -22,10 +22,10 @@ export interface HomeScreenProps {
   onGoTasks: () => void;
 }
 
-const HOME_WEEK_LIMIT = 3;
+const HOME_TASK_LIMIT = 3;
 
 /**
- * 홈 화면. 시선 순서를 상태(D-day/진행률) → 다음 행동(NEXT) → 목록(이번 주 할 일) → 탭바로 고정한다.
+ * 홈 화면. 시선 순서를 상태(D-day/진행률) → 다음 행동(NEXT) → 목록(할 일) → 탭바로 고정한다.
  * 태블릿(744~1179px)은 헤더가 Wabi 텍스트 + 국가 필로 단순해지고(로고·가이드 버튼은 레일에
  * 이미 있어 중복 표시하지 않는다), 데스크톱(1180px+)은 헤더 자체가 사라진다(사이드바가 대신한다)
  * — 캔버스 06절. 데스크톱 우측 336px 패널(NotesPanel)은 discussion.md 20.1절/20.2절에 따라
@@ -38,7 +38,7 @@ export function HomeScreen({
   total,
   nextTask,
   nextDescription,
-  weekTasks,
+  homeTasks,
   done,
   painCount,
   onToggleTask,
@@ -46,7 +46,7 @@ export function HomeScreen({
   onOpenPain,
   onGoTasks,
 }: HomeScreenProps) {
-  const visibleWeekTasks = weekTasks.slice(0, HOME_WEEK_LIMIT);
+  const visibleTasks = homeTasks.slice(0, HOME_TASK_LIMIT);
 
   return (
     <div className={styles.screen}>
@@ -87,21 +87,25 @@ export function HomeScreen({
           urgent={!!nextTask.urgent}
         />
       ) : (
-        <p className={styles.emptyNext}>아직 등록된 할 일이 없습니다.</p>
+        /* discussion.md 45절: 할 일이 아예 없을 때와 다 끝냈을 때는 다른 상태다 —
+           같은 문구를 쓰면 다 해낸 사람에게 아무것도 안 했다고 말하게 된다. */
+        <p className={styles.emptyNext}>
+          {total > 0 ? "할 일을 모두 마쳤습니다." : "아직 등록된 할 일이 없습니다."}
+        </p>
       )}
 
       <section className={styles.weekBlock}>
         <div className={styles.weekHeader}>
-          <h2 className={styles.weekTitle}>이번 주 할 일</h2>
+          <h2 className={styles.weekTitle}>할 일</h2>
           <button type="button" className={styles.linkButton} onClick={onGoTasks}>
             전체 보기 ›
           </button>
         </div>
-        {visibleWeekTasks.length === 0 ? (
-          <p className={styles.emptyList}>이번 주 할 일이 없습니다.</p>
+        {visibleTasks.length === 0 ? (
+          <p className={styles.emptyList}>등록된 할 일이 없습니다.</p>
         ) : (
           <div>
-            {visibleWeekTasks.map((task) => (
+            {visibleTasks.map((task) => (
               <ListRow
                 key={task.id}
                 title={task.title}

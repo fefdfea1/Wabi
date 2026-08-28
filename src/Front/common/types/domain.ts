@@ -28,12 +28,9 @@ export interface Task {
    */
   meta?: string;
   /**
-   * discussion.md 22.5절: 홈의 "이번 주 할 일"은 이 플래그를 그대로 읽는다
-   * (useWabiApp.ts의 `allTasks.filter((task) => task.week)`). 22.2절에서 dueDate 유무를 추가
-   * 조건으로 걸었다가 되돌린 자리다 — 조사해서 넣은 데이터에는 이 필드가 아예 없으므로,
-   * 플래그만 읽어도 지어낸 값이 섞여 들어오지 않는다.
-   *
-   * 값은 deriveDueDisplay가 마감일을 보고 계산해 채운다. 지어낸 고정값을 넣지 않는다.
+   * discussion.md 44절: 홈 목록이 전체 할 일을 보여주게 되면서 **이 플래그를 읽는 곳이 없어졌다.**
+   * 마감이 이번 주 안인지를 나타내는 값 자체는 여전히 deriveDueDisplay가 계산해 채우지만,
+   * 지금 화면 어디에서도 쓰지 않는다. 다시 쓸 일이 없다면 지워도 된다.
    */
   week?: boolean;
   /** discussion.md 22.2절: meta와 같은 이유로 마감일이 있을 때만 계산된다. 없으면 강조 색을 쓰지 않는다. */

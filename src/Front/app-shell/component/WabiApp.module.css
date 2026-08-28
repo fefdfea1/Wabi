@@ -16,7 +16,20 @@
   background: var(--bg);
 }
 
+/* discussion.md 43.4절: 세로 흐름으로 두어 제보처(.feedback)를 남는 높이만큼 아래로 민다.
+   본문이 짧아도 제보처가 화면 아래쪽에 놓이고, 길면 자연히 내용 뒤로 따라간다. */
 .content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* discussion.md 43.4절(PM 실측): 화면들을 감싸는 블록. .content를 flex로 바꾸자 각 화면의
+   margin:0 auto가 flex의 stretch를 무력화해 화면이 내용 크기로 줄어들었다(홈이 620 → 290).
+   블록 컨테이너를 하나 두어 화면들은 예전처럼 폭을 채우게 하고, 남는 높이는 이 상자가 먹어
+   제보처를 아래로 민다. */
+.screens {
   flex: 1;
   min-width: 0;
 }
@@ -72,15 +85,18 @@
 /* discussion.md 43절: 본문 맨 아래 제보처. 읽는 흐름을 끊지 않도록 위쪽 여백을 크게 두고,
    본문보다 옅은 색(--muted)으로 물러나 있게 한다. 42.2절에서 --muted가 세 배경 위 모두
    4.5:1을 넘도록 맞췄으므로 옅어도 읽을 수 있다. */
+/* discussion.md 43.4절: margin-top:auto로 남는 높이를 전부 위쪽 여백으로 밀어, 본문이 짧을 때도
+   제보처가 화면 아래쪽에 놓인다. 바닥에 딱 붙지 않도록 아래 여백을 조금 남긴다.
+   좌우 여백은 각 화면(.screen)의 20px과 맞춰 글의 왼쪽 선이 어긋나지 않게 한다. */
 .feedback {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-top: 40px;
-  padding: 24px 0 8px;
-  border-top: 1px solid var(--line);
-  text-align: center;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  margin-top: auto;
+  padding: 20px 20px 16px;
+  text-align: left;
 }
 
 .feedbackText {
@@ -90,11 +106,12 @@
 }
 
 /* 최소 44px 높이를 확보해 손가락으로도 누를 수 있게 한다(42.3절과 같은 이유). */
+/* 최소 44px 높이를 확보해 손가락으로도 누를 수 있게 한다(42.3절과 같은 이유). 좌측 정렬이라
+   좌우 padding은 두지 않는다 — 두면 글의 왼쪽 선이 설명 문구와 어긋난다. */
 .feedbackMail {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 8px;
   font-size: 13.5px;
   color: var(--text);
   text-decoration: underline;
@@ -104,5 +121,17 @@
 @media (hover: hover) {
   .feedbackMail:hover {
     color: var(--strong);
+  }
+}
+
+/* 캔버스 06절: 744px 이상에서 본문이 620 중앙 정렬로 바뀌므로 제보처도 같은 열에 맞춘다 —
+   그러지 않으면 본문 글보다 훨씬 왼쪽에 홀로 놓인다. */
+@media (min-width: 744px) {
+  .feedback {
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
   }
 }

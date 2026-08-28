@@ -173,13 +173,16 @@ export function useWabiApp() {
 
   /**
    * discussion.md 40절: 마감이 이른 것이 위, 마감을 정하지 않은 것은 맨 아래.
-   * 41절: 목록 세 곳(할 일 탭·홈의 이번 주 할 일·다음 할 일 카드)이 모두 이 하나에서 갈라져
+   * 41절: 목록 세 곳(할 일 탭·홈 목록·다음 할 일 카드)이 모두 이 하나에서 갈라져
    * 나오므로 순서가 어긋날 수 없다. 거르기는 순서를 바꾸지 않으니 정렬을 먼저 한 번만 한다.
    */
   const sortedTasks = useMemo(() => sortTasksForDisplay(allTasks), [allTasks]);
   const phaseTasks = sortedTasks.filter((task) => task.phase === phase);
   const phaseDoneCount = phaseTasks.filter((task) => countryDone[task.id]).length;
-  const weekTasks = sortedTasks.filter((task) => task.week);
+  // discussion.md 44절: 홈 목록은 마감이 이번 주 안인 것만 거르지 않는다 — 마감을 정하지 않은
+  // 할 일은 week가 아예 없어 홈에서 사라져 버렸다. 전체를 40절 순서로 보여주고, 마감 없는 것은
+  // 그 순서에 따라 자연히 맨 아래로 간다.
+  const homeTasks = sortedTasks;
   // discussion.md 41절: 다음 할 일도 같은 순서에서 고른다 — 목록 맨 위가 가장 급한 할 일인데
   // 카드가 다른 것을 가리키면 두 곳이 서로 다른 말을 한다.
   const nextTask = pickNextTask(sortedTasks, countryDone);
@@ -623,7 +626,7 @@ export function useWabiApp() {
     doneCount,
     phaseTasks,
     phaseDoneCount,
-    weekTasks,
+    homeTasks,
     nextTask,
     nextDescription,
     done: countryDone,
